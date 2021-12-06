@@ -6,6 +6,7 @@
  */
 
 #include "google-base/gs201-common.dtsi"
+#include "google-base/gs201-common-wlan-wcn6740.dtsi"
 #include "google-base/gs201-cloudripper-battery.dtsi"
 #include "google-base/gs201-cloudripper-bcl.dtsi"
 #include "google-base/gs201-cloudripper-bluetooth.dtsi"
