@@ -9,7 +9,6 @@
 #include "google-base/gs201-common-wlan-wcn6740.dtsi"
 #include "google-base/gs201-cloudripper-battery.dtsi"
 #include "google-base/gs201-cloudripper-bcl.dtsi"
-#include "google-base/gs201-cloudripper-bluetooth.dtsi"
 #include "google-base/gs201-cloudripper-charging.dtsi"
 #include "google-base/gs201-cloudripper-cp-s5300-sit.dtsi"
 #include "google-base/gs201-cloudripper-ese.dtsi"
@@ -21,6 +20,7 @@
 #include "google-base/gs201-ravenclaw-wcharger.dtsi"
 #include "google-base/gs201-ravenclaw-usecases.dtsi"
 
+#include "gs201-lynx-bluetooth.dtsi"
 #include "gs201-lynx-camera-pmic.dtsi"
 #include "gs201-lynx-camera.dtsi"
 #include "gs201-lynx-display.dtsi"
