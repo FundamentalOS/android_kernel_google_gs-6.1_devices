@@ -14,10 +14,11 @@
 &odm {
 	btqcom: btqcom {
 		compatible = "qcom,wcn6740";
-		qcom,bt-reset-gpio = <&gpp16 2 GPIO_ACTIVE_HIGH>; /* BT_EN */
+		qcom,bt-reset-gpio = <&gpp16 2 GPIO_ACTIVE_HIGH>;  /* BT_EN */
 		qcom,wl-reset-gpio = <&gph2 4 GPIO_ACTIVE_HIGH>;   /* WL_EN */
 		qcom,bthostwake_gpio = <&gpa6 6 GPIO_ACTIVE_HIGH>; /* BT_HOST_WAKE */
-		qcom,btwake_gpio = <&gpp16 3 GPIO_ACTIVE_HIGH>; /* BT_DEV_WAKE */
+		qcom,btwake_gpio = <&gpp16 3 GPIO_ACTIVE_HIGH>;    /* BT_DEV_WAKE */
+		qcom,xo-clk-gpio = <&gph2 5 GPIO_ACTIVE_HIGH>;     /* EN_0P95 */
 		status = "okay";
 	};
 };
