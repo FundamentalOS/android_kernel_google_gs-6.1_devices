@@ -13,7 +13,7 @@
 #include <dt-bindings/sound/google-aoc.h>
 
 &aoc {
-	aoc-board-cfg = "P10";
+	aoc-board-cfg = "L10";
 };
 
 &dai_be_tdm0_rx {
