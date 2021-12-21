@@ -9,6 +9,10 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/samsung.h>
 
+&serial_18 {
+	status = "okay";
+};
+
 /delete-node/ &btbcm;
 
 &odm {
