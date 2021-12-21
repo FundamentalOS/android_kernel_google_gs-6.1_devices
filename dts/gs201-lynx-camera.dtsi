@@ -21,18 +21,18 @@
 };
 
 &slg51002_ldo3 {
-	regulator-min-microvolt = <2900000>;
-	regulator-max-microvolt = <2900000>;
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
 };
 
 &slg51002_ldo4 {
-	regulator-min-microvolt = <2900000>;
-	regulator-max-microvolt = <2900000>;
+	regulator-min-microvolt = <2850000>;
+	regulator-max-microvolt = <2850000>;
 };
 
 &slg51002_ldo5 {
-	regulator-min-microvolt = <3000000>;
-	regulator-max-microvolt = <3000000>;
+	regulator-min-microvolt = <2850000>;
+	regulator-max-microvolt = <2850000>;
 };
 
 &slg51002_ldo6 {
@@ -46,8 +46,8 @@
 };
 
 &slg51002_ldo8 {
-	regulator-min-microvolt = <1100000>;
-	regulator-max-microvolt = <1100000>;
+	regulator-min-microvolt = <1050000>;
+	regulator-max-microvolt = <1050000>;
 };
 
 &s_ldo12_reg {
@@ -186,20 +186,20 @@
 	fragment@lwiscamera {
 		target-path = "/";
 		__overlay__ {
-			/* REAR CAMERA GN1 */
+			/* REAR CAMERA IMX787 */
 			sensor0: sensor@0 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-gn1";
+				node-name = "sensor-imx787";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_1>;
-				i2c-addr = <0x3D>;
+				i2c-addr = <0x1A>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
-				reg-value-bitwidth = <16>;
+				reg-value-bitwidth = <8>;
 
 				/* GPIOs */
 				/* CSID_RST_L GPP2[2] */
@@ -208,8 +208,10 @@
 				/* Power supplies */
 				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
 				ldo1-supply = <&slg51002_ldo1>;
+				ldo3-supply = <&slg51002_ldo3>;
+				ldo4-supply = <&slg51002_ldo4>;
+				ldo5-supply = <&slg51002_ldo5>;
 				ldo8-supply = <&slg51002_ldo8>;
-				gpio3-supply = <&slg51002_gpio3>;
 
 				clocks =
 					<&clock CIS_CLK3>,
@@ -218,7 +220,7 @@
 					"CIS_CLK3",
 					"GATE_DFTMUX_CMU_CIS_CLK3";
 				clock-rates =
-					<26000000>,
+					<24000000>,
 					<0>;
 
 				/* MCLK Control */
@@ -229,12 +231,16 @@
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
-					"gpio3",
-					"ldo8",
+					"ldo5",
+					"ldo4",
 					"ldo1",
+					"ldo3",
+					"ldo8",
 					"reset",
 					"mclk_on";
 				power-up-seq-types =
+					"regulator",
+					"regulator",
 					"regulator",
 					"regulator",
 					"regulator",
@@ -243,19 +249,23 @@
 					"pinctrl";
 				power-up-seq-delays-us =
 					<1000
-					 0
-					 0
-					 2000
 					 1000
-					 9000>;
+					 0
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 
 				/* Power down sequence */
 				power-down-seqs =
 					"mclk_off",
 					"reset",
-					"ldo1",
 					"ldo8",
-					"gpio3",
+					"ldo3",
+					"ldo1",
+					"ldo4",
+					"ldo5",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
 					"pinctrl",
@@ -263,14 +273,18 @@
 					"regulator",
 					"regulator",
 					"regulator",
+					"regulator",
+					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
 					<1000
 					 1000
-					 0
-					 0
-					 6000
-					 0>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 			};
 
 			/* FRONT CAMERA 3J1 */
@@ -431,16 +445,16 @@
 					 1000>;
 			};
 
-			/* Eeprom lc898128 for gn1*/
+			/* Eeprom lc898129 for IMX787*/
 			eeprom0: eeprom@0 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "eeprom-lc898128";
+				node-name = "eeprom-lc898129";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_1>;
-				i2c-addr = <0x24>;
+				i2c-addr = <0x3B>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
@@ -451,17 +465,17 @@
 				ldo1-supply = <&slg51002_ldo1>;
 				ldo3-supply = <&slg51002_ldo3>;
 				ldo4-supply = <&slg51002_ldo4>;
+				ldo5-supply = <&slg51002_ldo5>;
 				ldo8-supply = <&slg51002_ldo8>;
-				gpio3-supply = <&slg51002_gpio3>;
 
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
-					"gpio3",
-					"ldo8",
+					"ldo5",
+					"ldo4",
 					"ldo1",
 					"ldo3",
-					"ldo4";
+					"ldo8";
 				power-up-seq-types =
 					"regulator",
 					"regulator",
@@ -471,19 +485,19 @@
 					"regulator";
 				power-up-seq-delays-us =
 					<1000
+					 1000
 					 0
 					 1000
 					 1000
-					 0
-					 0>;
+					 1000>;
 
 				/* Power down sequence */
 				power-down-seqs =
-					"ldo4",
+					"ldo8",
 					"ldo3",
 					"ldo1",
-					"ldo8",
-					"gpio3",
+					"ldo4",
+					"ldo5",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
 					"regulator",
@@ -493,11 +507,11 @@
 					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
-					<0
-					 0
+					<1000
 					 1000
 					 1000
-					 0
+					 1000
+					 1000
 					 1000>;
 			};
 
