@@ -16,8 +16,8 @@
 };
 
 &slg51002_ldo2 {
-	regulator-min-microvolt = <2850000>;
-	regulator-max-microvolt = <2850000>;
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2800000>;
 };
 
 &slg51002_ldo3 {
@@ -36,13 +36,13 @@
 };
 
 &slg51002_ldo6 {
-	regulator-min-microvolt = <1100000>;
-	regulator-max-microvolt = <1100000>;
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
 };
 
 &slg51002_ldo7 {
-	regulator-min-microvolt = <1100000>;
-	regulator-max-microvolt = <1100000>;
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
 };
 
 &slg51002_ldo8 {
@@ -104,6 +104,12 @@
 		samsung,pin-drv = <GS101_PIN_DRV_5_MA>;
 	};
 	sensor_mclk1_fn: sensor-mclk1-fn {
+		samsung,pin-drv = <GS101_PIN_DRV_5_MA>;
+	};
+	sensor_mclk2_out: sensor-mclk2-out {
+		samsung,pin-drv = <GS101_PIN_DRV_5_MA>;
+	};
+	sensor_mclk2_fn: sensor-mclk2-fn {
 		samsung,pin-drv = <GS101_PIN_DRV_5_MA>;
 	};
 	sensor_mclk4_out: sensor-mclk4-out {
@@ -287,27 +293,27 @@
 					 1000>;
 			};
 
-			/* FRONT CAMERA 3J1 */
+			/* FRONT CAMERA IMX712 */
 			sensor1: sensor@1 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-3j1";
+				node-name = "sensor-imx712";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_2>;
-				i2c-addr = <0x10>;
+				i2c-addr = <0x1A>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
-				reg-value-bitwidth = <16>;
+				reg-value-bitwidth = <8>;
 
 				/* GPIOs */
 				reset-gpios = <&gpp4 2 GPIO_ACTIVE_HIGH>;
 
 				/* Power supplies */
 				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
-				ldo5-supply = <&slg51002_ldo5>;
+				gpio2-supply = <&slg51002_gpio2>;
 				ldo7-supply = <&slg51002_ldo7>;
 
 				clocks =
@@ -328,50 +334,50 @@
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
+					"gpio2",
 					"ldo7",
-					"ldo5",
-					"mclk_on",
-					"reset";
+					"reset",
+					"mclk_on";
 				power-up-seq-types =
 					"regulator",
 					"regulator",
 					"regulator",
-					"pinctrl",
-					"gpio";
+					"gpio",
+					"pinctrl";
 				power-up-seq-delays-us =
 					<1000
 					 1000
 					 1000
 					 1000
-					 8000>;
+					 1000>;
 
 				/* Power down sequence */
 				power-down-seqs =
-					"reset",
 					"mclk_off",
-					"ldo5",
+					"reset",
 					"ldo7",
+					"gpio2",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
-					"gpio",
 					"pinctrl",
+					"gpio",
 					"regulator",
 					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
-					<0
+					<1000
 					 1000
 					 1000
 					 1000
 					 1000>;
 			};
 
-			/* REAR ULTRA WIDE CAMERA IMX386 */
+			/* REAR ULTRA WIDE CAMERA IMX712 */
 			sensor2: sensor@2 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-imx386";
+				node-name = "sensor-imx712-uw";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_3>;
@@ -407,40 +413,40 @@
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
-					"ldo6",
 					"ldo2",
-					"mclk_on",
-					"reset";
+					"ldo6",
+					"reset",
+					"mclk_on";
 				power-up-seq-types =
 					"regulator",
 					"regulator",
 					"regulator",
-					"pinctrl",
-					"gpio";
+					"gpio",
+					"pinctrl";
 				power-up-seq-delays-us =
 					<1000
-					 0
+					 1000
 					 1000
 					 1000
 					 10000>;
 
 				/* Power down sequence */
 				power-down-seqs =
-					"reset",
 					"mclk_off",
-					"ldo2",
+					"reset",
 					"ldo6",
+					"ldo2",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
-					"gpio",
 					"pinctrl",
+					"gpio",
 					"regulator",
 					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
 					<1000
 					 1000
-					 0
+					 1000
 					 1000
 					 1000>;
 			};
