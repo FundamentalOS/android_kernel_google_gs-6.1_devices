@@ -28,3 +28,4 @@
 #include "gs201-lynx-touch.dtsi"
 #include "gs201-lynx-thermal.dtsi"
 #include "gs201-lynx-audio.dtsi"
+#include "gs201-lynx-usb.dtsi"
