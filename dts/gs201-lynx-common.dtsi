@@ -17,9 +17,9 @@
 #include "google-base/gs201-cloudripper-sbbm.dtsi"
 
 #include "google-base/gs201-ravenclaw-fingerprint.dtsi"
-#include "google-base/gs201-ravenclaw-wcharger.dtsi"
 #include "google-base/gs201-ravenclaw-usecases.dtsi"
 
+#include "gs201-lynx-wcharger.dtsi"
 #include "gs201-lynx-bluetooth.dtsi"
 #include "gs201-lynx-camera-pmic.dtsi"
 #include "gs201-lynx-camera.dtsi"
