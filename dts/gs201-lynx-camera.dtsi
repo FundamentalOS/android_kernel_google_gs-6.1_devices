@@ -521,16 +521,16 @@
 					 1000>;
 			};
 
-			/* Eeprom m24c64x for 3j1 */
+			/* Eeprom m24c64x for imx712 */
 			eeprom1: eeprom@1 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "eeprom-m24c64x-3j1";
+				node-name = "eeprom-m24c64x-imx712";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_2>;
-				i2c-addr = <0x51>;
+				i2c-addr = <0x50>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
@@ -556,12 +556,12 @@
 					<1000>;
 			};
 
-			/* Eeprom m24c64x for imx386 */
+			/* Eeprom m24c64x for imx712-uw */
 			eeprom2: eeprom@2 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "eeprom-m24c64x-imx386";
+				node-name = "eeprom-m24c64x-imx712-uw";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_3>;
