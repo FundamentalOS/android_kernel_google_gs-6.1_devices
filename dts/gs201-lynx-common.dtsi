@@ -25,7 +25,6 @@
 #include "gs201-lynx-camera.dtsi"
 #include "gs201-lynx-display.dtsi"
 #include "gs201-lynx-pmic.dtsi"
-#include "gs201-lynx-touch.dtsi"
 #include "gs201-lynx-thermal.dtsi"
 #include "gs201-lynx-audio.dtsi"
 #include "gs201-lynx-usb.dtsi"
