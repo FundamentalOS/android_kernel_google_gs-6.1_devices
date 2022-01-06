@@ -451,7 +451,7 @@
 					 1000>;
 			};
 
-			/* Eeprom lc898129 for IMX787*/
+			/* Eeprom lc898129 for imx787 */
 			eeprom0: eeprom@0 {
 				compatible = "google,lwis-i2c-device";
 
@@ -460,7 +460,7 @@
 
 				/* I2C */
 				i2c-bus = <&hsi2c_1>;
-				i2c-addr = <0x3B>;
+				i2c-addr = <0x24>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
@@ -468,55 +468,34 @@
 
 				/* Power supplies */
 				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
-				ldo1-supply = <&slg51002_ldo1>;
-				ldo3-supply = <&slg51002_ldo3>;
 				ldo4-supply = <&slg51002_ldo4>;
 				ldo5-supply = <&slg51002_ldo5>;
-				ldo8-supply = <&slg51002_ldo8>;
 
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
 					"ldo5",
-					"ldo4",
-					"ldo1",
-					"ldo3",
-					"ldo8";
+					"ldo4";
 				power-up-seq-types =
-					"regulator",
-					"regulator",
-					"regulator",
 					"regulator",
 					"regulator",
 					"regulator";
 				power-up-seq-delays-us =
 					<1000
 					 1000
-					 0
-					 1000
-					 1000
 					 1000>;
 
 				/* Power down sequence */
 				power-down-seqs =
-					"ldo8",
-					"ldo3",
-					"ldo1",
 					"ldo4",
 					"ldo5",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
 					"regulator",
 					"regulator",
-					"regulator",
-					"regulator",
-					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
 					<1000
-					 1000
-					 1000
-					 1000
 					 1000
 					 1000>;
 			};
@@ -591,54 +570,12 @@
 					<1000>;
 			};
 
-			/* Actuator ak7377 for gn1*/
+			/* Actuator lc898129 for imx787 */
 			actuator0: actuator@0 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "act-ak7377";
-
-				/* I2C */
-				i2c-bus = <&hsi2c_1>;
-				i2c-addr = <0xC>;
-
-				/* Registers */
-				reg-addr-bitwidth = <8>;
-				reg-value-bitwidth = <8>;
-
-				/* Power supplies */
-				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
-				ldo4-supply = <&slg51002_ldo4>;
-
-				/* Power up sequence */
-				power-up-seqs =
-					"s2mpg13_ldo12",
-					"ldo4";
-				power-up-seq-types =
-					"regulator",
-					"regulator";
-				power-up-seq-delays-us =
-					<0
-					 0>;
-
-				/* Power down sequence */
-				power-down-seqs =
-					"ldo4",
-					"s2mpg13_ldo12";
-				power-down-seq-types =
-					"regulator",
-					"regulator";
-				power-down-seq-delays-us =
-					<0
-					 0>;
-			};
-
-			/* Ois lc898128 for gn1*/
-			ois0: ois@0 {
-				compatible = "google,lwis-i2c-device";
-
-				/* Device node name */
-				node-name = "ois-lc898128";
+				node-name = "act-lc898129";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_1>;
@@ -650,14 +587,14 @@
 
 				/* Power supplies */
 				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
-				ldo3-supply = <&slg51002_ldo3>;
-				gpio2-supply = <&slg51002_gpio2>;
+				ldo4-supply = <&slg51002_ldo4>;
+				ldo5-supply = <&slg51002_ldo5>;
 
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
-					"ldo3",
-					"gpio2";
+					"ldo5",
+					"ldo4";
 				power-up-seq-types =
 					"regulator",
 					"regulator",
@@ -669,17 +606,66 @@
 
 				/* Power down sequence */
 				power-down-seqs =
-					"gpio2",
-					"ldo3",
+					"ldo4",
+					"ldo5",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
 					"regulator",
 					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
-					<5000
-					 0
-					 0>;
+					<1000
+					 1000
+					 1000>;
+			};
+
+			/* Ois lc898129 for imx787 */
+			ois0: ois@0 {
+				compatible = "google,lwis-i2c-device";
+
+				/* Device node name */
+				node-name = "ois-lc898129";
+
+				/* I2C */
+				i2c-bus = <&hsi2c_1>;
+				i2c-addr = <0x24>;
+
+				/* Registers */
+				reg-addr-bitwidth = <16>;
+				reg-value-bitwidth = <32>;
+
+				/* Power supplies */
+				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
+				ldo4-supply = <&slg51002_ldo4>;
+				ldo5-supply = <&slg51002_ldo5>;
+
+				/* Power up sequence */
+				power-up-seqs =
+					"s2mpg13_ldo12",
+					"ldo5",
+					"ldo4";
+				power-up-seq-types =
+					"regulator",
+					"regulator",
+					"regulator";
+				power-up-seq-delays-us =
+					<1000
+					 1000
+					 1000>;
+
+				/* Power down sequence */
+				power-down-seqs =
+					"ldo4",
+					"ldo5",
+					"s2mpg13_ldo12";
+				power-down-seq-types =
+					"regulator",
+					"regulator",
+					"regulator";
+				power-down-seq-delays-us =
+					<1000
+					 1000
+					 1000>;
 			};
 
 			flash0: flash@0 {
