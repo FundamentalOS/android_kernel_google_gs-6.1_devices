@@ -22,8 +22,6 @@ ext_modules += power/reset
 ext_modules += touch/common
 ext_modules += touch/focaltech/ft3658
 ext_modules += touch/goodix
-ext_modules += touch/sec
-ext_modules += touch/synaptics
 ext_modules += wlan/wcn6740/cnss2
 ext_modules += wlan/wcn6740/wlan/qcacld-3.0
 ext_modules += video/gchips
@@ -47,8 +45,6 @@ allmodules: $(ext_modules) $(install_uapi_headers_targets) depmod
 touch/focaltech/ft3658: | touch/common
 
 touch/goodix: | touch/common
-
-touch/sec: | touch/common
 
 aoc/alsa: | aoc
 
