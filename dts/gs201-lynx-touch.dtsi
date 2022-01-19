@@ -22,6 +22,12 @@
  * AOC2AP: XAOC_GPIO8 - gpio_in[74] -> XEINT_19 - GPA8[7]
  */
 
+&spi_0 {
+	dma-mode;
+	dmas = <&pdma0 0 &pdma0 1>;
+	swap-mode = <1>;
+};
+
 &spitouch {
 	status = "ok";
 	compatible = "goodix,nottingham";
