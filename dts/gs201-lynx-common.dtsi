@@ -28,6 +28,7 @@
 #include "gs201-lynx-thermal.dtsi"
 #include "gs201-lynx-audio.dtsi"
 #include "gs201-lynx-usb.dtsi"
+#include "gs201-lynx-battery.dtsi"
 
 &aoc {
 	sensor_mag-supply = <&m_ldo24_reg>;
