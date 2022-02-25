@@ -9,14 +9,6 @@
 #include <dt-bindings/pinctrl/samsung.h>
 #include <dt-bindings/regulator/samsung,s2mpg-regulator.h>
 
-&m_ldo25_reg {
-	/delete-property/ regulator-always-on;
-};
-
-&m_ldo26_reg {
-	/delete-property/ regulator-always-on;
-};
-
 /*
  * Touch is connected to spi_0, pins:
  *   CLK=GPP20[0], MOSI=GPP20[1], MISO=GPP20[2], CS=GPP20[3]

@@ -15,8 +15,14 @@
 };
 
 /* Touch: touch controller requires 3.0v typ */
+&m_ldo25_reg {
+	/delete-property/ regulator-always-on;
+};
+
 &m_ldo26_reg {
+	regulator-min-microvolt = <3000000>;
 	regulator-max-microvolt = <3000000>;
+	/delete-property/ regulator-always-on;
 };
 
 /* Display: vci-supply voltage */
