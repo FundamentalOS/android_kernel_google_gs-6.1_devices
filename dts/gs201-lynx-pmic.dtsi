@@ -30,3 +30,19 @@
 	regulator-min-microvolt = <3025000>;
 	regulator-max-microvolt = <3025000>;
 };
+
+&s_ext6_rail {
+	shunt-res-uohms = <5000>;
+	schematic-name = "VSYS_PWR_CAM";
+	subsys-name = "Multimedia";
+};
+
+&s_ldo16_reg {
+	schematic-name = "L16S_SPARE";
+	subsys-name = "Spare";
+};
+
+&s_ldo17_reg {
+	schematic-name = "L17S_SPARE";
+	subsys-name = "Spare";
+};
