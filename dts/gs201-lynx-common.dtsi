@@ -8,7 +8,6 @@
 #include "google-base/gs201-common.dtsi"
 #include "google-base/gs201-cloudripper-battery.dtsi"
 #include "google-base/gs201-cloudripper-bcl.dtsi"
-#include "google-base/gs201-cloudripper-charging.dtsi"
 #include "google-base/gs201-cloudripper-cp-s5300-sit.dtsi"
 #include "google-base/gs201-cloudripper-ese.dtsi"
 #include "google-base/gs201-cloudripper-gsa-gsc.dtsi"
@@ -28,6 +27,7 @@
 #include "gs201-lynx-audio.dtsi"
 #include "gs201-lynx-usb.dtsi"
 #include "gs201-lynx-battery.dtsi"
+#include "gs201-lynx-charging.dtsi"
 #include "gs201-lynx-wlan.dtsi"
 
 &aoc {
