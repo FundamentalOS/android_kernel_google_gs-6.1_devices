@@ -9,11 +9,13 @@ VENDOR_RAMDISK_BINARY=${ROOT_DIR}/private/devices/google/lynx/vendor_ramdisk-lyn
 MAKE_GOALS="$MAKE_GOALS
 modules
 google/devices/lynx/google-base/gs201-a0.dtb
+google/devices/lynx/google-base/gs201-b0.dtb
 google/devices/lynx/dtbo.img
 "
 
 FILES="
 arch/arm64/boot/dts/google/devices/lynx/google-base/gs201-a0.dtb
+arch/arm64/boot/dts/google/devices/lynx/google-base/gs201-b0.dtb
 arch/arm64/boot/dts/google/devices/lynx/dtbo.img
 "
 
