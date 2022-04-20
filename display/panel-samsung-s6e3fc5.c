@@ -171,8 +171,8 @@ static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x00, 0x22, 0xD8); /* global para */
 	ret = mipi_dsi_dcs_read(dsi, 0xD8, hs_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1);
 	if (ret == (LHBM_GAMMA_CMD_SIZE - 1)) {
-		/* fill in gamma write command 0x65 in offset 0 */
-		hs_cmd[0] = 0x65;
+		/* fill in gamma write command 0x66 in offset 0 */
+		hs_cmd[0] = 0x66;
 		exynos_bin2hex(hs_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1,
 			buf, sizeof(buf));
 		dev_info(ctx->dev, "%s: hs_gamma: %s\n", __func__, buf);
@@ -182,8 +182,8 @@ static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x00, 0x1D, 0xD8); /* global para */
 	ret = mipi_dsi_dcs_read(dsi, 0xD8, ns_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1);
 	if (ret == (LHBM_GAMMA_CMD_SIZE - 1)) {
-		/* fill in gamma write command 0x65 in offset 0 */
-		ns_cmd[0] = 0x65;
+		/* fill in gamma write command 0x66 in offset 0 */
+		ns_cmd[0] = 0x66;
 		exynos_bin2hex(ns_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1,
 			buf, sizeof(buf));
 		dev_info(ctx->dev, "%s: ns_gamma: %s\n", __func__, buf);
@@ -194,8 +194,8 @@ static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x00, 0x18, 0xD8); /* global para */
 	ret = mipi_dsi_dcs_read(dsi, 0xD8, aod_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1);
 	if (ret == (LHBM_GAMMA_CMD_SIZE - 1)) {
-		/* fill in gamma write command 0x65 in offset 0 */
-		aod_cmd[0] = 0x65;
+		/* fill in gamma write command 0x66 in offset 0 */
+		aod_cmd[0] = 0x66;
 		exynos_bin2hex(aod_cmd + 1, LHBM_GAMMA_CMD_SIZE - 1,
 			buf, sizeof(buf));
 		dev_info(ctx->dev, "%s: aod_gamma: %s\n", __func__, buf);
