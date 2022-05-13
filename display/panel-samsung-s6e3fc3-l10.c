@@ -737,8 +737,8 @@ static const struct exynos_panel_mode s6e3fc3_l10_modes[] = {
 			.vsync_end = 2400 + 12 + 4, // add vsa
 			.vtotal = 2400 + 12 + 4 + 26, // add vbp
 			.flags = 0,
-			.width_mm = 64,
-			.height_mm = 142,
+			.width_mm = 70,
+			.height_mm = 149,
 		},
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
@@ -770,8 +770,8 @@ static const struct exynos_panel_mode s6e3fc3_l10_modes[] = {
 			.vsync_end = 2400 + 12 + 4, // add vsa
 			.vtotal = 2400 + 12 + 4 + 26, // add vbp
 			.flags = 0,
-			.width_mm = 64,
-			.height_mm = 142,
+			.width_mm = 70,
+			.height_mm = 149,
 		},
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
@@ -807,8 +807,8 @@ static const struct exynos_panel_mode s6e3fc3_l10_lp_mode = {
 		.vtotal = 2400 + 12 + 4 + 26, // add vbp
 		.flags = 0,
 		.type = DRM_MODE_TYPE_DRIVER,
-		.width_mm = 64,
-		.height_mm = 142,
+		.width_mm = 70,
+		.height_mm = 149,
 	},
 	.exynos_mode = {
 		.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
