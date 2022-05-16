@@ -44,6 +44,11 @@
 	goodix,panel-max-w = <255>;
 	goodix,sleep-enable;
 
+	goog,offload-enable;
+	goog,v4l2-enable;
+	goog,touch_offload_id = /bits/ 8 <'l' '1' '0' '0'>;
+	goog,display-resolution = /bits/ 16 <1080 2400>;
+	goog,channel-num = /bits/ 16 <16 34>;
 
 	controller-data {
 		cs-gpio = <&gpp20 3 0>;
