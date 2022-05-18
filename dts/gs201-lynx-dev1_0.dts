@@ -26,3 +26,8 @@
 &serial_0 {
 	status = "okay";
 };
+
+&aoc {
+	sensor_mag-supply = <&m_ldo24_reg>;
+	sensor_power_list = "sensor_mag", "sensor_1v8", "sensor_3v3";
+};
