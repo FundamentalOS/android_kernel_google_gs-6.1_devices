@@ -5,10 +5,14 @@ dtb-$(CONFIG_SOC_GS201) += \
 dtbo-y += \
         gs201-lynx-dev1_0.dtbo \
         gs201-lynx-proto1_0.dtbo \
-        gs201-lynx-proto1_1.dtbo
+        gs201-lynx-proto1_1.dtbo \
+        gs201-lynx-evt1_0.dtbo \
+        gs201-lynx-evt1_0-wingboard.dtbo
 
 gs201-lynx-dev1_0.dtbo-base := google-base/gs201-a0.dtb
 gs201-lynx-proto1_0.dtbo-base := google-base/gs201-a0.dtb
 gs201-lynx-proto1_1.dtbo-base := google-base/gs201-b0.dtb
+gs201-lynx-evt1_0.dtbo-base := google-base/gs201-b0.dtb
+gs201-lynx-evt1_0-wingboard.dtbo-base := google-base/gs201-b0.dtb
 
 MKDTIMG_FLAGS += --page_size=4096  --id=/:board_id --rev=/:board_rev
