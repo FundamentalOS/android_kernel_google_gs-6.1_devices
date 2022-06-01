@@ -22,8 +22,8 @@
 
 				google,fv-max-uv = <4450000>;
 
-				google,thermal-mitigation = <4000000 3000000
-							2000000 1000000 500000>;
+				google,thermal-mitigation = <4300000 3500000 3000000
+					2500000 2000000 1500000 1000000 500000>;
 				google,wlc-thermal-mitigation = <1100000 500000 250000 110000>;
 
 				/* b/170700459 thresholds, updated in b/191070950 */
