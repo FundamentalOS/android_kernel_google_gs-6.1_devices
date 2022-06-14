@@ -313,7 +313,7 @@
 
 				/* Power supplies */
 				s2mpg13_ldo12-supply = <&s_ldo12_reg>;
-				gpio2-supply = <&slg51002_gpio2>;
+				ldo2-supply = <&slg51002_ldo2>;
 				ldo7-supply = <&slg51002_ldo7>;
 
 				clocks =
@@ -334,7 +334,7 @@
 				/* Power up sequence */
 				power-up-seqs =
 					"s2mpg13_ldo12",
-					"gpio2",
+					"ldo2",
 					"ldo7",
 					"reset",
 					"mclk_on";
@@ -356,7 +356,7 @@
 					"mclk_off",
 					"reset",
 					"ldo7",
-					"gpio2",
+					"ldo2",
 					"s2mpg13_ldo12";
 				power-down-seq-types =
 					"pinctrl",
