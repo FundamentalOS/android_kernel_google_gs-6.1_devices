@@ -1,7 +1,7 @@
 KERNEL_DIR=private/gs-google
 
-DEFCONFIG=cloudripper_gki_defconfig
-GKI_FRAGMENT_DEFCONFIG=${KERNEL_DIR}/arch/arm64/configs/cloudripper_gki.fragment
+DEFCONFIG=lynx_gki_defconfig
+GKI_FRAGMENT_DEFCONFIG="${KERNEL_DIR}/arch/arm64/configs/cloudripper_gki.fragment ${ROOT_DIR}/private/devices/google/lynx/lynx_gki.fragment"
 VENDOR_RAMDISK_BINARY=${ROOT_DIR}/private/devices/google/lynx/vendor_ramdisk-lynx.img
 
 . ${ROOT_DIR}/${KERNEL_DIR}/build.config.gs101
