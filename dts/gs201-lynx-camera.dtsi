@@ -291,6 +291,7 @@
 					 1000
 					 1000
 					 1000>;
+				transaction-thread-priority = <99>;
 			};
 
 			/* FRONT CAMERA IMX712 */
@@ -370,6 +371,7 @@
 					 1000
 					 1000
 					 1000>;
+				transaction-thread-priority = <99>;
 			};
 
 			/* REAR ULTRA WIDE CAMERA IMX712 */
@@ -449,6 +451,7 @@
 					 1000
 					 1000
 					 1000>;
+				transaction-thread-priority = <99>;
 			};
 
 			/* Eeprom lc898129 for imx787 */
