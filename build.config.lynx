@@ -20,12 +20,14 @@ MAKE_GOALS="$MAKE_GOALS
 modules
 google/devices/lynx/google-base/gs201-a0.dtb
 google/devices/lynx/google-base/gs201-b0.dtb
+google/devices/lynx/google-base/gs201-b0_v2-ipop.dtb
 google/devices/lynx/dtbo.img
 "
 
 FILES="
 arch/arm64/boot/dts/google/devices/lynx/google-base/gs201-a0.dtb
 arch/arm64/boot/dts/google/devices/lynx/google-base/gs201-b0.dtb
+arch/arm64/boot/dts/google/devices/lynx/google-base/gs201-b0_v2-ipop.dtb
 arch/arm64/boot/dts/google/devices/lynx/dtbo.img
 "
 
