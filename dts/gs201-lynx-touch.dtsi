@@ -46,6 +46,7 @@
 
 	goog,offload-enable;
 	goog,v4l2-enable;
+	goog,offload-caps-scan-types = /bits/ 16 <0xC0>;
 	goog,touch_offload_id = /bits/ 8 <'l' '1' '0' '0'>;
 	goog,display-resolution = /bits/ 16 <1080 2400>;
 	goog,channel-num = /bits/ 16 <16 34>;
