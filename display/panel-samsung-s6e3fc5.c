@@ -371,10 +371,20 @@ static void s6e3fc5_change_frequency(struct exynos_panel *ctx,
 		return;
 
 	EXYNOS_DCS_WRITE_TABLE(ctx, test_key_on_f0);
-	if (vrefresh == 90)
+	if (vrefresh == 90) {
 		EXYNOS_DCS_WRITE_TABLE(ctx, hs90_setting);
-	else
+		if (ctx->panel_rev >= PANEL_REV_EVT1) {
+			EXYNOS_DCS_WRITE_SEQ(ctx, 0xB9, 0x31);
+			EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x00, 0x10, 0xB9);
+			EXYNOS_DCS_WRITE_SEQ(ctx, 0xB9, 0x00, 0x25, 0x00, 0x0C);
+		}
+	}
+	else {
 		EXYNOS_DCS_WRITE_TABLE(ctx, hs60_setting);
+		if (ctx->panel_rev >= PANEL_REV_EVT1) {
+			EXYNOS_DCS_WRITE_SEQ(ctx, 0xB9, 0x30);
+		}
+	}
 	EXYNOS_DCS_WRITE_TABLE(ctx, freq_update);
 	EXYNOS_DCS_WRITE_TABLE(ctx, test_key_off_f0);
 
