@@ -157,6 +157,48 @@ struct s6e3fc5_panel {
 
 #define to_spanel(ctx) container_of(ctx, struct s6e3fc5_panel, base)
 
+static void s6e3fc5_update_lhbm_gamma(struct exynos_panel *ctx)
+{
+	/* ratio provided by HW for update the LHBM gamma.
+	 * ratio must be a integer due to kernel didn't support floating.
+	 * ratio original value R: 0.922974324, G: 0.910436713, B: 0.898442180.
+	 * ratio cannot exceed u32 max 4294967296.
+	 * R gamma hex from last 16bit from gamma_cmd[1] combine with gamma_cmd[3]
+	 * G gamma hex from first 16bit from gamma_cmd[2] combine with gamma_cmd[4]
+	 * B gamma hex from last 16bit from gamma_cmd[2] combine with gamma_cmd[5]
+	 */
+	struct s6e3fc5_panel *spanel = to_spanel(ctx);
+	u8 *gamma_cmd = spanel->local_hbm_gamma.hs_cmd;
+	const u32 rgb_ratio[3] = {922974324, 910436713, 898442180};
+	const u8 rgb_offset[3][2] = {{1, 3}, {2, 4}, {2,5}};
+	u8 new_gamma_cmd[LHBM_GAMMA_CMD_SIZE] = {0};
+	u64 tmp;
+	int i;
+	u16 mask, shift;
+
+	dev_info(ctx->dev, "%s: gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
+		gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
+	for (i = 0; i < ARRAY_SIZE(rgb_ratio); i++) {
+		if (i % 2) {
+			mask = 0xf0;
+			shift = 4;
+		} else {
+			mask = 0x0f;
+			shift = 0;
+		}
+		tmp = ((gamma_cmd[rgb_offset[i][0]] & mask) >> shift) << 8 | gamma_cmd[rgb_offset[i][1]];
+		dev_dbg(ctx->dev, "%s: lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
+		/* Round off and revert to original gamma value */
+		tmp = (tmp * rgb_ratio[i] + 500000000)/1000000000;
+		dev_dbg(ctx->dev, "%s: new lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
+		new_gamma_cmd[rgb_offset[i][0]] |= ((tmp & 0xff00) >> 8) << shift;
+		new_gamma_cmd[rgb_offset[i][1]] |= tmp & 0xff;
+	}
+	memcpy(&gamma_cmd[1], &new_gamma_cmd[1], LHBM_GAMMA_CMD_SIZE - 1);
+	dev_info(ctx->dev, "%s: new_gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
+		gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
+}
+
 static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
 {
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
@@ -205,6 +247,9 @@ static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
 	}
 
 	EXYNOS_DCS_WRITE_TABLE(ctx, test_key_off_f0);
+
+	if (ctx->panel_rev < PANEL_REV_EVT1)
+		s6e3fc5_update_lhbm_gamma(ctx);
 }
 
 static void s6e3fc5_lhbm_gamma_write(struct exynos_panel *ctx)
