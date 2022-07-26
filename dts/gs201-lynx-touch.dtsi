@@ -56,6 +56,7 @@
 	goog,channel-num = /bits/ 16 <16 34>;
 	goog,tbn-enable;
 	goog,offload-caps-rotation-reporting;
+	goog,offload-caps-cancel-reporting;
 
 	controller-data {
 		cs-gpio = <&gpp20 3 0>;
