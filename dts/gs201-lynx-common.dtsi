@@ -16,6 +16,8 @@
 
 #include "google-base/gs201-ravenclaw-fingerprint.dtsi"
 
+#include "google-base/gs101-faceauth-dma-heap.dtsi"
+
 #include "gs201-lynx-usecases.dtsi"
 #include "gs201-lynx-wcharger.dtsi"
 #include "gs201-lynx-bluetooth.dtsi"
