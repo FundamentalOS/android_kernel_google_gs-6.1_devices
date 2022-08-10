@@ -59,6 +59,8 @@ static DEFINE_EXYNOS_CMD_SET(s6e3fc5_off);
 static const struct exynos_dsi_cmd s6e3fc5_lp_cmds[] = {
 	EXYNOS_DSI_CMD(display_off, 0),
 	EXYNOS_DSI_CMD0(test_key_on_f0),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0xB9, 0x30),
+	EXYNOS_DSI_CMD0_REV(freq_update, PANEL_REV_GE(PANEL_REV_EVT1)),
 	EXYNOS_DSI_CMD0_REV(new_gamma_ip_bypass, PANEL_REV_LT(PANEL_REV_EVT1)),
 	EXYNOS_DSI_CMD0_REV(new_gamma_ip_enable, PANEL_REV_GE(PANEL_REV_EVT1)),
 	EXYNOS_DSI_CMD0(test_key_off_f0),
