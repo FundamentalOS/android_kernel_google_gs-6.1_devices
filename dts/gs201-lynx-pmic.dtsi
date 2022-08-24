@@ -119,3 +119,13 @@
 &ch15 {
 	rail-name = "VSEN_C6";
 };
+
+/* replace L2S_PLL_MIPI_UFS to S6S_LLDO2 */
+&ch23 {
+	rail-name = "BUCK6S";
+};
+
+/* replace L14S_ALIVE to S7S_MLDO */
+&ch24 {
+	rail-name = "BUCK7S";
+};
