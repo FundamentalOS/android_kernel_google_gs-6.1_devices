@@ -74,9 +74,12 @@
 		google,alignment_offset_high_current = <129000>;
 		google,alignment_current_threshold = <500>;
 
-		google,q_value = <37>;
+		google,q_value = <43>;
 		fod = [A9 20 89 27 8D 25 92 23 9B 10 A0 0F];
 		fod_epp = [84 68 89 4D 92 2B 8A 4B 93 20 93 26 01 01 FF 19];
+
+		google,iop_en;		/* IOP enable */
+		google,light_load;	/* Calibration light load */
 
 		p9xxx_gpio: p9xxx_gpio {
 			gpio-controller;
