@@ -570,7 +570,6 @@ static void s6e3fc5_set_dimming_on(struct exynos_panel *exynos_panel,
 static void s6e3fc5_set_local_hbm_mode(struct exynos_panel *exynos_panel,
 				 bool local_hbm_en)
 {
-	exynos_panel->hbm.local_hbm.enabled = local_hbm_en;
 	s6e3fc5_update_wrctrld(exynos_panel);
 }
 

@@ -597,10 +597,6 @@ static void s6e3fc3_l10_set_dimming_on(struct exynos_panel *exynos_panel,
 static void s6e3fc3_l10_set_local_hbm_mode(struct exynos_panel *exynos_panel,
 				 bool local_hbm_en)
 {
-	if (exynos_panel->hbm.local_hbm.enabled == local_hbm_en)
-		return;
-
-	exynos_panel->hbm.local_hbm.enabled = local_hbm_en;
 	if (local_hbm_en) {
 		EXYNOS_DCS_WRITE_TABLE(exynos_panel, test_key_on_f0);
 		/* global para */
@@ -627,9 +623,6 @@ static void s6e3fc3_l10_set_local_hbm_mode(struct exynos_panel *exynos_panel,
 static void s6e3fc3_l10_mode_set(struct exynos_panel *ctx,
 			     const struct exynos_panel_mode *pmode)
 {
-	if (!ctx->enabled)
-		return;
-
 	s6e3fc3_l10_change_frequency(ctx, drm_mode_vrefresh(&pmode->mode));
 }
 
