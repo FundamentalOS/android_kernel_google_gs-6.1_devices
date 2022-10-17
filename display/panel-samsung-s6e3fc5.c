@@ -460,7 +460,7 @@ static void s6e3fc5_update_wrctrld(struct exynos_panel *ctx)
 	EXYNOS_DCS_WRITE_SEQ(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, val);
 }
 
-#define MAX_BR_HBM_EVT1 4094
+#define MAX_BR_HBM_EVT1_0_2 4094
 static int s6e3fc5_set_brightness(struct exynos_panel *ctx, u16 br)
 {
 	u16 brightness;
@@ -474,10 +474,10 @@ static int s6e3fc5_set_brightness(struct exynos_panel *ctx, u16 br)
 		return 0;
 	}
 
-	if (ctx->panel_rev <= PANEL_REV_EVT1 && br >= MAX_BR_HBM_EVT1) {
-		br = MAX_BR_HBM_EVT1;
-		dev_dbg(ctx->dev, "%s: capped to dbv(%d) for EVT1 and before\n",
-			__func__, MAX_BR_HBM_EVT1);
+	if (ctx->panel_rev <= PANEL_REV_EVT1_0_2 && br >= MAX_BR_HBM_EVT1_0_2) {
+		br = MAX_BR_HBM_EVT1_0_2;
+		dev_dbg(ctx->dev, "%s: capped to dbv(%d) for EVT1_0_2 and before\n",
+			__func__, MAX_BR_HBM_EVT1_0_2);
 	}
 
 	brightness = (br & 0xff) << 8 | br >> 8;
