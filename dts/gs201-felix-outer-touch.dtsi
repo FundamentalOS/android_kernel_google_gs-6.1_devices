@@ -8,6 +8,10 @@
 
 #include <dt-bindings/pinctrl/samsung.h>
 
+&tbn {
+	tbn,max_devices = <2>;
+};
+
 &spi_6 {
 	status = "okay";
 	dma-mode;
@@ -94,10 +98,12 @@
 		st,dchip_id = /bits/ 8 <0x36 0x40>;
 		st,max-coords = <1079 2091>;
 		st,device_name = "fts_ext";
+		goog,offload-device-name = "fts_ext";
 		st,firmware_names = "ftm5_fw_f10_ext.ftb";
 		st,limits_names = "stm_fts_production_limits_f10_ext.csv";
 		st,heatmap_mode_full;
-		/* st,panel_map = <&samsung_ea8182 0>; */
+		st,touch_offload_id = /bits/ 8 <'f' '1' '0' '1'>;
+		st,panel_map = <&samsung_ea8182_f10 0>;
 		st,sensor_inverted_x;
 		st,sensor_inverted_y;
 		vdd-supply = <&m_ldo25_reg>;
