@@ -97,12 +97,12 @@ maxim,config {
 			/* 0x002e */	0x0400	/* CGain */
 		>;
 	};
-	/* 2_L10_COS_031622_RC2_INI_0830.txt http://b/244371981#comment1 */
+	/* 2_L10_COS_031622_RC2_INI_1110_Change\ QRTable.txt http://b/255458373#comment11 */
 	maxim,cos-pack-b-2k {
 		maxim,batt-id-kohm = <2>;
-		maxim,model-version = <4>;
+		maxim,model-version = <5>;
 		maxim,force-reset-model-data;
-		maxim,rc1-tempco = /bits/ 16 <0x1d3f>;
+		maxim,rc1-tempco = /bits/ 16 <0x1d0f>;
 		maxim,rc2-tempco = /bits/ 16 <0x0902>;
 		maxim,rc2-learncfg = /bits/ 16 <0x260e>;
 		maxim,fg-model = /bits/ 16 <
@@ -127,16 +127,16 @@ maxim,config {
 			/* 0x0023 */	0x08A2	/* nFullCapNom */
 			/* 0x003A */	0xA561	/* V_empty */
 			/* 0x0012 */	0x1900	/* nQRTable00 -> QResidual00 */
-			/* 0x0022 */	0x1100	/* nQRTable10 -> QResidual10 */
-			/* 0x0032 */	0x0d80	/* nQRTable20 -> QResidual20 */
-			/* 0x0042 */	0x0a80	/* nQRTable30 -> QResidual30 */
+			/* 0x0022 */	0x0b80	/* nQRTable10 -> QResidual10 */
+			/* 0x0032 */	0x0500	/* nQRTable20 -> QResidual20 */
+			/* 0x0042 */	0x0480	/* nQRTable30 -> QResidual30 */
 			/* 0x0038 */	0x07a0	/* nRcomp0 */
 			/* 0x0039 */	0x0902	/* nTempco */
 			/* 0x001E */	0x0560	/* ICHGTerm */
 			/* 0x002C */	0xED51	/* *TGain */
 			/* 0x002D */	0x1EBA	/* *TOFF */
 			/* 0x00B9 */	0x0014	/* *TCurve */
-			/* 0x002B */	0x3870	/* *nMiscCfg */
+			/* 0x002B */	0x6030	/* *nMiscCfg */
 			/* 0x0004 */	0x1900	/* AtRate @ 0x04 */
 			/* 0x0049 */	0x2241	/* convgcfg */
 			/* 0x0029 */	0xc613	/* FilterCFG */
@@ -144,10 +144,10 @@ maxim,config {
 			/* 0x002e */	0x0400	/* CGain */
 		>;
 	};
-	/* 3_L10_LSN_031522_RC2_INI_0830.txt http://b/244371981#comment1 */
+	/* 3_L10_LSN_061322_RC2_INI_1028_change\ QRtable.txt http://b/255458373#comment11 */
 	maxim,lsn-pack-b-3k {
 		maxim,batt-id-kohm = <3>;
-		maxim,model-version = <4>;
+		maxim,model-version = <5>;
 		maxim,force-reset-model-data;
 		maxim,rc1-tempco = /bits/ 16 <0x173a>;
 		maxim,rc2-tempco = /bits/ 16 <0x1602>;
@@ -173,17 +173,17 @@ maxim,config {
 			/* 0x0045 */	0x022a	/* dQacc */
 			/* 0x0023 */	0x08a9	/* nFullCapNom */
 			/* 0x003A */	0xA561	/* V_empty */
-			/* 0x0012 */	0x1f04	/* nQRTable00 -> QResidual00 */
-			/* 0x0022 */	0x1300	/* nQRTable10 -> QResidual10 */
-			/* 0x0032 */	0x0d00	/* nQRTable20 -> QResidual20 */
-			/* 0x0042 */	0x0a80	/* nQRTable30 -> QResidual30 */
+			/* 0x0012 */	0x2500	/* nQRTable00 -> QResidual00 */
+			/* 0x0022 */	0x1180	/* nQRTable10 -> QResidual10 */
+			/* 0x0032 */	0x0780	/* nQRTable20 -> QResidual20 */
+			/* 0x0042 */	0x0580	/* nQRTable30 -> QResidual30 */
 			/* 0x0038 */	0x0760	/* nRcomp0 */
 			/* 0x0039 */	0x1602	/* nTempco */
 			/* 0x001E */	0x0560	/* ICHGTerm */
 			/* 0x002C */	0xED51	/* *TGain */
 			/* 0x002D */	0x1EBA	/* *TOFF */
 			/* 0x00B9 */	0x0014	/* *TCurve */
-			/* 0x002B */	0x3870	/* *nMiscCfg */
+			/* 0x002B */	0x6030	/* *nMiscCfg */
 			/* 0x0004 */	0x1900	/* AtRate @ 0x04 */
 			/* 0x0049 */	0x2241	/* convgcfg */
 			/* 0x0029 */	0xc613	/* FilterCFG */
