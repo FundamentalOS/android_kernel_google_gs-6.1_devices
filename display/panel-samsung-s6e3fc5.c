@@ -54,6 +54,8 @@ static const u32 lhbm_1300_1100_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {922974324, 910
 static const u32 lhbm_990_1300_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {1089563019, 1063348416, 1099934254};
 static const u32 lhbm_1208_1300_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {1029306415, 1018581722, 1029205963};
 static const u32 lhbm_1280_1300_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {1005012531, 1005714286, 1003953871};
+static const u32 lhbm_1250_1300_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {1013985465, 1011108127, 1012870314};
+static const u32 lhbm_1270_1300_rgb_ratio[LHBM_RGB_RATIO_SIZE] = {1005722353, 1004545049, 1005266073};
 
 static const struct exynos_dsi_cmd s6e3fc5_off_cmds[] = {
 	EXYNOS_DSI_CMD(display_off, 0),
@@ -191,33 +193,37 @@ static void s6e3fc5_update_lhbm_gamma(struct exynos_panel *ctx)
 		rgb_ratio = lhbm_1208_1300_rgb_ratio;
 	else if (ctx->panel_rev == PANEL_REV_EVT1_1)
 		rgb_ratio = lhbm_1280_1300_rgb_ratio;
+	else if (ctx->panel_rev == PANEL_REV_DVT1)
+		rgb_ratio = lhbm_1250_1300_rgb_ratio;
+	else if (ctx->panel_rev >= PANEL_REV_DVT1_1)
+		rgb_ratio = lhbm_1270_1300_rgb_ratio;
 
-	if (rgb_ratio) {
-		dev_info(ctx->dev, "%s: gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
-			gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
-		for (i = 0; i < LHBM_RGB_RATIO_SIZE ; i++) {
-			if (i % 2) {
-				mask = 0xf0;
-				shift = 4;
-			} else {
-				mask = 0x0f;
-				shift = 0;
-			}
-			tmp = ((gamma_cmd[rgb_offset[i][0]] & mask) >> shift) << 8 | gamma_cmd[rgb_offset[i][1]];
-			dev_dbg(ctx->dev, "%s: lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
-			/* Round off and revert to original gamma value */
-			tmp = (tmp * rgb_ratio[i] + 500000000)/1000000000;
-			dev_dbg(ctx->dev, "%s: new lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
-			new_gamma_cmd[rgb_offset[i][0]] |= ((tmp & 0xff00) >> 8) << shift;
-			new_gamma_cmd[rgb_offset[i][1]] |= tmp & 0xff;
+	if (!rgb_ratio)
+		return;
+
+	dev_info(ctx->dev, "%s: gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
+		gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
+	for (i = 0; i < LHBM_RGB_RATIO_SIZE ; i++) {
+		if (i % 2) {
+			mask = 0xf0;
+			shift = 4;
+		} else {
+			mask = 0x0f;
+			shift = 0;
 		}
-		memcpy(&gamma_cmd[1], &new_gamma_cmd[1], LHBM_GAMMA_CMD_SIZE - 1);
-		dev_info(ctx->dev, "%s: new_gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
-			gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
-		dev_info(ctx->dev, "%s: rgb_ratio(%u %u %u)\n", __func__,
-			rgb_ratio[0], rgb_ratio[1], rgb_ratio[2]);
+		tmp = ((gamma_cmd[rgb_offset[i][0]] & mask) >> shift) << 8 | gamma_cmd[rgb_offset[i][1]];
+		dev_dbg(ctx->dev, "%s: lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
+		/* Round off and revert to original gamma value */
+		tmp = (tmp * rgb_ratio[i] + 500000000)/1000000000;
+		dev_dbg(ctx->dev, "%s: new lhbm_gamma[%d] = %llu\n", __func__, i, tmp);
+		new_gamma_cmd[rgb_offset[i][0]] |= ((tmp & 0xff00) >> 8) << shift;
+		new_gamma_cmd[rgb_offset[i][1]] |= tmp & 0xff;
 	}
-
+	memcpy(&gamma_cmd[1], &new_gamma_cmd[1], LHBM_GAMMA_CMD_SIZE - 1);
+	dev_info(ctx->dev, "%s: new_gamma_cmd(%02x %02x %02x %02x %02x)\n", __func__,
+		gamma_cmd[1], gamma_cmd[2], gamma_cmd[3], gamma_cmd[4], gamma_cmd[5]);
+	dev_info(ctx->dev, "%s: rgb_ratio(%u %u %u)\n", __func__,
+		rgb_ratio[0], rgb_ratio[1], rgb_ratio[2]);
 }
 
 static void s6e3fc5_lhbm_gamma_read(struct exynos_panel *ctx)
