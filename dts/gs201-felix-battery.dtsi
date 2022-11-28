@@ -13,10 +13,10 @@
 	maxim,rc-soc = <20>;
 	maxim,rc-temp = <50>;
 
-//	maxim,filtercfg-temp = <100>;
-//	maxim,filtercfg-temp-hysteresis = <30>;
-//	maxim,filtercfg-default = /bits/ 16 <0xc613>;
-//	maxim,filtercfg-adjust = /bits/ 16 <0xc617>;
+	maxim,filtercfg-temp = <100>;
+	maxim,filtercfg-temp-hysteresis = <30>;
+	maxim,filtercfg-default = /bits/ 16 <0xc624>;
+	maxim,filtercfg-adjust = /bits/ 16 <0xc617>;
 
 	maxim,fg-data {
 		#include "gs201-felix-battery-data.dtsi"
@@ -47,9 +47,9 @@
 
 				google,ttf-temp-idx= <2>;
 				google,ttf-adapter = <3000>;
-				google,ttf-soc-table =  <69 77 90 94  96  98  99  100>;
-				google,ttf-elap-table = <41 62 78 115 170 230 308 152>;
-				google,ttf-tier-table = <0 61 77>;
+				google,ttf-soc-table =  <49 71 88 91  93  100>;
+				google,ttf-elap-table = <41 55 79 106 147 178>;
+				google,ttf-tier-table = <0 50 74>;
 			};
 
 			google_dual_batt_gauge: google,dual_batt_gauge {
@@ -104,5 +104,10 @@
 
 		maxim,dual-battery = "maxfg_flip";
 		maxim,read-batt-sn = <1>;
+
+		maxim,filtercfg-temp = <100>;
+		maxim,filtercfg-temp-hysteresis = <30>;
+		maxim,filtercfg-default = /bits/ 16 <0xeb5>;
+		maxim,filtercfg-adjust = /bits/ 16 <0xea7>;
 	};
 };
