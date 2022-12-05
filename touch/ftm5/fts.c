@@ -254,6 +254,46 @@ static ssize_t fwupdate_show(struct device *dev,
 /***************************************** UTILITIES
   * (current fw_ver/conf_id, active mode, file fw_ver/conf_id)
   ***************************************************/
+static ssize_t get_fw_info(struct fts_ts_info *info, char *buf, size_t buf_size)
+{
+	ssize_t buf_idx = 0;
+	char temp[35];
+
+	buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "\nREL: %s\n",
+			     printHex("",
+				      info->systemInfo.u8_releaseInfo,
+				      EXTERNAL_RELEASE_INFO_SIZE,
+				      temp,
+				      sizeof(temp)));
+	buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "FW: %04X\nCFG: %04X\nAFE: %02X\nProject: %04X\n",
+			     info->systemInfo.u16_fwVer,
+			     info->systemInfo.u16_cfgVer,
+			     info->systemInfo.u8_cfgAfeVer,
+			     info->systemInfo.u16_cfgProjectId);
+	buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "FW file: %s\n", info->board->fw_name);
+
+	buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "Extended display info: ");
+	if (!info->extinfo.is_read)
+		buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "[pending]");
+	else if (info->extinfo.size == 0)
+		buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "[none]");
+	else if (info->extinfo.size * 2 < buf_size - buf_idx) {
+		bin2hex(buf + buf_idx, info->extinfo.data, info->extinfo.size);
+		buf_idx += info->extinfo.size * 2;
+	}
+
+	buf_idx += scnprintf(buf + buf_idx, buf_size - buf_idx,
+			     "\nMPFlag: %02X\n",
+			     info->systemInfo.u8_mpFlag);
+	return buf_idx;
+}
+
 /**
   * File node to show on terminal external release version in Little Endian \n
   * (first the less significant byte) \n
@@ -263,43 +303,10 @@ static ssize_t appid_show(struct device *dev, struct device_attribute *attr,
 			      char *buf)
 {
 	struct fts_ts_info *info = dev_get_drvdata(dev);
-	int written = 0;
-	char temp[35];
 
-	written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "REL: %s\n",
-			     printHex("",
-				      info->systemInfo.u8_releaseInfo,
-				      EXTERNAL_RELEASE_INFO_SIZE,
-				      temp,
-				      sizeof(temp)));
-	written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "FW: %04X\nCFG: %04X\nAFE: %02X\nProject: %04X\n",
-			     info->systemInfo.u16_fwVer,
-			     info->systemInfo.u16_cfgVer,
-			     info->systemInfo.u8_cfgAfeVer,
-			     info->systemInfo.u16_cfgProjectId);
-	written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "FW file: %s\n", info->board->fw_name);
+	ssize_t buf_idx = get_fw_info(info, buf, PAGE_SIZE);
 
-	written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "Extended display info: ");
-	if (!info->extinfo.is_read)
-		written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "[pending]");
-	else if (info->extinfo.size == 0)
-		written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "[none]");
-	else if (info->extinfo.size * 2 < PAGE_SIZE - written) {
-		bin2hex(buf + written, info->extinfo.data, info->extinfo.size);
-		written += info->extinfo.size * 2;
-	}
-
-	written += scnprintf(buf + written, PAGE_SIZE - written,
-			     "\nMPFlag: %02X\n",
-			     info->systemInfo.u8_mpFlag);
-
-	return written;
+	return buf_idx;
 }
 
 /**
@@ -432,6 +439,7 @@ static ssize_t fts_strength_frame_show(struct device *dev,
 	/* char buff[CMD_STR_LEN] = {0}; */
 	/* struct i2c_client *client = to_i2c_client(dev); */
 	struct fts_ts_info *info = dev_get_drvdata(dev);
+	size_t buf_size = 0;
 
 	frame.node_data = NULL;
 
@@ -478,35 +486,25 @@ END:
 	release_all_touches(info);
 	fts_mode_handler(info, 1);
 
-	all_strbuff = (char *)kzalloc(size * sizeof(char), GFP_KERNEL);
+	buf_size = size * sizeof(char);
+	all_strbuff = (char *)kzalloc(buf_size, GFP_KERNEL);
 
 	if (all_strbuff != NULL) {
-		snprintf(&all_strbuff[index], 11, "{ %08X", res);
-
-		index += 10;
-
+		index += scnprintf(all_strbuff + index, buf_size - index, "{ %08X", res);
 		if (res >= OK) {
-			snprintf(&all_strbuff[index], 3, "%02X",
+			index += scnprintf(all_strbuff + index, buf_size - index, "%02X",
 				 (u8)frame.header.force_node);
-			index += 2;
-			snprintf(&all_strbuff[index], 3, "%02X",
+			index += scnprintf(all_strbuff + index, buf_size - index, "%02X",
 				 (u8)frame.header.sense_node);
-
-			index += 2;
-
 			for (j = 0; j < frame.node_data_size; j++) {
-				snprintf(&all_strbuff[index], 10, "%d,%n",
+				index += scnprintf(all_strbuff + index, buf_size - index, "%d,%n",
 					 frame.node_data[j], &count);
-				index += count;
 			}
-
 			kfree(frame.node_data);
 		}
+		index += scnprintf(all_strbuff + index, buf_size - index, " }");
 
-		snprintf(&all_strbuff[index], 3, " }");
-		index += 2;
-
-		count = snprintf(buf, TSP_BUF_SIZE, "%s\n", all_strbuff);
+		count = scnprintf(buf, TSP_BUF_SIZE, "%s\n", all_strbuff);
 		kfree(all_strbuff);
 	} else
 		dev_err(dev, "%s: Unable to allocate all_strbuff! ERROR %08X\n",
@@ -2496,34 +2494,73 @@ static int gti_default_handler(void *private_data, enum gti_cmd_type cmd_type,
 	return ret;
 }
 
+static int get_fw_version(void *private_data, struct gti_fw_version_cmd *cmd)
+{
+	struct fts_ts_info *info = private_data;
+	int cmd_buffer_size = sizeof(cmd->buffer);
+
+	get_fw_info(info, cmd->buffer, cmd_buffer_size);
+	return 0;
+}
+
 static int get_mutual_sensor_data(void *private_data, struct gti_sensor_data_cmd *cmd)
 {
 	struct fts_ts_info *info = private_data;
 	int max_x = getForceLen(info);
 	int max_y = getSenseLen(info);
 	int result;
-	MutualSenseFrame ms_frame = { 0 };
 	uint32_t frame_index = 0, x, y;
 	uint32_t x_val, y_val;
 	int16_t heatmap_value;
+	u16 addr_offset;
 
-	cmd->size = max_x * max_y * sizeof(int16_t);
+	cmd->size = max_x * max_y * BYTES_PER_NODE;
 
 	if (!info->mutual_data) {
 		info->mutual_data = devm_kzalloc(info->dev, cmd->size, GFP_KERNEL);
 		if (!info->mutual_data) {
 			dev_err(info->dev, "Failed to allocate mutual_data.\n");
-			return -ENOMEM;
+			result = -ENOMEM;
+			goto get_data_err;
 		}
 	}
 
 	cmd->buffer = (u8 *)info->mutual_data;
 
-	result = getMSFrame3(info, MS_STRENGTH, &ms_frame);
-	if (result <= 0) {
-		dev_err(info->dev, "getMSFrame3 failed with result=0x%08X.\n", result);
-		kfree(ms_frame.node_data);
-		return result;
+	if (!info->data_buffer || (info->data_buffer_size < cmd->size)) {
+		devm_kfree(info->dev, info->data_buffer);
+		info->data_buffer = NULL;
+		info->data_buffer_size = 0;
+		info->data_buffer = devm_kzalloc(info->dev, cmd->size, GFP_KERNEL);
+		if (!info->data_buffer) {
+			dev_err(info->dev, "Failed to allocate data_buffer.\n");
+			result = -ENOMEM;
+			goto get_data_err;
+		}
+		info->data_buffer_size = cmd->size;
+	}
+
+	switch (cmd->type) {
+	case GTI_SENSOR_DATA_TYPE_MS_RAW:
+		addr_offset = info->systemInfo.u16_msTchRawAddr;
+		break;
+	case GTI_SENSOR_DATA_TYPE_MS_BASELINE:
+		addr_offset = info->systemInfo.u16_msTchBaselineAddr;
+		break;
+	case GTI_SENSOR_DATA_TYPE_MS:
+	case GTI_SENSOR_DATA_TYPE_MS_DIFF:
+	default:
+		addr_offset = info->systemInfo.u16_msTchStrenAddr;
+		break;
+	}
+
+	result = fts_writeReadU8UX(info, FTS_CMD_FRAMEBUFFER_R, BITS_16,
+			addr_offset,
+			(u8 *)info->data_buffer,
+			cmd->size, DUMMY_FRAMEBUFFER);
+	if (result < 0) {
+		dev_err(info->dev, "get mutual data failed with result=0x%08X.\n", result);
+		goto get_data_err;
 	}
 
 	for (y = 0; y < max_y; y++) {
@@ -2541,51 +2578,95 @@ static int get_mutual_sensor_data(void *private_data, struct gti_sensor_data_cmd
 				y_val = y;
 
 			if (info->board->tx_rx_dir_swap)
-				heatmap_value = ms_frame.node_data[y_val * max_x + x_val];
+				heatmap_value = info->data_buffer[y_val * max_x + x_val];
 			else
-				heatmap_value = ms_frame.node_data[x_val * max_y + y_val];
+				heatmap_value = info->data_buffer[x_val * max_y + y_val];
 
 			info->mutual_data[frame_index++] = heatmap_value;
 		}
 	}
 
-	kfree(ms_frame.node_data);
-
 	return 0;
+
+get_data_err:
+	cmd->size = 0;
+	cmd->buffer = NULL;
+	return result;
 }
 
 static int get_self_sensor_data(void *private_data, struct gti_sensor_data_cmd *cmd)
 {
 	struct fts_ts_info *info = private_data;
-	SelfSenseFrame ss_frame = { 0 };
 	int i;
 	int result;
 	int16_t *tx_src, *rx_src, *tx_dst, *rx_dst;
 	int tx_size = getForceLen(info);
 	int rx_size = getSenseLen(info);
+	u16 tx_addr_offset, rx_addr_offset;
 
-	cmd->size = (tx_size + rx_size) * sizeof(int16_t);
+	cmd->size = (tx_size + rx_size) * BYTES_PER_NODE;
 
 	if (!info->self_data) {
 		info->self_data = devm_kzalloc(info->dev, cmd->size, GFP_KERNEL);
 		if (!info->self_data) {
 			dev_err(info->dev, "Failed to allocate self_data.\n");
-			return -ENOMEM;
+			result = -ENOMEM;
+			goto get_data_err;
 		}
 	}
 
 	cmd->buffer = (u8 *)info->self_data;
 
-	result = getSSFrame3(info, SS_STRENGTH, &ss_frame);
-	if (result <= 0) {
-		dev_err(info->dev, "getSSFrame3 failed with result=0x%08X.\n", result);
-		kfree(ss_frame.force_data);
-		kfree(ss_frame.sense_data);
-		return result;
+	if (!info->data_buffer || (info->data_buffer_size < cmd->size)) {
+		devm_kfree(info->dev, info->data_buffer);
+		info->data_buffer = NULL;
+		info->data_buffer_size = 0;
+		info->data_buffer = devm_kzalloc(info->dev, cmd->size, GFP_KERNEL);
+		if (!info->data_buffer) {
+			dev_err(info->dev, "Failed to allocate data_buffer.\n");
+			result = -ENOMEM;
+			goto get_data_err;
+		}
+		info->data_buffer_size = cmd->size;
 	}
 
-	tx_src = ss_frame.force_data;
-	rx_src = ss_frame.sense_data;
+	switch (cmd->type) {
+	case GTI_SENSOR_DATA_TYPE_SS_RAW:
+		tx_addr_offset = info->systemInfo.u16_ssTchTxRawAddr;
+		rx_addr_offset = info->systemInfo.u16_ssTchRxRawAddr;
+		break;
+	case GTI_SENSOR_DATA_TYPE_SS_BASELINE:
+		tx_addr_offset = info->systemInfo.u16_ssTchTxBaselineAddr;
+		rx_addr_offset = info->systemInfo.u16_ssTchRxBaselineAddr;
+		break;
+	case GTI_SENSOR_DATA_TYPE_SS:
+	case GTI_SENSOR_DATA_TYPE_SS_DIFF:
+	default:
+		tx_addr_offset = info->systemInfo.u16_ssTchTxStrenAddr;
+		rx_addr_offset = info->systemInfo.u16_ssTchRxStrenAddr;
+		break;
+	}
+
+	tx_src = info->data_buffer;
+	rx_src = info->data_buffer + tx_size;
+
+	result = fts_writeReadU8UX(info, FTS_CMD_FRAMEBUFFER_R, BITS_16,
+			tx_addr_offset,
+			(u8 *)tx_src,
+			tx_size * BYTES_PER_NODE, DUMMY_FRAMEBUFFER);
+	if (result < 0) {
+		dev_err(info->dev, "get tx data failed with result=0x%08X.\n", result);
+		goto get_data_err;
+	}
+
+	result = fts_writeReadU8UX(info, FTS_CMD_FRAMEBUFFER_R, BITS_16,
+			rx_addr_offset,
+			(u8 *)rx_src,
+			rx_size * BYTES_PER_NODE, DUMMY_FRAMEBUFFER);
+	if (result < 0) {
+		dev_err(info->dev, "get rx data failed with result=0x%08X.\n", result);
+		goto get_data_err;
+	}
 
 	/* tx, rx data order is fixed in TouchOffloadData1d */
 	tx_dst = info->self_data;
@@ -2607,10 +2688,12 @@ static int get_self_sensor_data(void *private_data, struct gti_sensor_data_cmd *
 		memcpy(rx_dst, rx_src, sizeof(int16_t) * rx_size);
 	}
 
-	kfree(ss_frame.force_data);
-	kfree(ss_frame.sense_data);
-
 	return 0;
+
+get_data_err:
+	cmd->size = 0;
+	cmd->buffer = NULL;
+	return result;
 }
 
 static int set_continuous_report(void *private_data, struct gti_continuous_report_cmd *cmd)
@@ -5581,6 +5664,7 @@ static int fts_probe(struct spi_device *client)
 		dev_err(info->dev, "GTI optional configuration kzalloc failed.\n");
 	}
 
+	options->get_fw_version = get_fw_version;
 	options->get_mutual_sensor_data = get_mutual_sensor_data;
 	options->get_self_sensor_data = get_self_sensor_data;
 	options->set_continuous_report = set_continuous_report;

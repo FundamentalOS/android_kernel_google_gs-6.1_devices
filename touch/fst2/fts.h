@@ -34,6 +34,9 @@
 #define LOGI(fmt, args...) \
 	pr_info(LOG_PREFIX fmt, ##args)
 
+#define LOGW(fmt, args...) \
+	pr_warn(LOG_PREFIX fmt, ##args)
+
 #define LOGE(fmt, args...) \
 	pr_err(LOG_PREFIX fmt, ##args)
 
