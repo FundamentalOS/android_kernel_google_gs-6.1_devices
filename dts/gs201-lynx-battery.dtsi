@@ -14,6 +14,8 @@
 	google,ttf-soc-table =  <55 63 77 87 89  92  96 100>;
 	google,ttf-elap-table = <40 46 54 73 84 104 150 213>;
 	google,ttf-tier-table = <0 65 80>;
+
+	google,temp-filter-enable;
 };
 
 &max77759_fg {
