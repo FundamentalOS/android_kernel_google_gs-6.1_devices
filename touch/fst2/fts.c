@@ -150,23 +150,29 @@ void set_system_reseted_down(int val)
 int fts_set_interrupt(struct fts_ts_info *info, bool enable)
 {
 	if (info->client == NULL) {
-		dev_err(info->dev, "Cannot get client irq. Error = %08X\n",
-			ERROR_OP_NOT_ALLOW);
+		dev_err(info->dev, "Error: Cannot get client irq.\n");
+		return ERROR_OP_NOT_ALLOW;
+	}
+
+	if (enable == info->irq_enabled) {
+		dev_dbg(info->dev, "Interrupt is already set (enable = %d).\n", enable);
+		return OK;
+	}
+
+	if (enable && !info->resume_bit) {
+		dev_err(info->dev, "Error: Interrupt can't enable in suspend mode.\n");
 		return ERROR_OP_NOT_ALLOW;
 	}
 
 	mutex_lock(&info->fts_int_mutex);
-	if (enable == info->irq_enabled) {
-		dev_dbg(info->dev, "Interrupt is already set (enable = %d).\n", enable);
+
+	info->irq_enabled = enable;
+	if (enable) {
+		enable_irq(info->client->irq);
+		dev_dbg(info->dev, "Interrupt enabled.\n");
 	} else {
-		info->irq_enabled = enable;
-		if (enable) {
-			enable_irq(info->client->irq);
-			dev_dbg(info->dev, "Interrupt enabled.\n");
-		} else {
-			disable_irq_nosync(info->client->irq);
-			dev_dbg(info->dev, "Interrupt disabled.\n");
-		}
+		disable_irq_nosync(info->client->irq);
+		dev_dbg(info->dev, "Interrupt disabled.\n");
 	}
 
 	mutex_unlock(&info->fts_int_mutex);
@@ -274,10 +280,14 @@ static irqreturn_t fts_interrupt_handler(int irq, void *handle)
 	unsigned char *evt_data;
 	bool has_pointer_event = false;
 	int event_start_idx = -1;
+	u32 goog_pm_locks = 0;
 
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
-	if (goog_pm_wake_lock(info->gti, GTI_PM_WAKELOCK_TYPE_IRQ, true) < 0) {
-		dev_warn(info->dev, "Touch device already suspended.\n");
+	error = goog_pm_wake_lock(info->gti, GTI_PM_WAKELOCK_TYPE_IRQ, true);
+	if (error < 0) {
+		goog_pm_locks = goog_pm_wake_get_locks(info->gti);
+		dev_warn(info->dev, "%s: Touch device already suspended(locks=0x%X,err=%d).\n",
+			__func__, goog_pm_locks, error);
 		return IRQ_HANDLED;
 	}
 #endif
@@ -1523,6 +1533,7 @@ static int fts_init(struct fts_ts_info *info)
 	int res = 0;
 	u8 data[3] = { 0 };
 	u16 chip_id = 0;
+	int retry_cnt = 0;
 
 	open_channel(info->client);
 	init_test_to_do();
@@ -1537,28 +1548,35 @@ static int fts_init(struct fts_ts_info *info)
 	}
 #endif
 #endif
-	res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
-				CHIP_ID_ADDRESS, data, 2, DUMMY_BYTE);
-	if (res < OK) {
-		LOGE("%s: Bus Connection issue: %08X\n", __func__, res);
-		return res;
-	}
-	chip_id = (u16)((data[0] << 8) + data[1]);
-	LOGI("%s: Chip id: 0x%04X\n", __func__, chip_id);
-	if (chip_id != CHIP_ID) {
-		LOGE("%s: Wrong Chip detected.. Expected|Detected: 0x%04X|0x%04X\n",
-			__func__, CHIP_ID, chip_id);
-		return ERROR_WRONG_CHIP_ID;
-	}
-	res = fts_system_reset(info, 1);
-	if (res < OK) {
-		if (res == ERROR_BUS_W) {
-			LOGE("%s: Bus Connection issue\n", __func__);
+	do {
+		res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
+			CHIP_ID_ADDRESS, data, 2, DUMMY_BYTE);
+		if (res < OK) {
+			LOGE("%s: Bus Connection issue: %08X\n", __func__, res);
 			return res;
 		}
-		/*other errors are because of no FW,
-		so we continue to flash*/
-	}
+		chip_id = (u16)((data[0] << 8) + data[1]);
+		LOGI("%s: Chip id: 0x%04X, retry: %d\n", __func__, chip_id, retry_cnt);
+		if (chip_id != CHIP_ID) {
+			LOGE("%s: Wrong Chip detected.. Expected|Detected: 0x%04X|0x%04X\n",
+				__func__, CHIP_ID, chip_id);
+			if (retry_cnt >= MAX_PROBE_RETRY)
+				return ERROR_WRONG_CHIP_ID;
+		}
+		res = fts_system_reset(info, 1);
+		if (res < OK) {
+			if (res == ERROR_BUS_W) {
+				LOGE("%s: Bus Connection issue\n", __func__);
+				return res;
+			}
+			/*
+			 * other errors are because of no FW,
+			 * so we continue to flash
+			 */
+		}
+		retry_cnt++;
+	} while (chip_id != CHIP_ID);
+
 	res = read_sys_info();
 	if (res < 0)
 		LOGE("%s: Couldnot read sys info.. No FW..\n", __func__);
@@ -2074,6 +2092,10 @@ static int fts_probe(struct spi_device *client)
 	ret_val = fts_init(info);
 	if (ret_val < OK) {
 		LOGE("%s: Initialization fails.. exiting..\n", __func__);
+		if (ret_val == ERROR_WRONG_CHIP_ID)
+			error = -EPROBE_DEFER;
+		else
+			error = -EIO;
 		goto probe_error_exit_6;
 	}
 
