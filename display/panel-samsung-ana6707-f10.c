@@ -674,6 +674,24 @@ static int ana6707_f10_enable(struct drm_panel *panel)
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0x2A, 0x00, 0x00, 0x07, 0x2F); /* CASET */
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0x2B, 0x00, 0x00, 0x08, 0x9F); /* PASET */
 
+	/* SP */
+	if (ctx->panel_rev >= PANEL_REV_DVT1) {
+		EXYNOS_DCS_WRITE_TABLE(ctx, unlock_cmd_f0);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF1, 0x5A, 0x5A);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xFC, 0x5A, 0x5A);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x2B);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF5, 0x01);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x15);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF5, 0x77, 0x77, 0x77, 0x77, 0x77);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x75);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF5, 0x77, 0x77, 0x77, 0x77, 0x07, 0x07);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x52);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF5, 0x64);
+		EXYNOS_DCS_WRITE_TABLE(ctx, lock_cmd_f0);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF1, 0xA5, 0xA5);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xFC, 0xA5, 0xA5);
+	}
+
 	EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, 110, 0x53, 0x20); /* backlight control */
 
 	ctx->enabled = true;
@@ -693,12 +711,20 @@ static void ana6707_f10_set_hbm_mode(struct exynos_panel *ctx,
 
 	ctx->hbm_mode = mode;
 
+	EXYNOS_DCS_WRITE_SEQ(ctx, 0xF0, 0x5A, 0x5A);
+
+	if (ctx->panel_rev >= PANEL_REV_DVT1) {
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x2C);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF4, IS_HBM_ON(mode) ? 0x22 : 0x23);
+	}
+
 	if (irc_update) {
-		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF0, 0x5A, 0x5A);
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x0C,);
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0x92, IS_HBM_ON_IRC_OFF(mode) ? 0x85 : 0xA5);
-		EXYNOS_DCS_WRITE_SEQ(ctx, 0xF0, 0xA5, 0xA5);
 	}
+
+	EXYNOS_DCS_WRITE_SEQ(ctx, 0xF0, 0xA5, 0xA5);
+
 	dev_info(ctx->dev, "IS_HBM_ON=%d IS_HBM_ON_IRC_OFF=%d\n", IS_HBM_ON(ctx->hbm_mode),
 		 IS_HBM_ON_IRC_OFF(ctx->hbm_mode));
 }
