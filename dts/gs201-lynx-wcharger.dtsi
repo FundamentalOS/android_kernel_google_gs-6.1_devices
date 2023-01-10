@@ -68,12 +68,6 @@
 
 		idt,max_vout_mv = <10000>;  /* max voltage in mV */
 
-		google,alignment_scalar_low_current = <50>;
-		google,alignment_scalar_high_current = <50>;
-		google,alignment_offset_low_current = <124000>;
-		google,alignment_offset_high_current = <129000>;
-		google,alignment_current_threshold = <500>;
-
 		google,q_value = <43>;
 		fod = [A9 20 89 27 8D 25 92 23 9B 10 A0 0F];
 		fod_epp = [84 68 89 4D 92 2B 8A 4B 93 20 93 26 01 01 FF 19];
