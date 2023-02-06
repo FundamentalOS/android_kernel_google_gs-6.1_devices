@@ -64,25 +64,26 @@ static const struct exynos_dsi_cmd ea8182_f10_lp_off_cmds[] = {
 
 
 static const struct exynos_dsi_cmd ea8182_f10_lp_low_cmds[] = {
-	EXYNOS_DSI_CMD0(unlock_cmd_f0),
+	EXYNOS_DSI_CMD0_REV(unlock_cmd_f0, PANEL_REV_LT(PANEL_REV_DVT1)),
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xC3, 0x01),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0xB0, 0xBC),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0xB7, 0x12, 0x06, 0xBC, 0x01, 0x00),
-	EXYNOS_DSI_CMD0(lock_cmd_f0),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_EVT1|PANEL_REV_EVT1_1, 0xB0, 0xBC),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_EVT1|PANEL_REV_EVT1_1, 0xB7, 0x12, 0x06, 0xBC, 0x01, 0x00),
+	EXYNOS_DSI_CMD0_REV(lock_cmd_f0, PANEL_REV_LT(PANEL_REV_DVT1)),
 	EXYNOS_DSI_CMD_SEQ_DELAY_REV(PANEL_REV_LT(PANEL_REV_EVT1), 34, 0x53, 0x25),
 	EXYNOS_DSI_CMD_SEQ_DELAY_REV(PANEL_REV_GE(PANEL_REV_EVT1), 34, 0x53, 0x24),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0x51, 0x07, 0xFF),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_EVT1|PANEL_REV_EVT1_1, 0x51, 0x07, 0xFF),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_DVT1), 0x51, 0x00, 0x1A),
 
 	EXYNOS_DSI_CMD(display_on, 0),
 };
 
 static const struct exynos_dsi_cmd ea8182_f10_lp_high_cmds[] = {
-	EXYNOS_DSI_CMD0(unlock_cmd_f0),
+	EXYNOS_DSI_CMD0_REV(unlock_cmd_f0, PANEL_REV_LT(PANEL_REV_DVT1)),
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xC3, 0x01),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0xB0, 0xBC),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0xB7, 0x02, 0x06, 0xBC, 0x01, 0x00),
-	EXYNOS_DSI_CMD0(lock_cmd_f0),
-	EXYNOS_DSI_CMD_SEQ_DELAY(34, 0x53, 0x24), /* AOD 50 nit */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_EVT1|PANEL_REV_EVT1_1, 0xB0, 0xBC),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_EVT1|PANEL_REV_EVT1_1, 0xB7, 0x02, 0x06, 0xBC, 0x01, 0x00),
+	EXYNOS_DSI_CMD0_REV(lock_cmd_f0, PANEL_REV_LT(PANEL_REV_DVT1)),
+	EXYNOS_DSI_CMD_SEQ_DELAY(34, 0x53, 0x24),
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0x51, 0x07, 0xFF),
 
 	EXYNOS_DSI_CMD(display_on, 0),
@@ -165,12 +166,18 @@ static void ea8182_f10_set_nolp_mode(struct exynos_panel *ctx,
 
 	EXYNOS_DCS_WRITE_TABLE(ctx, display_off);
 	EXYNOS_DCS_WRITE_TABLE(ctx, unlock_cmd_f0);
+
+	if ((ctx->panel_rev >= PANEL_REV_DVT1) && vrefresh == 60) {
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x04);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xEE, 0x83);
+	}
+
 	ea8182_f10_change_frequency(ctx, vrefresh);
 
 	if (ctx->panel_rev <= PANEL_REV_PROTO1_1)
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0xC3, 0x02);
 
-	if (ctx->panel_rev >= PANEL_REV_EVT1) {
+	if ((ctx->panel_rev >= PANEL_REV_EVT1) && (ctx->panel_rev < PANEL_REV_DVT1)) {
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0xBC);
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB7, 0x02);
 	}
@@ -311,7 +318,7 @@ static void ea8182_f10_get_panel_rev(struct exynos_panel *ctx, u32 id)
 	case 0xA:
 		ctx->panel_rev = PANEL_REV_DVT1_1;
 		break;
-	case 0x11:
+	case 0x10:
 		ctx->panel_rev = PANEL_REV_PVT;
 		break;
 	default:
@@ -523,24 +530,24 @@ const struct brightness_capability ea8182_f10_brightness_capability = {
 		},
 		.level = {
 			.min = 4,
-			.max = 2047,
+			.max = 1536,
 		},
 		.percentage = {
 			.min = 0,
-			.max = 60,
+			.max = 50,
 		},
 	},
 	.hbm = {
 		.nits = {
 			.min = 600,
-			.max = 1000,
+			.max = 1200,
 		},
 		.level = {
 			.min = 2048,
-			.max = 3652,
+			.max = 3584,
 		},
 		.percentage = {
-			.min = 60,
+			.min = 50,
 			.max = 100,
 		},
 	},
@@ -550,7 +557,7 @@ const struct exynos_panel_desc samsung_ea8182_f10 = {
 	.dsc_pps = PPS_SETTING,
 	.dsc_pps_len = ARRAY_SIZE(PPS_SETTING),
 	.data_lane_cnt = 4,
-	.max_brightness = 3652,
+	.max_brightness = 3584,
 	.min_brightness = 4,
 	.dft_brightness = 1023,
 	.brt_capability = &ea8182_f10_brightness_capability,

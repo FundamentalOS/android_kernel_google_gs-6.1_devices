@@ -642,6 +642,7 @@ static int ana6707_f10_enable(struct drm_panel *panel)
 {
 	struct exynos_panel *ctx = container_of(panel, struct exynos_panel, panel);
 	const struct exynos_panel_mode *pmode = ctx->current_mode;
+	u8 delay = (ctx->panel_rev >= PANEL_REV_DVT1) ? 132 : 110;
 
 	if (!pmode) {
 		dev_err(ctx->dev, "no current mode set\n");
@@ -667,6 +668,12 @@ static int ana6707_f10_enable(struct drm_panel *panel)
 
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x08);
 	EXYNOS_DCS_WRITE_SEQ(ctx, 0xB9, 0x0A); /* TE pulse width 168us */
+
+	/* brightness init setting*/
+	if (ctx->panel_rev >= PANEL_REV_EVT1) {
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0xB0, 0x96);
+		EXYNOS_DCS_WRITE_SEQ(ctx, 0x91, 0x81);
+	}
 	EXYNOS_DCS_WRITE_TABLE(ctx, lock_cmd_f0);
 
 	ana6707_f10_change_frequency(ctx, pmode, false);
@@ -692,13 +699,17 @@ static int ana6707_f10_enable(struct drm_panel *panel)
 		EXYNOS_DCS_WRITE_SEQ(ctx, 0xFC, 0xA5, 0xA5);
 	}
 
-	EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, 110, 0x53, 0x20); /* backlight control */
+	EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, delay, 0x53, 0x20); /* backlight control */
 
 	ctx->enabled = true;
-	if (pmode->exynos_mode.is_lp_mode)
+	if (pmode->exynos_mode.is_lp_mode) {
 		exynos_panel_set_lp_mode(ctx, pmode);
-	else
-		EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, 100, 0x29); /* display on: b/253361485 */
+	} else {
+		if (ctx->panel_rev >= PANEL_REV_DVT1)
+			EXYNOS_DCS_WRITE_SEQ(ctx, 0x29); /* display on */
+		else
+			EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, 100, 0x29); /* display on */
+	}
 
 	return 0;
 }
@@ -785,9 +796,6 @@ static void ana6707_f10_get_panel_rev(struct exynos_panel *ctx, u32 id)
 		ctx->panel_rev = PANEL_REV_DVT1;
 		break;
 	case 0x11:
-		ctx->panel_rev = PANEL_REV_DVT1_1;
-		break;
-	case 0x14:
 		ctx->panel_rev = PANEL_REV_PVT;
 		break;
 	default:
@@ -1288,8 +1296,8 @@ const struct brightness_capability ana6707_f10_brightness_capability = {
 			.max = 1000,
 		},
 		.level = {
-			.min = 2052,
-			.max = 3410,
+			.min = 2049,
+			.max = 3320,
 		},
 		.percentage = {
 			.min = 60,
@@ -1302,7 +1310,7 @@ const struct exynos_panel_desc samsung_ana6707_f10 = {
 	.dsc_pps = PPS_SETTING,
 	.dsc_pps_len = ARRAY_SIZE(PPS_SETTING),
 	.data_lane_cnt = 4,
-	.max_brightness = 3410,
+	.max_brightness = 3320,
 	.min_brightness = 7,
 	.dft_brightness = 1023,
 	.brt_capability = &ana6707_f10_brightness_capability,
