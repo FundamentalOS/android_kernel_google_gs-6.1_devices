@@ -953,7 +953,7 @@
 					<1000
 					 1000
 					 1000>;
-				periodic-io-thread-priority = <99>;
+				transaction-thread-priority = <99>;
 				i2c-lock-group-id = <0>;
 			};
 
@@ -1014,7 +1014,7 @@
 					 1000
 					 1000
 					 1000>;
-				periodic-io-thread-priority = <99>;
+				transaction-thread-priority = <99>;
 				i2c-lock-group-id = <1>;
 			};
 
@@ -1065,7 +1065,7 @@
 					<1000
 					 1000
 					 1000>;
-				periodic-io-thread-priority = <99>;
+				transaction-thread-priority = <99>;
 				i2c-lock-group-id = <0>;
 			};
 
@@ -1126,7 +1126,7 @@
 					 1000
 					 1000
 					 1000>;
-				periodic-io-thread-priority = <99>;
+				transaction-thread-priority = <99>;
 				i2c-lock-group-id = <1>;
 			};
 
