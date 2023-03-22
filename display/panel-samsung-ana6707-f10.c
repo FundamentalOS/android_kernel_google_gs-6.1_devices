@@ -875,6 +875,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 		}
 
 		ctx->panel_idle_vrefresh = ctx->self_refresh_active ? spanel->hw_idle_vrefresh : 0;
+		backlight_state_changed(ctx->bl);
 		return false;
 	}
 
