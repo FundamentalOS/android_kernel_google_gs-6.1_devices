@@ -4521,12 +4521,6 @@ static int fts_interrupt_install(struct fts_ts_info *info)
 	install_handler(info, STATUS_UPDATE, status);
 	install_handler(info, USER_REPORT, user_report);
 
-	/* disable interrupts in any case */
-	error = fts_enableInterrupt(info, false);
-	if (error) {
-		return error;
-	}
-
 	error = goog_request_threaded_irq(info->gti, info->client->irq, fts_isr,
 			fts_interrupt_handler, IRQF_ONESHOT | IRQF_TRIGGER_LOW,
 			FTS_TS_DRV_NAME, info);
@@ -4535,8 +4529,13 @@ static int fts_interrupt_install(struct fts_ts_info *info)
 	if (error) {
 		dev_err(info->dev, "Request irq failed\n");
 		kfree(info->event_dispatch_table);
+		goto exit;
 	}
 
+	/* disable interrupts in any case */
+	error = fts_enableInterrupt(info, false);
+
+exit:
 	return error;
 }
 
