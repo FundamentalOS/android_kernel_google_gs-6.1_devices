@@ -415,7 +415,7 @@ static void ana6707_f10_early_exit_enable(struct exynos_panel *ctx)
 	if (spanel->early_exit.status == EARLY_EXIT_ON)
 		return;
 
-	dev_info(ctx->dev, "%s\n", __func__);
+	dev_dbg(ctx->dev, "%s\n", __func__);
 
 	DPU_ATRACE_BEGIN(__func__);
 	exynos_panel_send_cmd_set_flags(ctx, &ana6707_f10_early_exit_enable_cmd_set, flags);
@@ -494,7 +494,7 @@ static void ana6707_f10_early_exit_post_enable(struct exynos_panel *ctx, bool fo
 	if (ctx->panel_rev <= PANEL_REV_PROTO1_1 && idle_vrefresh != 1)
 		step_cmd[5] = 0x03;
 
-	dev_info(ctx->dev, "%s\n", __func__);
+	dev_dbg(ctx->dev, "%s\n", __func__);
 
 	EXYNOS_DCS_WRITE_TABLE(ctx, unlock_cmd_f0);
 
