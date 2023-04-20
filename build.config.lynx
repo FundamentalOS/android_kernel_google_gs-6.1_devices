@@ -65,6 +65,7 @@ private/google-modules/gpu/mali_kbase
 private/devices/google/lynx/display
 private/google-modules/bms
 private/google-modules/power/reset
+private/google-modules/amplifiers/snd_soc_wm_adsp
 private/google-modules/amplifiers/cs35l41
 private/google-modules/amplifiers/cs35l45
 private/google-modules/amplifiers/cs40l26
