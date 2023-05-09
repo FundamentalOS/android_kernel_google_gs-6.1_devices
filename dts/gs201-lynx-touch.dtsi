@@ -26,6 +26,8 @@
 	dma-mode;
 	dmas = <&pdma0 0 &pdma0 1>;
 	swap-mode = <1>;
+	cs-gpio = <&gpp20 3 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
 };
 
 &spitouch {
@@ -59,7 +61,6 @@
 	goog,offload-caps-cancel-reporting;
 
 	controller-data {
-		cs-gpio = <&gpp20 3 0>;
 		samsung,spi-feedback-delay = <0>;
 		samsung,spi-chip-select-mode = <1>;
 		cs-clock-delay = <1>;
