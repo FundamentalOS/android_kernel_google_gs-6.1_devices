@@ -75,15 +75,15 @@ private/google-modules/aoc
 private/google-modules/aoc/alsa
 private/google-modules/lwis
 private/google-modules/nfc
+private/google-modules/touch/common
+private/google-modules/touch/focaltech/ft3658
+private/google-modules/touch/goodix
 private/google-modules/video/gchips
 "
 #private/google-modules/aoc/usb
 #private/google-modules/bluetooth/qcom
 #private/google-modules/edgetpu/janeiro/drivers/edgetpu
 #private/google-modules/gxp/gs201
-#private/google-modules/touch/common
-#private/google-modules/touch/focaltech/ft3658
-#private/google-modules/touch/goodix
 #private/google-modules/wlan/wcn6740/cnss2
 #private/google-modules/wlan/wcn6740/wlan/qcacld-3.0
 
