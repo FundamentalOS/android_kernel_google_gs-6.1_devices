@@ -62,6 +62,7 @@ private/google-modules/soc/gs
 private/google-modules/display
 private/google-modules/gpu/mali_pixel
 private/google-modules/gpu/mali_kbase
+private/google-modules/edgetpu/janeiro/drivers/edgetpu
 private/devices/google/lynx/display
 private/google-modules/bms
 private/google-modules/power/reset
@@ -82,7 +83,6 @@ private/google-modules/video/gchips
 "
 #private/google-modules/aoc/usb
 #private/google-modules/bluetooth/qcom
-#private/google-modules/edgetpu/janeiro/drivers/edgetpu
 #private/google-modules/gxp/gs201
 #private/google-modules/wlan/wcn6740/cnss2
 #private/google-modules/wlan/wcn6740/wlan/qcacld-3.0

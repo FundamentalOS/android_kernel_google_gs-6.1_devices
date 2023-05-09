@@ -46,6 +46,7 @@ kernel_module_group(
         "//private/google-modules/display:samsung",
         "//private/google-modules/gpu/mali_kbase",
         "//private/google-modules/gpu/mali_pixel",
+        "//private/google-modules/edgetpu/janeiro/drivers/edgetpu:edgetpu.janeiro",
         "//private/google-modules/bms",
         "//private/google-modules/power/reset",
         "//private/google-modules/lwis",
