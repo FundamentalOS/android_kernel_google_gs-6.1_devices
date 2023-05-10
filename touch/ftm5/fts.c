@@ -3848,17 +3848,6 @@ static irqreturn_t fts_interrupt_handler(int irq, void *handle)
 	unsigned char *evt_data;
 	bool has_pointer_event = false;
 	int event_start_idx = -1;
-	u32 goog_pm_locks = 0;
-
-#if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
-	error = goog_pm_wake_lock(info->gti, GTI_PM_WAKELOCK_TYPE_IRQ, true);
-	if (error < 0) {
-		goog_pm_locks = goog_pm_wake_get_locks(info->gti);
-		dev_warn(info->dev, "%s: Touch device already suspended(locks=0x%X,err=%d).\n",
-			__func__, goog_pm_locks, error);
-		return IRQ_HANDLED;
-	}
-#endif
 
 	/* Read the first FIFO event and the number of events remaining */
 	error = fts_writeReadU8UX(info, regAdd, 0, 0, data, FIFO_EVENT_SIZE,
@@ -3951,9 +3940,6 @@ static irqreturn_t fts_interrupt_handler(int irq, void *handle)
 	}
 
 exit:
-#if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
-	goog_pm_wake_unlock_nosync(info->gti, GTI_PM_WAKELOCK_TYPE_IRQ);
-#endif
 	return IRQ_HANDLED;
 }
 
