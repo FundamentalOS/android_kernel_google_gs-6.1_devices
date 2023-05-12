@@ -113,6 +113,8 @@ kernel_build(
         "drivers/spi/spidev.ko",
         "drivers/watchdog/softdog.ko",
         "lib/crc-t10dif.ko",
+        "net/mac80211/mac80211.ko",
+        "net/wireless/cfg80211.ko",
     ],
     strip_modules = True,
     # Keep in sync with build.config.common
