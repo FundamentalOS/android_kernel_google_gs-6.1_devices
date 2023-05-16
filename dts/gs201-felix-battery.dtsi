@@ -52,6 +52,18 @@
 				google,ttf-tier-table = <0 50 74>;
 
 				google,fan-bt-limits = <280 290 300 320>;
+
+				google,batt-id-1-atl {
+					google,batt-id = <1>;
+					google,aacr-ref-cycles = <300 400 500 600 700 800>;
+					google,aacr-ref-fade10 = <  3  10  27  37  46  55>;
+				};
+
+				google,batt-id-2-cos {
+					google,batt-id = <2>;
+					google,aacr-ref-cycles = <200 300 400 500 600 700 800>;
+					google,aacr-ref-fade10 = <  8  16  17  33  38  44  50>;
+				};
 			};
 
 			google_dual_batt_gauge: google,dual_batt_gauge {
