@@ -3163,7 +3163,7 @@ static bool fts_error_event_handler(struct fts_ts_info *info, unsigned
 		/* before reset clear all slot */
 		release_all_touches(info);
 #endif
-		fts_chip_powercycle(info);
+		fts_chip_powercycle(info, false);
 
 		error = fts_system_reset(info);
 		error |= fts_mode_handler(info, 0);
@@ -4265,7 +4265,7 @@ static int fts_fw_update(struct fts_ts_info *info)
 			dev_err(info->dev, "%s: firmware update failed; retrying. ERROR %08X\n",
 				__func__, ret);
 			/* Power cycle the touch IC */
-			fts_chip_powercycle(info);
+			fts_chip_powercycle(info, false);
 			ret = flashProcedure(info, info->board->fw_name,
 					     info->reflash_fw, keep_cx);
 			if ((ret & 0xFF000000) == ERROR_FLASH_PROCEDURE) {
@@ -4457,7 +4457,7 @@ static int fts_chip_initialization(struct fts_ts_info *info, int init_type)
 		initretrycnt++;
 		dev_err(info->dev, "initialization cycle count = %04d - ERROR %08X\n",
 			initretrycnt, ret2);
-		fts_chip_powercycle(info);
+		fts_chip_powercycle(info, false);
 	}
 
 	if (ret2 < OK)	/* initialization error */
@@ -4582,9 +4582,10 @@ static int fts_init(struct fts_ts_info *info)
   * Execute a power cycle in the IC, toggling the power lines (AVDD and DVDD)
   * @param info pointer to fts_ts_info struct which contain information of the
   * regulators
+  * @param wait_drain to drain the AVDD/DVDD before reenable
   * @return 0 if success or another value if fail
   */
-int fts_chip_powercycle(struct fts_ts_info *info)
+int fts_chip_powercycle(struct fts_ts_info *info, bool wait_drain)
 {
 	int error = 0;
 
@@ -4608,10 +4609,15 @@ int fts_chip_powercycle(struct fts_ts_info *info)
 				__func__);
 	}
 
-	if (info->board->reset_gpio != GPIO_NOT_DEFINED)
+	if (info->board->reset_gpio != GPIO_NOT_DEFINED) {
+		if (wait_drain)
+			usleep_range(15 * USEC_PER_MSEC, 15 * USEC_PER_MSEC + 100);
 		gpio_set_value(info->board->reset_gpio, 0);
-	else
+		if (wait_drain)
+			usleep_range(5 * USEC_PER_MSEC, 5 * USEC_PER_MSEC + 100);
+	} else {
 		mdelay(300);
+	}
 
 	/* in FTI power up first the digital and then the analog */
 	if (info->vdd_reg) {

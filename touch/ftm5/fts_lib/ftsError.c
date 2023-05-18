@@ -143,7 +143,7 @@ int errorHandler(struct fts_ts_info *info, u8 *event, int size)
 		switch (event[1]) {	/* TODO: write an error log for
 					 * undefined command subtype 0xBA */
 		case EVT_TYPE_ERROR_ESD:	/* esd */
-			res = fts_chip_powercycle(info);
+			res = fts_chip_powercycle(info, false);
 			if (res < OK)
 				dev_err(info->dev, "errorHandler: Error performing powercycle ERROR %08X\n",
 					res);

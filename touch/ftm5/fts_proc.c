@@ -2046,7 +2046,7 @@ static ssize_t fts_driver_test_write(struct file *file, const char __user *buf,
 			break;
 
 		case CMD_POWERCYCLE:
-			res = fts_chip_powercycle(info);
+			res = fts_chip_powercycle(info, false);
 			break;
 
 		case CMD_GETLIMITSFILE:

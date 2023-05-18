@@ -63,7 +63,7 @@ typedef enum {
 #define RETRY_MAX_REQU_DATA		2	/* /< Max number of attempts
 						 * performed
 						 * when requesting data */
-#define RETRY_SYSTEM_RESET		3	/* /< Max number of attempts
+#define RETRY_SYSTEM_RESET		2	/* /< Max number of attempts
 						 * performed
 						 * to reset the IC */
 

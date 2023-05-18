@@ -91,7 +91,7 @@ int fts_system_reset(struct fts_ts_info *info)
 						    data));
 		else {
 			gpio_set_value(info->board->reset_gpio, 0);
-			msleep(10);
+			usleep_range(10 * USEC_PER_MSEC, 10 * USEC_PER_MSEC + 100);
 			gpio_set_value(info->board->reset_gpio, 1);
 			res = OK;
 		}
@@ -99,16 +99,24 @@ int fts_system_reset(struct fts_ts_info *info)
 			dev_err(info->dev, "fts_system_reset: ERROR %08X\n", ERROR_BUS_W);
 		else {
 			res = pollForEvent(info, &event_to_search, 1, readData,
-					   GENERAL_TIMEOUT);
+					   TIMEOUT_SYSTEM_RESET);
 			if (res < OK)
 				dev_err(info->dev, "fts_system_reset: ERROR %08X\n", res);
 		}
 	}
 
 	if (res < OK) {
-		dev_err(info->dev, "fts_system_reset...failed after 3 attempts: ERROR %08X\n",
-			(res | ERROR_SYSTEM_RESET_FAIL));
-		return res | ERROR_SYSTEM_RESET_FAIL;
+		dev_err(info->dev, "%s: failed after %d attempts: ERROR %08X\n",
+			__func__, i, (res | ERROR_SYSTEM_RESET_FAIL));
+		/* Do powercycle to recover unexpected system reset fail. */
+		fts_chip_powercycle(info, true);
+		res = pollForEvent(info, &event_to_search, 1, readData, TIMEOUT_SYSTEM_RESET);
+		if (res < OK) {
+			dev_err(info->dev, "%s: no ready ack after powercycle!\n", __func__);
+			return res | ERROR_SYSTEM_RESET_FAIL;
+		}
+
+		return OK;
 	} else {
 #ifdef FTS_GPIO6_UNUSED
 		u8ToU64_be(&cmd[1], &addr, ADDR_SIZE_HW_REG);
