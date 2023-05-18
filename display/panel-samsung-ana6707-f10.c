@@ -849,12 +849,16 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 	if (unlikely(!pmode))
 		return false;
 
+	/* self refresh is not supported in lp mode since that always makes use of early exit */
+	if (pmode->exynos_mode.is_lp_mode) {
+		/* set 1Hz while self refresh is active, otherwise clear it */
+		ctx->panel_idle_vrefresh = enable ? 1 : 0;
+		backlight_state_changed(ctx->bl);
+		return false;
+	}
+
 	mdata = pmode->priv_data;
 	if (unlikely(!mdata))
-		return false;
-
-	/* self refresh is not supported in lp mode since that always makes use of early exit */
-	if (pmode->exynos_mode.is_lp_mode)
 		return false;
 
 	idle_vrefresh = ana6707_f10_get_min_idle_vrefresh(ctx, pmode);
