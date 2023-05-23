@@ -136,7 +136,8 @@ int fts_read(u8 *out_buf, int byte_to_read)
 	} else {
 		transfer[0].len = byte_to_read;
 	}
-	transfer[0].delay_usecs = SPI_DELAY_CS;
+	transfer[0].delay.unit = SPI_DELAY_UNIT_USECS;
+	transfer[0].delay.value = SPI_DELAY_CS;
 	transfer[0].tx_buf = NULL;
 	transfer[0].rx_buf = out_buf;
 	spi_message_add_tail(&transfer[0], &msg);
@@ -216,7 +217,8 @@ int fts_write_read(u8 *cmd, int cmd_length, u8 *out_buf, int byte_to_read)
 	} else {
 		transfer[1].len = byte_to_read;
 	}
-	transfer[1].delay_usecs = SPI_DELAY_CS;
+	transfer[1].delay.unit = SPI_DELAY_UNIT_USECS;
+	transfer[1].delay.value = SPI_DELAY_CS;
 	transfer[1].tx_buf = NULL;
 	transfer[1].rx_buf = out_buf;
 	spi_message_add_tail(&transfer[1], &msg);
@@ -288,7 +290,9 @@ int fts_write(u8 *cmd, int cmd_length)
 	} else {
 		transfer[0].len = cmd_length;
 	}
-	transfer[0].delay_usecs = SPI_DELAY_CS;
+
+	transfer[0].delay.unit = SPI_DELAY_UNIT_USECS;
+	transfer[0].delay.value = SPI_DELAY_CS;
 	transfer[0].tx_buf = cmd;
 	transfer[0].rx_buf = NULL;
 	spi_message_add_tail(&transfer[0], &msg);
