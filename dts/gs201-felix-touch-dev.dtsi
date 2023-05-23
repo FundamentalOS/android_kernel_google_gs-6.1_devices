@@ -20,6 +20,11 @@
 	/delete-property/ regulator-always-on;
 };
 
+&spi_0 {
+	cs-gpio = <&gpp20 3 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
+};
+
 &spitouch {
 	status = "ok";
 	compatible = "st,fts";
@@ -41,7 +46,6 @@
 	vdd-supply = <&s_ldo22_reg>; /* VIO 1.8V, different from common. */
 	avdd-supply = <&s_ldo6_reg>; /* AVDD 3.3V, different from common. */
 	controller-data {
-		cs-gpio = <&gpp20 3 0>;
 		samsung,spi-feedback-delay = <1>;
 		samsung,spi-chip-select-mode = <0>;
 		cs-clock-delay = <2>;

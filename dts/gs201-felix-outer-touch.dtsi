@@ -17,6 +17,8 @@
 	dma-mode;
 	dmas = <&pdma0 12 &pdma0 13>;
 	swap-mode = <1> ;
+	cs-gpio = <&gpp12 3 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
 };
 
 &m_ldo25_reg {
@@ -120,7 +122,6 @@
 		goog,default-grip-disabled;
 		goog,default-palm-disabled;
 		controller-data {
-			cs-gpio = <&gpp12 3 0>;
 			samsung,spi-feedback-delay = <1>;
 			samsung,spi-chip-select-mode = <0>;
 			cs-clock-delay = <2>;
