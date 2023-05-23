@@ -336,7 +336,7 @@ static ssize_t fts_seq_write(struct file *file, const char __user *buf,
 	struct force_update_flag force_burn_flag;
 	struct mutual_total_cx_data mutual_total_cx;
 	struct self_total_cx_data self_total_cx;
-	struct fts_ts_info *info = PDE_DATA(file_inode(file));
+	struct fts_ts_info *info = pde_data(file_inode(file));
 
 	pbuf = (u8 *)kmalloc(count * sizeof(u8), GFP_KERNEL);
 	if (pbuf == NULL) {
