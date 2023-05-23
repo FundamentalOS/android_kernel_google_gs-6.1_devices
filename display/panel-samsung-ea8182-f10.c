@@ -10,6 +10,7 @@
  */
 
 #include <drm/drm_vblank.h>
+#include <linux/debugfs.h>
 #include <linux/module.h>
 #include <linux/of_platform.h>
 #include <video/mipi_display.h>
@@ -625,11 +626,20 @@ static int ea8182_f10_panel_probe(struct mipi_dsi_device *dsi)
 	return exynos_panel_common_init(dsi, &spanel->base);
 }
 
-static void ea8182_f10_panel_init(struct exynos_panel *ctx)
+
+static void ea8182_f10_debugfs_init(struct drm_panel *panel, struct dentry *root)
 {
-	struct dentry *csroot = ctx->debugfs_cmdset_entry;
+	struct exynos_panel *ctx = container_of(panel, struct exynos_panel, panel);
+	struct dentry *csroot = debugfs_lookup("cmdsets", root);
+
+	if (!ctx || !csroot)
+		return;
 
 	exynos_panel_debugfs_create_cmdset(ctx, csroot, &ea8182_f10_init_cmd_set, "init");
+}
+
+static void ea8182_f10_panel_init(struct exynos_panel *ctx)
+{
 }
 
 static const struct exynos_display_underrun_param underrun_param = {
@@ -738,6 +748,7 @@ static const struct drm_panel_funcs ea8182_f10_drm_funcs = {
 	.prepare = exynos_panel_prepare,
 	.enable = ea8182_f10_enable,
 	.get_modes = exynos_panel_get_modes,
+	.debugfs_init = ea8182_f10_debugfs_init,
 };
 
 static const struct exynos_panel_funcs ea8182_f10_exynos_funcs = {

@@ -1264,38 +1264,47 @@ static const struct exynos_panel_mode ana6707_f10_lp_mode = {
 	}
 };
 
-static void ana6707_f10_panel_mode_create_cmdset(struct exynos_panel *ctx,
+static void ana6707_f10_panel_mode_create_cmdset(struct exynos_panel *ctx, struct dentry *root,
 					     const struct exynos_panel_mode *pmode)
 {
-	struct dentry *root;
+	struct dentry *csroot;
 	const struct ana6707_f10_mode_data *mdata = pmode->priv_data;
 
 	if (!mdata)
 		return;
 
-	root = debugfs_create_dir(pmode->mode.name, ctx->debugfs_cmdset_entry);
-	if (!root) {
+	csroot = debugfs_create_dir(pmode->mode.name, root);
+	if (!csroot) {
 		dev_err(ctx->dev, "unable to create %s mode debugfs dir\n", pmode->mode.name);
 		return;
 	}
 
-	exynos_panel_debugfs_create_cmdset(ctx, root, mdata->auto_mode_pre_cmd_set,
+	exynos_panel_debugfs_create_cmdset(ctx, csroot, mdata->auto_mode_pre_cmd_set,
 					   "auto_mode_pre");
-	exynos_panel_debugfs_create_cmdset(ctx, root, mdata->manual_mode_cmd_set, "manual_mode");
+	exynos_panel_debugfs_create_cmdset(ctx, csroot, mdata->manual_mode_cmd_set, "manual_mode");
 }
 
-static void ana6707_f10_panel_init(struct exynos_panel *ctx)
+static void ana6707_f10_debugfs_init(struct drm_panel *panel, struct dentry *root)
 {
-	struct dentry *csroot = ctx->debugfs_cmdset_entry;
-	struct ana6707_f10_panel *spanel = to_spanel(ctx);
+	struct exynos_panel *ctx = container_of(panel, struct exynos_panel, panel);
+	struct dentry *csroot = debugfs_lookup("cmdsets", root);
 	int i;
+
+	if (!csroot || !ctx)
+		return;
 
 	exynos_panel_debugfs_create_cmdset(ctx, csroot, &ana6707_f10_early_exit_enable_cmd_set,
 					   "early_exit_enable");
 	exynos_panel_debugfs_create_cmdset(ctx, csroot, &ana6707_f10_early_exit_post_enable_cmd_set,
 					   "early_exit_post_enable");
+
 	for (i = 0; i < ctx->desc->num_modes; i++)
-		ana6707_f10_panel_mode_create_cmdset(ctx, &ctx->desc->modes[i]);
+		ana6707_f10_panel_mode_create_cmdset(ctx, csroot, &ctx->desc->modes[i]);
+}
+
+static void ana6707_f10_panel_init(struct exynos_panel *ctx)
+{
+	struct ana6707_f10_panel *spanel = to_spanel(ctx);
 
 	/* early exit is disabled by default */
 	spanel->early_exit.status = EARLY_EXIT_OFF;
@@ -1359,6 +1368,7 @@ static const struct drm_panel_funcs ana6707_f10_drm_funcs = {
 	.prepare = exynos_panel_prepare,
 	.enable = ana6707_f10_enable,
 	.get_modes = exynos_panel_get_modes,
+	.debugfs_init = ana6707_f10_debugfs_init,
 };
 
 static const struct exynos_panel_funcs ana6707_f10_exynos_funcs = {
