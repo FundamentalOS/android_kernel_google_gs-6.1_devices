@@ -78,10 +78,10 @@ private/google-modules/aoc/alsa
 private/google-modules/lwis
 private/google-modules/nfc
 private/google-modules/touch/common
+private/devices/google/felix/touch/fst2
+private/devices/google/felix/touch/ftm5
 private/google-modules/wlan/bcmdhd4389
 "
-#private/devices/google/felix/touch/ftm5
-#private/devices/google/felix/touch/fst2
 #private/google-modules/aoc/usb
 #private/google-modules/bluetooth/broadcom
 #private/google-modules/fingerprint/fpc
