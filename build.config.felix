@@ -3,7 +3,7 @@
 DEVICE_DIR=${KERNEL_DIR}
 SOC_DIR=private/google-modules/soc/gs
 KERNEL_DIR="common"
-DEVICE_REL_DIR=$(rel_path2 ${DEVICE_DIR} ${KERNEL_DIR})
+DEVICE_REL_DIR=$(realpath ${DEVICE_DIR} --relative-to ${KERNEL_DIR})
 KCONFIG_EXT_PREFIX=${SOC_DIR}
 
 GKI_FRAGMENT_DEFCONFIG=${SOC_DIR}/arch/arm64/configs/cloudripper_gki.fragment
