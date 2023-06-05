@@ -342,14 +342,14 @@ kernel_images(
     # Keep the following in sync with build.config.lynx:
     modules_list = ":vendor_kernel_boot_modules.lynx-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props.gs201",
+    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props",
     vendor_dlkm_etc_files = ["//private/devices/google/lynx:insmod_cfgs"],
     vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.cloudripper",
     # No MODULES_BLOCKLIST
     vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.slider",
-    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props.slider",
+    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props",
     deps = [
-        # Keep the following in sync with vendor_dlkm.props.slider:
+        # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
         "//prebuilts/boot-artifacts/selinux:vendor_dlkm_file_contexts",
         "//prebuilts/boot-artifacts/selinux:system_dlkm_file_contexts",
