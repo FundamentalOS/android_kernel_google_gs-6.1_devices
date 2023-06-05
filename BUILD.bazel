@@ -77,13 +77,13 @@ kernel_build(
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
+        "//private/devices/google/felix/touch/fst2:fst2.kconfig",
+        "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
         "//private/google-modules/power/reset:reset.kconfig",
         "//private/google-modules/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
         "//private/google-modules/soc/gs:build.config.gs101",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
         "//private/google-modules/touch/common:common.kconfig",
-        "//private/devices/google/felix/touch/fst2:fst2.kconfig",
-        "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/video/gchips:video.gchips.kconfig",
@@ -355,8 +355,8 @@ kernel_images(
     deps = [
         # Keep the following in sync with vendor_dlkm.props.slider:
         # selinux_fc
-        "//prebuilts/boot-artifacts/selinux:file_contexts",
-        "//prebuilts/boot-artifacts/selinux:system_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:vendor_dlkm_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:system_dlkm_file_contexts",
     ],
 )
 
