@@ -351,8 +351,8 @@ kernel_images(
     deps = [
         # Keep the following in sync with vendor_dlkm.props.slider:
         # selinux_fc
-        "//prebuilts/boot-artifacts/selinux:file_contexts",
-        "//prebuilts/boot-artifacts/selinux:system_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:vendor_dlkm_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:system_dlkm_file_contexts",
     ],
 )
 
