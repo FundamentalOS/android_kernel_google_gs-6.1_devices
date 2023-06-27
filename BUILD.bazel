@@ -63,6 +63,7 @@ kernel_module_group(
         "//private/devices/google/felix/touch/ftm5",
         "//private/google-modules/nfc",
         "//private/google-modules/touch/common:touch.common",
+        "//private/google-modules/trusty",
         "//private/google-modules/video/gchips:video.gchips",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
         "//private/google-modules/wlan/bcmdhd4389",
@@ -86,6 +87,7 @@ kernel_build(
         "//private/google-modules/touch/common:common.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/sec:sec.kconfig",
+        "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/video/gchips:video.gchips.kconfig",
     ],
     outs = [
@@ -141,6 +143,7 @@ kernel_module(
     name = "gs201_soc",
     srcs = [
         "//private/google-modules/soc/gs:gs_soc_sources",
+        "//private/google-modules/trusty:headers",
     ],
     outs = [
         # keep sorted
@@ -258,11 +261,6 @@ kernel_module(
         "drivers/thermal/google/s2mpg13_spmic_thermal.ko",
         "drivers/thermal/samsung/gpu_cooling.ko",
         "drivers/thermal/samsung/gs_thermal.ko",
-        "drivers/trusty/trusty-core.ko",
-        "drivers/trusty/trusty-ipc.ko",
-        "drivers/trusty/trusty-log.ko",
-        "drivers/trusty/trusty-test.ko",
-        "drivers/trusty/trusty-virtio.ko",
         "drivers/tty/serial/exynos_tty.ko",
         "drivers/usb/dwc3/dwc3-exynos-usb.ko",
         "drivers/usb/gadget/function/usb_f_dm.ko",
@@ -282,6 +280,9 @@ kernel_module(
         # keep sorted
         "//private/devices/google:__subpackages__",
         "//private/google-modules:__subpackages__",
+    ],
+    deps = [
+        "//private/google-modules/trusty",
     ],
 )
 
