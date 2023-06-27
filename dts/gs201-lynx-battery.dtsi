@@ -17,8 +17,6 @@
 
 	google,temp-filter-enable;
 
-	google,aacr-disable;
-
 	google,batt-id-2-cos {
 		google,batt-id = <2>;
 		google,aacr-ref-cycles = <100 200 300 400 500 600 700 800>;
