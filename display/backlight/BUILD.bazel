@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+load("//build/kernel/kleaf:kernel.bzl", "kernel_module")
+
+kernel_module(
+    name = "rt4539",
+    srcs = glob([
+        "*.c",
+        "*.h",
+        "Kbuild",
+    ]),
+    outs = [
+        "rt4539_bl.ko",
+    ],
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    visibility = [
+        "//private/devices/google:__subpackages__",
+    ],
+)

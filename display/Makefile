@@ -6,10 +6,9 @@ KBUILD_OPTIONS += CONFIG_DRM_PANEL_BOE_TS110F5MLG0=m
 KBUILD_OPTIONS += CONFIG_DRM_PANEL_CSOT_PPA957DB2D=m
 
 EXTRA_CFLAGS += -DDYNAMIC_DEBUG_MODULE=1
-EXTRA_CFLAGS += -I$(KERNEL_SRC)/../google-modules/display
 EXTRA_CFLAGS += -Werror
 
-EXTRA_SYMBOLS += $(OUT_DIR)/../google-modules/display/samsung/Module.symvers
+EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/display/Module.symvers
 
 modules modules_install clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(M) W=1 \
