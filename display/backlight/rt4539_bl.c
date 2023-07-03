@@ -486,7 +486,7 @@ static int rt4539_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	return 0;
 }
 
-static int rt4539_remove(struct i2c_client *cl)
+static void rt4539_remove(struct i2c_client *cl)
 {
 	struct rt4539 *rt = i2c_get_clientdata(cl);
 
@@ -494,8 +494,6 @@ static int rt4539_remove(struct i2c_client *cl)
 	backlight_update_status(rt->bl);
 	if (rt->is_forced_blank == false)
 		rt4539_disable(rt);
-
-	return 0;
 }
 
 static const struct of_device_id rt4539_dt_ids[] = {
