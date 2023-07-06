@@ -6,7 +6,6 @@ kernel_dtstree(
     name = "felix.dt",
     srcs = glob([
         "Makefile",
-        "Makefile",
         "**/*.dtsi",
         "**/*.dts",
         "google-base",
