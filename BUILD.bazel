@@ -380,6 +380,7 @@ _lynx_dist_targets = [
     ":insmod_cfgs",
     "//common:android/abi_gki_aarch64_pixel",
     "//common:kernel_aarch64_download_or_build",
+    "//common:kernel_aarch64_headers_download_or_build",
 ] + ["//common:kernel_aarch64/{}".format(m) for m in COMMON_GKI_MODULES_LIST]
 
 copy_to_dist_dir(
