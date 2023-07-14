@@ -7,7 +7,8 @@
  */
 
 #include <dt-bindings/clock/gs201.h>
-#include <dt-bindings/pinctrl/samsung.h>
+#include <arm64/exynos/exynos-pinctrl.h>
+#include "google-base/gs101-pinctrl.h"
 
 &pinctrl_6 {
 	nfc_rst: nfc-rst {
@@ -29,7 +30,7 @@
 	#size-cells = <0>;
 	clock-frequency = <370000>;
 	status = "okay";
-	st21nfc@08 {
+	st21nfc@8 {
 		compatible = "st,st21nfc";
 		reg = <0x08>;
 		dev-name = "st21nfc";
