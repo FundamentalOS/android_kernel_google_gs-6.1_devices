@@ -6,7 +6,8 @@
  *
  */
 
-#include <dt-bindings/pinctrl/samsung.h>
+#include <arm64/exynos/exynos-pinctrl.h>
+#include "google-base/gs101-pinctrl.h"
 #include <dt-bindings/regulator/samsung,s2mpg-regulator.h>
 
 &ts_spi_cs_active {
@@ -29,6 +30,8 @@
 };
 
 &spitouch {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	compatible = "novatek,NVT-ts-spi";
 	reg = <0>;

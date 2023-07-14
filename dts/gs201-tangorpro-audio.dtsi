@@ -6,7 +6,8 @@
  *          https://www.google.com
  *
  */
-#include <dt-bindings/pinctrl/samsung.h>
+#include <arm64/exynos/exynos-pinctrl.h>
+#include "google-base/gs101-pinctrl.h"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/sound/google-aoc.h>
 
