@@ -1,6 +1,0 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
-#
-# Copyright (C) 2022 Google LLC
-
-build:lynx --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/lynx:lynx
-build:lynx --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/lynx:gs201_soc
