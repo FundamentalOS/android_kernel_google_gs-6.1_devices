@@ -82,7 +82,7 @@ kernel_build(
         "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
         "//private/google-modules/power/reset:reset.kconfig",
         "//private/google-modules/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
-        "//private/google-modules/soc/gs:build.config.gs101",
+        "//private/google-modules/soc/gs:build.config.gs.common",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
         "//private/google-modules/touch/common:common.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
@@ -348,7 +348,7 @@ kernel_images(
     system_dlkm_modules_list = ":system_dlkm_modules_list",
     system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props",
     #vendor_dlkm_etc_files = ["//private/devices/google/felix:insmod_cfgs"],
-    vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.cloudripper",
+    vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.gs201",
     # No MODULES_BLOCKLIST
     vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.slider",
     vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props",

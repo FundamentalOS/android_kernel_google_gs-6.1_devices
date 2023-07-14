@@ -2,87 +2,25 @@
 # file is located.
 DEVICE_DIR=${KERNEL_DIR}
 SOC_DIR=private/google-modules/soc/gs
+# Compile these modules with the GKI kernel
 KERNEL_DIR="common"
 DEVICE_REL_DIR=$(realpath ${DEVICE_DIR} --relative-to ${KERNEL_DIR})
 KCONFIG_EXT_PREFIX=${SOC_DIR}
 
 GKI_FRAGMENT_DEFCONFIG=${SOC_DIR}/arch/arm64/configs/cloudripper_gki.fragment
+. ${ROOT_DIR}/${SOC_DIR}/build.config.gs.common
 
-. ${ROOT_DIR}/${SOC_DIR}/build.config.gs101
+DEFCONFIG=felix_gki_defconfig
+PRE_DEFCONFIG_CMDS="mkdir -p \${OUT_DIR}/arch/arm64/configs/ && KCONFIG_CONFIG=\${OUT_DIR}/arch/arm64/configs/${DEFCONFIG} ${ROOT_DIR}/${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m -r ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/gki_defconfig ${ROOT_DIR}/${GKI_FRAGMENT_DEFCONFIG}"
 
 MAKE_GOALS="$MAKE_GOALS
 modules
 dtbs
 "
 
-BUILD_BOOT_IMG=
-BUILD_VENDOR_BOOT_IMG=
-VENDOR_RAMDISK_BINARY=
-
-BUILD_VENDOR_KERNEL_BOOT=1
-DTS_EXT_DIR="private/devices/google/felix/dts"
 DTC_INCLUDE=${ROOT_DIR}/${SOC_DIR}/include/dtc
-BUILD_DTBO_IMG=1
 MKDTIMG_FLAGS="--page_size=4096 --id=/:board_id --rev=/:board_rev"
 # These paths need to be relative to KERNEL_DIR.
 MKDTIMG_DTBOS="
 ${DEVICE_REL_DIR}/dts/*.dtbo
 "
-
-FILES="
-google-base/gs201-a0.dtb
-google-base/gs201-b0.dtb
-gs201-felix-dev1_0.dtbo
-gs201-felix-proto1_0.dtbo
-gs201-felix-proto1_0_testDDR.dtbo
-gs201-felix-proto1_1.dtbo
-gs201-felix-proto1_1_testDDR.dtbo
-gs201-felix-evt1_0.dtbo
-gs201-felix-evt1_0-wingboard.dtbo
-gs201-felix-evt1_0-doe.dtbo
-gs201-felix-dvt1_0.dtbo
-gs201-felix-pvt1_0.dtbo
-gs201-felix-mp.dtbo
-"
-
-# Concatenate vendor_kernel_boot_modules.gs201 (platform common) and
-# vendor_kernel_boot_modules.felix (device specified) into one file
-POST_KERNEL_BUILD_CMDS="concat_vendor_boot_modules"
-function concat_vendor_boot_modules() {
-  cat ${SOC_DIR}/vendor_kernel_boot_modules.gs201 \
-    ${DEVICE_DIR}/vendor_kernel_boot_modules.felix > \
-    ${OUT_DIR}/vendor_kernel_boot_modules.concat
-  MODULES_LIST=${OUT_DIR}/vendor_kernel_boot_modules.concat
-}
-
-VENDOR_DLKM_MODULES_BLOCKLIST=${SOC_DIR}/vendor_dlkm.blocklist.cloudripper
-
-EXT_MODULES="
-private/google-modules/soc/gs
-private/google-modules/display
-private/google-modules/gpu/mali_pixel
-private/google-modules/gpu/mali_kbase
-private/google-modules/edgetpu/janeiro/drivers/edgetpu
-private/google-modules/gxp/gs201
-private/devices/google/felix/display
-private/google-modules/bms
-private/google-modules/power/reset
-private/google-modules/amplifiers/snd_soc_wm_adsp
-private/google-modules/amplifiers/cs35l41
-private/google-modules/amplifiers/cs35l45
-private/google-modules/amplifiers/cs40l26
-private/google-modules/amplifiers/drv2624
-private/google-modules/amplifiers/audiometrics
-private/google-modules/aoc
-private/google-modules/aoc/alsa
-private/google-modules/lwis
-private/google-modules/nfc
-private/google-modules/touch/common
-private/devices/google/felix/touch/fst2
-private/devices/google/felix/touch/ftm5
-private/google-modules/wlan/bcmdhd4389
-"
-#private/google-modules/aoc/usb
-#private/google-modules/bluetooth/broadcom
-#private/google-modules/fingerprint/fpc
-#private/google-modules/sensors/hall_sensor
