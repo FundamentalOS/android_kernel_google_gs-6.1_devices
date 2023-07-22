@@ -78,6 +78,7 @@ kernel_build(
         "//private/google-modules/soc/gs:build.config.gs.common",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
         "//private/google-modules/touch/common:common.kconfig",
+        "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/video/gchips:video.gchips.kconfig",
