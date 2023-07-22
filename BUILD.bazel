@@ -40,6 +40,7 @@ kernel_module_group(
         "//private/devices/google/tangorpro:gs201_soc",
         "//private/devices/google/tangorpro/display:drm_panel.google",
         "//private/devices/google/tangorpro/display/backlight:rt4539",
+        "//private/devices/google/tangorpro/pogo:pogo_transport",
         "//private/google-modules/display:samsung",
         "//private/google-modules/gpu/mali_kbase",
         "//private/google-modules/gpu/mali_pixel",

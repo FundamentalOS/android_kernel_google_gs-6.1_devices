@@ -22,10 +22,10 @@
 #include <linux/regulator/consumer.h>
 #include <linux/spinlock.h>
 #include <linux/usb.h>
+#include <linux/usb/tcpci.h>
 #include <linux/usb/tcpm.h>
 #include <misc/gvotable.h>
 
-#include "../tcpci.h"
 #include "google_bms.h"
 #include "google_psy.h"
 #include "tcpci_max77759.h"
