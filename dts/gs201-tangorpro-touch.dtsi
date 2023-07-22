@@ -29,6 +29,11 @@
 	samsung,pin-pud-pdn = <EXYNOS_PIN_PULL_NONE>;
 };
 
+&spi_0 {
+	cs-gpio = <&gpp20 3 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
+};
+
 &spitouch {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -2151,7 +2156,6 @@
 	};
 
 	controller-data {
-		cs-gpio = <&gpp20 3 0>;
 		samsung,spi-feedback-delay = <0>;
 		samsung,spi-chip-select-mode = <1>;
 		cs-clock-delay = <1>;
