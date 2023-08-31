@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//common:modules.bzl", "COMMON_GKI_MODULES_LIST")
+load("//common:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load(
@@ -318,10 +318,13 @@ genrule(
     tools = ["//build/kernel:hermetic-tools/cat"],
 )
 
+# TODO: Add support to disable a list of GKI modules
+_GKI_MODULES_LIST = get_gki_modules_list("arm64")
+
 write_file(
     name = "system_dlkm_modules_list",
     out = "system_dlkm_modules_list.tangorpro",
-    content = COMMON_GKI_MODULES_LIST,
+    content = _GKI_MODULES_LIST,
 )
 
 kernel_images(
@@ -379,7 +382,7 @@ _tangorpro_dist_targets = [
     ":insmod_cfgs",
     "//common:android/abi_gki_aarch64_pixel",
     "//common:kernel_aarch64_download_or_build",
-] + ["//common:kernel_aarch64/{}".format(m) for m in COMMON_GKI_MODULES_LIST]
+] + ["//common:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
 
 copy_to_dist_dir(
     name = "tangorpro_dist_copy_to_dist_dir",
