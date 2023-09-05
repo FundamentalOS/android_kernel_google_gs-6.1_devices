@@ -26,19 +26,10 @@
 #include <goog_touch_interface.h>
 #endif
 
-#define LOG_PREFIX "[FTS] "
-
-#define LOGD(fmt, args...) \
-	pr_debug(LOG_PREFIX fmt, ##args)
-
-#define LOGI(fmt, args...) \
-	pr_info(LOG_PREFIX fmt, ##args)
-
-#define LOGW(fmt, args...) \
-	pr_warn(LOG_PREFIX fmt, ##args)
-
-#define LOGE(fmt, args...) \
-	pr_err(LOG_PREFIX fmt, ##args)
+#undef pr_fmt
+#define pr_fmt(fmt) "gtd: fst2: " fmt
+#undef dev_fmt
+#define dev_fmt(fmt) "gtd: " fmt
 
 #define FTS_TS_DRV_NAME		"fst2"
 #define FTS_TS_DRV_VERSION	"6.0.3"

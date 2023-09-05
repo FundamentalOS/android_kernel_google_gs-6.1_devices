@@ -85,20 +85,20 @@ int read_sys_info(void)
 
 	res = fts_request_hdm(HDM_REQ_SYS_INFO);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	res = fts_read_hdm(FRAME_BUFFER_ADDR, data, SYS_INFO_SIZE);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
-	LOGI("%s: type: %02X, cnt: %02X, len: %d words\n",
+	pr_info("%s: type: %02X, cnt: %02X, len: %d words\n",
 		__func__, data[0], data[1],
 		(u16)((data[3] << 8) + data[2]));
 	if (data[0] != HDM_REQ_SYS_INFO) {
-		LOGE("%s: parsing ERROR %08X\n", __func__, ERROR_TIMEOUT);
+		pr_err("%s: parsing ERROR %08X\n", __func__, ERROR_TIMEOUT);
 		return ERROR_TIMEOUT;
 	}
 	index += 4;
@@ -217,133 +217,133 @@ int read_sys_info(void)
 	index += 4;
 	u8_to_u32(&data[index], &system_info.u32_pure_raw_ss_det_flash_addr);
 
-	LOGI("%s: API Version: 0x%04X\n",
+	pr_info("%s: API Version: 0x%04X\n",
 		__func__, system_info.u16_api_ver_rev);
-	LOGI("%s: API Major Version: 0x%02X\n",
+	pr_info("%s: API Major Version: 0x%02X\n",
 		__func__, system_info.u8_api_ver_major);
-	LOGI("%s: API Minor Version: 0x%02X\n",
+	pr_info("%s: API Minor Version: 0x%02X\n",
 		__func__, system_info.u8_api_ver_minor);
-	LOGI("%s: ChipId0: 0x%04X\n",
+	pr_info("%s: ChipId0: 0x%04X\n",
 		__func__, system_info.u16_chip0_id);
-	LOGI("%s: ChipVer0: 0x%04X\n",
+	pr_info("%s: ChipVer0: 0x%04X\n",
 		__func__, system_info.u16_chip0_ver);
-	LOGI("%s: ChipId1: 0x%04X\n",
+	pr_info("%s: ChipId1: 0x%04X\n",
 		__func__, system_info.u16_chip1_id);
-	LOGI("%s: ChipVer1: 0x%04X\n",
+	pr_info("%s: ChipVer1: 0x%04X\n",
 		__func__, system_info.u16_chip1_ver);
-	LOGI("%s: FW Version: 0x%04X\n",
+	pr_info("%s: FW Version: 0x%04X\n",
 		__func__, system_info.u16_fw_ver);
-	LOGI("%s: SVN Revision: 0x%04X\n",
+	pr_info("%s: SVN Revision: 0x%04X\n",
 		__func__, system_info.u16_svn_rev);
-	LOGI("%s: PE Version: 0x%04X\n",
+	pr_info("%s: PE Version: 0x%04X\n",
 		__func__, system_info.u16_pe_ver);
-	LOGI("%s: REG Revision: 0x%04X\n",
+	pr_info("%s: REG Revision: 0x%04X\n",
 		__func__, system_info.u16_reg_ver);
-	LOGI("%s: Scr-X Resolution: %d\n",
+	pr_info("%s: Scr-X Resolution: %d\n",
 		__func__, system_info.u16_scr_x_res);
-	LOGI("%s: Scr-Y Resolution: %d\n",
+	pr_info("%s: Scr-Y Resolution: %d\n",
 		__func__, system_info.u16_scr_y_res);
-	LOGI("%s: Tx Length: %d\n",
+	pr_info("%s: Tx Length: %d\n",
 		__func__, system_info.u8_scr_tx_len);
-	LOGI("%s: Rx Length: %d\n",
+	pr_info("%s: Rx Length: %d\n",
 		__func__, system_info.u8_scr_rx_len);
-	LOGI("%s: DIE Info: ", __func__);
+	pr_info("%s: DIE Info: ", __func__);
 	for (i = 0; i < DIE_INFO_SIZE; i++)
 		printk("%02X ", system_info.u8_die_info[i]);
 	printk("\n");
-	LOGI("%s: External Release Info: ", __func__);
+	pr_info("%s: External Release Info: ", __func__);
 	for (i = 0; i < RELEASE_INFO_SIZE; i++)
 		printk("%02X ", system_info.u8_release_info[i]);
 	printk("\n");
-	LOGI("%s: Flash Org Info: 0x%08X\n",
+	pr_info("%s: Flash Org Info: 0x%08X\n",
 		__func__, system_info.u32_flash_org_info);
-	LOGI("%s: Config Afe Ver: 0x%02X\n",
+	pr_info("%s: Config Afe Ver: 0x%02X\n",
 		__func__, system_info.u8_cfg_afe_ver);
-	LOGI("%s: Mutual Afe Ver: 0x%02X\n",
+	pr_info("%s: Mutual Afe Ver: 0x%02X\n",
 		__func__, system_info.u8_ms_scr_afe_ver);
-	LOGI("%s: Mutual GV Ver: 0x%02X\n",
+	pr_info("%s: Mutual GV Ver: 0x%02X\n",
 		__func__, system_info.u8_ms_scr_gv_ver);
-	LOGI("%s: Mutual LP Afe Ver: 0x%02X\n",
+	pr_info("%s: Mutual LP Afe Ver: 0x%02X\n",
 		__func__, system_info.u8_ms_scr_lp_afe_ver);
-	LOGI("%s: Mutual LP GV Ver: 0x%02X\n",
+	pr_info("%s: Mutual LP GV Ver: 0x%02X\n",
 		__func__, system_info.u8_ms_scr_lp_gv_ver);
-	LOGI("%s: Self Afe Ver: 0x%02X\n",
+	pr_info("%s: Self Afe Ver: 0x%02X\n",
 		__func__, system_info.u8_ss_tch_afe_ver);
-	LOGI("%s: Self GV Ver: 0x%02X\n",
+	pr_info("%s: Self GV Ver: 0x%02X\n",
 		__func__, system_info.u8_ss_tch_gv_ver);
-	LOGI("%s: Self Detect Afe Ver: 0x%02X\n",
+	pr_info("%s: Self Detect Afe Ver: 0x%02X\n",
 		__func__, system_info.u8_ss_det_afe_ver);
-	LOGI("%s: Self Detect GV Ver: 0x%02X\n",
+	pr_info("%s: Self Detect GV Ver: 0x%02X\n",
 		__func__, system_info.u8_ss_det_gv_ver);
-	LOGI("%s: Debug Info Address: 0x%04X\n",
+	pr_info("%s: Debug Info Address: 0x%04X\n",
 		__func__, system_info.u16_dbg_info_addr);
-	LOGI("%s: Mutual Raw Address: 0x%04X\n",
+	pr_info("%s: Mutual Raw Address: 0x%04X\n",
 		__func__, system_info.u16_ms_scr_raw_addr);
-	LOGI("%s: Mutual Filter Address: 0x%04X\n",
+	pr_info("%s: Mutual Filter Address: 0x%04X\n",
 		__func__, system_info.u16_ms_scr_filter_addr);
-	LOGI("%s: Mutual Strength Address: 0x%04X\n",
+	pr_info("%s: Mutual Strength Address: 0x%04X\n",
 		__func__, system_info.u16_ms_scr_strength_addr);
-	LOGI("%s: Mutual Baseline Address: 0x%04X\n",
+	pr_info("%s: Mutual Baseline Address: 0x%04X\n",
 		__func__, system_info.u16_ms_scr_baseline_addr);
-	LOGI("%s: Self Tx Raw Address: 0x%04X\n",
+	pr_info("%s: Self Tx Raw Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_tx_raw_addr);
-	LOGI("%s: Self Tx Filter Address: 0x%04X\n",
+	pr_info("%s: Self Tx Filter Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_tx_filter_addr);
-	LOGI("%s: Self Tx Strength Address: 0x%04X\n",
+	pr_info("%s: Self Tx Strength Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_tx_strength_addr);
-	LOGI("%s: Self Tx Baseline Address: 0x%04X\n",
+	pr_info("%s: Self Tx Baseline Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_tx_baseline_addr);
-	LOGI("%s: Self Rx Raw Address: 0x%04X\n",
+	pr_info("%s: Self Rx Raw Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_rx_raw_addr);
-	LOGI("%s: Self Rx Filter Address: 0x%04X\n",
+	pr_info("%s: Self Rx Filter Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_rx_filter_addr);
-	LOGI("%s: Self Rx Strength Address: 0x%04X\n",
+	pr_info("%s: Self Rx Strength Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_rx_strength_addr);
-	LOGI("%s: Self Rx Baseline Address: 0x%04X\n",
+	pr_info("%s: Self Rx Baseline Address: 0x%04X\n",
 		__func__, system_info.u16_ss_tch_rx_baseline_addr);
-	LOGI("%s: Self Detect Tx Raw Address: 0x%04X\n",
+	pr_info("%s: Self Detect Tx Raw Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_tx_raw_addr);
-	LOGI("%s: Self Detect Tx Filter Address: 0x%04X\n",
+	pr_info("%s: Self Detect Tx Filter Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_tx_filter_addr);
-	LOGI("%s: Self Detect Tx Strength Address: 0x%04X\n",
+	pr_info("%s: Self Detect Tx Strength Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_tx_strength_addr);
-	LOGI("%s: Self Detect Tx Baseline Address: 0x%04X\n",
+	pr_info("%s: Self Detect Tx Baseline Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_tx_baseline_addr);
-	LOGI("%s: Self Detect Rx Raw Address: 0x%04X\n",
+	pr_info("%s: Self Detect Rx Raw Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_rx_raw_addr);
-	LOGI("%s: Self Detect Rx Filter Address: 0x%04X\n",
+	pr_info("%s: Self Detect Rx Filter Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_rx_filter_addr);
-	LOGI("%s: Self Detect Rx Strength Address: 0x%04X\n",
+	pr_info("%s: Self Detect Rx Strength Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_rx_strength_addr);
-	LOGI("%s: Self Detect Rx Baseline Address: 0x%04X\n",
+	pr_info("%s: Self Detect Rx Baseline Address: 0x%04X\n",
 		__func__, system_info.u16_ss_det_rx_baseline_addr);
-	LOGI("%s: Default Flash Address: 0x%08X\n",
+	pr_info("%s: Default Flash Address: 0x%08X\n",
 		__func__, system_info.u32_reg_default_sect_flash_addr);
-	LOGI("%s: Misc Flash Address: 0x%08X\n",
+	pr_info("%s: Misc Flash Address: 0x%08X\n",
 		__func__, system_info.u32_misc_sect_flash_addr);
-	LOGI("%s: Cx Mutual Flash Address: 0x%08X\n",
+	pr_info("%s: Cx Mutual Flash Address: 0x%08X\n",
 		__func__, system_info.u32_cx_ms_scr_flash_addr);
-	LOGI("%s: Cx Mutual LP Flash Address: 0x%08X\n",
+	pr_info("%s: Cx Mutual LP Flash Address: 0x%08X\n",
 		__func__, system_info.u32_cx_ms_scr_lp_flash_addr);
-	LOGI("%s: Cx Self Flash Address: 0x%08X\n",
+	pr_info("%s: Cx Self Flash Address: 0x%08X\n",
 		__func__, system_info.u32_cx_ss_tch_flash_addr);
-	LOGI("%s: Cx Self Detect Flash Address: 0x%08X\n",
+	pr_info("%s: Cx Self Detect Flash Address: 0x%08X\n",
 		__func__, system_info.u32_cx_ss_det_flash_addr);
-	LOGI("%s: Ioff Mutual Flash Address: 0x%08X\n",
+	pr_info("%s: Ioff Mutual Flash Address: 0x%08X\n",
 		__func__, system_info.u32_ioff_ms_scr_flash_addr);
-	LOGI("%s: Ioff Mutual LP Flash Address: 0x%08X\n",
+	pr_info("%s: Ioff Mutual LP Flash Address: 0x%08X\n",
 		__func__, system_info.u32_ioff_ms_scr_lp_flash_addr);
-	LOGI("%s: Ioff Self LP Flash Address: 0x%08X\n",
+	pr_info("%s: Ioff Self LP Flash Address: 0x%08X\n",
 		__func__, system_info.u32_ioff_ss_tch_flash_addr);
-	LOGI("%s: Ioff Self Detect Flash Address: 0x%08X\n",
+	pr_info("%s: Ioff Self Detect Flash Address: 0x%08X\n",
 		__func__, system_info.u32_ioff_ss_det_flash_addr);
-	LOGI("%s: Pure Raw Mutual Flash Address: 0x%08X\n",
+	pr_info("%s: Pure Raw Mutual Flash Address: 0x%08X\n",
 		__func__, system_info.u32_pure_raw_ms_scr_flash_addr);
-	LOGI("%s: Pure Raw Mutual Lp Flash Address: 0x%08X\n",
+	pr_info("%s: Pure Raw Mutual Lp Flash Address: 0x%08X\n",
 		__func__, system_info.u32_pure_raw_ms_scr_lp_flash_addr);
-	LOGI("%s: Pure Raw Self Flash Address: 0x%08X\n",
+	pr_info("%s: Pure Raw Self Flash Address: 0x%08X\n",
 		__func__, system_info.u32_pure_raw_ss_tch_flash_addr);
-	LOGI("%s: Pure Raw Self Detect Flash Address: 0x%08X\n",
+	pr_info("%s: Pure Raw Self Detect Flash Address: 0x%08X\n",
 		__func__, system_info.u32_pure_raw_ss_det_flash_addr);
 	return res;
 }
@@ -366,22 +366,22 @@ int get_fw_file_data(const char *path_to_file, u8 **data, int *size)
 	int from = 0;
 	char *path = (char *)path_to_file;
 
-	LOGI("%s: Getting FW file data...\n", __func__);
+	pr_info("%s: Getting FW file data...\n", __func__);
 	if (strncmp(path_to_file, "NULL", 4) == 0) {
 		from = 1;
 		path = PATH_FILE_FW;
-		LOGI("%s: Getting FW file data...\n", __func__);
+		pr_info("%s: Getting FW file data...\n", __func__);
 	}
 	/* keep the switch case because if the argument passed is null but
 	  * the option from .h is not set we still try to load from bin */
 	switch (from) {
 #ifdef FW_H_FILE
 	case 1:
-		LOGI("%s: Read FW from .h file!\n", __func__);
+		pr_info("%s: Read FW from .h file!\n", __func__);
 		*size = FW_SIZE_NAME;
 		*data = (u8 *)kmalloc((*size) * sizeof(u8), GFP_KERNEL);
 		if (*data == NULL) {
-			LOGE("%s: Impossible to allocate memory! ERROR %08X\n",
+			pr_err("%s: Impossible to allocate memory! ERROR %08X\n",
 				__func__, ERROR_ALLOC);
 			return ERROR_ALLOC;
 		}
@@ -390,7 +390,7 @@ int get_fw_file_data(const char *path_to_file, u8 **data, int *size)
 		break;
 #endif
 	default:
-		LOGI("%s: Read FW from BIN file %s !\n", __func__, path);
+		pr_info("%s: Read FW from BIN file %s !\n", __func__, path);
 		dev = get_dev();
 
 		if (dev != NULL) {
@@ -400,7 +400,7 @@ int get_fw_file_data(const char *path_to_file, u8 **data, int *size)
 				*data = (u8 *)kmalloc((*size) * sizeof(u8),
 					GFP_KERNEL);
 				if (*data == NULL) {
-					LOGE("%s: Impossible to allocate memory! ERROR %08X\n",
+					pr_err("%s: Impossible to allocate memory! ERROR %08X\n",
 						__func__, ERROR_ALLOC);
 					release_firmware(fw);
 					return ERROR_ALLOC;
@@ -408,18 +408,18 @@ int get_fw_file_data(const char *path_to_file, u8 **data, int *size)
 				memcpy(*data, (u8 *)fw->data, (*size));
 				release_firmware(fw);
 			} else {
-				LOGE("%s: No File found! ERROR %08X\n",
+				pr_err("%s: No File found! ERROR %08X\n",
 					__func__ , ERROR_FILE_NOT_FOUND);
 				return ERROR_FILE_NOT_FOUND;
 			}
 		} else {
-			LOGE("%s: No device found! ERROR %08X\n",
+			pr_err("%s: No device found! ERROR %08X\n",
 				__func__, ERROR_OP_NOT_ALLOW);
 			return ERROR_OP_NOT_ALLOW;
 		}
 	}
 
-	LOGI("%s: get fw file data finished!\n", __func__);
+	pr_info("%s: get fw file data finished!\n", __func__);
 	return OK;
 }
 
@@ -445,37 +445,37 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 	crc = calculate_crc(ubin_data + 4, ubin_size - 4);
 	if (crc == (u32)((ubin_data[0] << 24) + (ubin_data[1] << 16) +
 			(ubin_data[2] << 8) + ubin_data[3]))
-		LOGI("%s: BIN CRC OK\n",  __func__);
+		pr_info("%s: BIN CRC OK\n",  __func__);
 	else {
-		LOGE("%s: BIN CRC error... ERROR %08X\n", __func__, ERROR_FILE_PARSE);
+		pr_err("%s: BIN CRC error... ERROR %08X\n", __func__, ERROR_FILE_PARSE);
 		return ERROR_FILE_PARSE;
 	}
 	index += 4;
 	if (ubin_size <= (BIN_HEADER_SIZE + SECTION_HEADER_SIZE) ||
 		ubin_data == NULL) {
-		LOGE("%s: Read only %d instead of %d... ERROR %08X\n",
+		pr_err("%s: Read only %d instead of %d... ERROR %08X\n",
 			__func__, ubin_size, BIN_HEADER_SIZE, ERROR_FILE_PARSE);
 		return ERROR_FILE_PARSE;
 	}
 	u8_to_u32_be(&ubin_data[index], &temp);
 	if (temp != BIN_HEADER) {
-		LOGE("%s: Wrong Signature 0x%08X ... ERROR %08X\n",
+		pr_err("%s: Wrong Signature 0x%08X ... ERROR %08X\n",
 			__func__, temp, ERROR_FILE_PARSE);
 		return ERROR_FILE_PARSE;
 	}
 	index += 5;
 	u8_to_u16_be(&ubin_data[index], &u16_temp);
 	if (u16_temp != CHIP_ID) {
-		LOGE("%s: Wrong Chip ID 0x%04X ... ERROR %08X\n",
+		pr_err("%s: Wrong Chip ID 0x%04X ... ERROR %08X\n",
 			__func__, u16_temp, ERROR_FILE_PARSE);
 		return ERROR_FILE_PARSE;
 	}
-	LOGI("%s: Chip ID: 0x%04X\n", __func__, u16_temp);
+	pr_info("%s: Chip ID: 0x%04X\n", __func__, u16_temp);
 	index += 27;
 	while (index < ubin_size) {
 		u8_to_u32_be(&ubin_data[index], &temp);
 		if (temp != SECTION_HEADER) {
-			LOGE("%s: Wrong Section Signature %08X ... ERROR %08X\n",
+			pr_err("%s: Wrong Section Signature %08X ... ERROR %08X\n",
 				__func__, temp, ERROR_FILE_PARSE);
 			return ERROR_FILE_PARSE;
 		}
@@ -483,7 +483,7 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 		u8_to_u16_be(&ubin_data[index], &u16_temp);
 		if (u16_temp == FINGERTIP_FW_CODE) {
 			if (code_data_found) {
-				LOGE("%s: Cannot have more than one code memh ... ERROR %08X\n",
+				pr_err("%s: Cannot have more than one code memh ... ERROR %08X\n",
 					__func__, ERROR_FILE_PARSE);
 				return ERROR_FILE_PARSE;
 			}
@@ -492,7 +492,7 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 			u8_to_u32_be(&ubin_data[index], &temp);
 			fw_data->fw_code_size = temp;
 			if (fw_data->fw_code_size == 0) {
-				LOGE("%s: Code data cannot be empty ... ERROR %08X\n",
+				pr_err("%s: Code data cannot be empty ... ERROR %08X\n",
 					__func__, ERROR_FILE_PARSE);
 				return ERROR_FILE_PARSE;
 			}
@@ -500,7 +500,7 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 				(u8 *)kmalloc(fw_data->fw_code_size *
 				sizeof(u8), GFP_KERNEL);
 			if (fw_data->fw_code_data == NULL) {
-				LOGE("%s: Error allocating memory... ERROR %08X\n",
+				pr_err("%s: Error allocating memory... ERROR %08X\n",
 					__func__, ERROR_FILE_PARSE);
 				return ERROR_FILE_PARSE;
 			}
@@ -509,9 +509,9 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 			if (fw_data->fw_code_size % FLASH_PAGE_SIZE)
 				fw_data->num_code_pages++;
 
-			LOGI("%s: code pages: %d\n",
+			pr_info("%s: code pages: %d\n",
 				__func__, fw_data->num_code_pages);
-			LOGI("%s: code size: %d bytes\n",
+			pr_info("%s: code size: %d bytes\n",
 				__func__, fw_data->fw_code_size);
 			index += 12;
 			memcpy(fw_data->fw_code_data,
@@ -520,9 +520,9 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 			fw_data->fw_ver =
 			(u16)((fw_data->fw_code_data[209] << 8) +
 					fw_data->fw_code_data[208]);
-			LOGI("%s: FW version: 0x%04X\n",
+			pr_info("%s: FW version: 0x%04X\n",
 				__func__, fw_data->fw_ver);
-			LOGI("%s: SVN revision: 0x%04X\n",
+			pr_info("%s: SVN revision: 0x%04X\n",
 				__func__,
 				(u16)((fw_data->fw_code_data[211]
 				<< 8) +	fw_data->fw_code_data[210]));
@@ -530,13 +530,13 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 				fw_data->fw_code_data[216];
 			fw_data->panel_info_pages =
 				fw_data->fw_code_data[217];
-			LOGI("%s: Code Pages(in org info): %02X,Panel Info "
+			pr_info("%s: Code Pages(in org info): %02X,Panel Info "
 				"Pages(in org info): %02X\n",
 				__func__, fw_data->flash_code_pages,
 				fw_data->panel_info_pages);
 			if ((fw_data->flash_code_pages +
 			fw_data->panel_info_pages) > NUM_FLASH_PAGES) {
-				LOGE("%s: FW code + panel Info pages(%d) is "
+				pr_err("%s: FW code + panel Info pages(%d) is "
 					"more the maximum flash pages(%d)\n",
 					__func__, (fw_data->flash_code_pages +
 					fw_data->panel_info_pages),
@@ -545,7 +545,7 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 			}
 			if (fw_data->num_code_pages >
 				fw_data->flash_code_pages) {
-				LOGE("%s: FW code size in the bin file(%d) is "
+				pr_err("%s: FW code size in the bin file(%d) is "
 					"more than the FW code pages(%d) allocated by FW\n",
 					__func__, fw_data->num_code_pages,
 					fw_data->flash_code_pages);
@@ -559,7 +559,7 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 			fw_data->sections[sec_index].sec_size = temp;
 			if (fw_data->sections[sec_index].
 				sec_size == 0) {
-				LOGE("%s: section data cannot be empty ... ERROR %08X\n",
+				pr_err("%s: section data cannot be empty ... ERROR %08X\n",
 					__func__, ERROR_FILE_PARSE);
 				return ERROR_FILE_PARSE;
 			}
@@ -569,14 +569,14 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 				sizeof(u8), GFP_KERNEL);
 			if (fw_data->sections[sec_index].
 				sec_data == NULL) {
-				LOGE("%s: Error allocating memory... ERROR %08X\n",
+				pr_err("%s: Error allocating memory... ERROR %08X\n",
 					__func__, ERROR_FILE_PARSE);
 				return ERROR_FILE_PARSE;
 			}
-			LOGI("%s: section%d type : 0x%02X\n",
+			pr_info("%s: section%d type : 0x%02X\n",
 				__func__, sec_index,
 				fw_data->sections[sec_index].sec_id);
-			LOGI("%s: section%d size : %d bytes\n",
+			pr_info("%s: section%d size : %d bytes\n",
 				__func__, sec_index,
 				fw_data->sections[sec_index].sec_size);
 			index += 12;
@@ -591,14 +591,14 @@ int parse_bin_file(u8 *ubin_data, int ubin_size,
 				sec_data[15] << 8) +
 				fw_data->sections[sec_index].
 				sec_data[14]);
-				LOGI("%s: section version : 0x%04X\n",
+				pr_info("%s: section version : 0x%04X\n",
 				__func__,
 				fw_data->sections[sec_index].sec_ver);
 			}
 			sec_index++;
 		}
 	}
-	LOGI("%s: Total number of sections : %d\n", __func__,
+	pr_info("%s: Total number of sections : %d\n", __func__,
 		fw_data->num_sections);
 	return OK;
 }
@@ -621,14 +621,14 @@ int read_fw_file(const char *path, struct firmware_file *fw_file)
 
 	res = get_fw_file_data(path, &orig_data, &orig_size);
 	if (res < OK) {
-		LOGE("%s: Impossible to retrieve FW file data... ERROR %08X\n",
+		pr_err("%s: Impossible to retrieve FW file data... ERROR %08X\n",
 			__func__, ERROR_MEMH_READ);
 		res |= ERROR_MEMH_READ;
 		goto goto_end;
 	}
 	res = parse_bin_file(orig_data, orig_size, fw_file);
 	if (res < OK) {
-		LOGE("%s: BIN file parse ERROR %08X\n", __func__,
+		pr_err("%s: BIN file parse ERROR %08X\n", __func__,
 			ERROR_MEMH_READ);
 		res |= ERROR_MEMH_READ;
 		goto goto_end;
@@ -655,14 +655,14 @@ int configure_spi4(void)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, GPIO_GPIO_PU_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data = 0x07;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 		GPIO_MISO_CONFIG_ADDR, &data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
@@ -670,7 +670,7 @@ int configure_spi4(void)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, SPI4_CONFIG_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
@@ -690,16 +690,16 @@ int flash_update_preset(void)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, SYS_RST_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
 #ifndef I2C_INTERFACE
 #ifdef SPI4_WIRE
-	LOGI("%s: Configuring SPI4..\n", __func__);
+	pr_info("%s: Configuring SPI4..\n", __func__);
 	res = configure_spi4();
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 #endif
@@ -709,35 +709,35 @@ int flash_update_preset(void)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, UVLO_CTRL_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data = 0x13;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 		FLASH_FSM_CTRL_ADDR, &data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data = 0x20;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, BOOT_OPT_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data = 0x00;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, PAGE_SEL_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
 	res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
 		FLASH_CTRL_ADDR, &data, 1, DUMMY_BYTE);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data |= 0x03;
@@ -749,7 +749,7 @@ int flash_update_preset(void)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, FLASH_CTRL_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	return res;
@@ -767,11 +767,11 @@ int wait_for_flash_ready(u8 type)
 	u8 read_data[2] = { 0 };
 	int i, res = -1;
 
-	LOGI("%s: Waiting for flash ready ...\n", __func__);
+	pr_info("%s: Waiting for flash ready ...\n", __func__);
 	for (i = 0; i < FLASH_RETRY_COUNT && res != 0; i++) {
 		res = fts_write_read(cmd, 5, read_data, 2);
 		if (res < OK)
-			LOGE("%s: ERROR %08X\n",
+			pr_err("%s: ERROR %08X\n",
 				__func__, ERROR_BUS_W);
 		else {
 #ifdef I2C_INTERFACE
@@ -779,18 +779,18 @@ int wait_for_flash_ready(u8 type)
 #else
 			res = read_data[1] & 0x80;
 #endif
-			LOGI("%s: flash status = %d\n", __func__, res);
+			pr_info("%s: flash status = %d\n", __func__, res);
 		}
 		msleep(FLASH_WAIT_BEFORE_RETRY);
 	}
 
 	if (i == FLASH_RETRY_COUNT && res != 0) {
-		LOGE("%s: Wait for flash TIMEOUT! ERROR %08X\n", __func__,
+		pr_err("%s: Wait for flash TIMEOUT! ERROR %08X\n", __func__,
 			ERROR_TIMEOUT);
 		return ERROR_TIMEOUT;
 	}
 
-	LOGI("%s: Flash READY!\n", __func__);
+	pr_info("%s: Flash READY!\n", __func__);
 	return OK;
 }
 
@@ -817,46 +817,46 @@ int flash_erase(int flash_pages)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 			FLASH_PAGE_MASK_ADDR, mask, mask_cnt);
 	if (res < OK) {
-		LOGE("%s: mask set ERROR %08X\n", __func__, res);
+		pr_err("%s: mask set ERROR %08X\n", __func__, res);
 		return res;
 	}
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, PAGE_SEL_ADDR,
 						&data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
 	res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
 			FLASH_MULTI_PAGE_ERASE_ADDR, &data, 1, DUMMY_BYTE);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data |= 0x80;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 			FLASH_MULTI_PAGE_ERASE_ADDR, &data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data = 0x80;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 		FLASH_ERASE_CTRL_ADDR, &data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 
 	res = wait_for_flash_ready(FLASH_ERASE_READY_VAL);
 
 	if (res != OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res | ERROR_FLASH_NOT_READY);
+		pr_err("%s: ERROR %08X\n", __func__, res | ERROR_FLASH_NOT_READY);
 		return res | ERROR_FLASH_NOT_READY;
 		/* Flash not ready within the chosen time, better exit! */
 	}
 
-	LOGI("%s: Erase flash page by page DONE!\n", __func__);
+	pr_info("%s: Erase flash page by page DONE!\n", __func__);
 
 	return OK;
 }
@@ -875,21 +875,21 @@ int start_flash_dma(void)
 		FLASH_DMA_CODE_VAL };
 
 	/* write the command to erase the flash */
-	LOGI("%s: Command flash DMA ...\n", __func__);
+	pr_info("%s: Command flash DMA ...\n", __func__);
 	if (fts_write(cmd, 12) < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, ERROR_BUS_W);
+		pr_err("%s: ERROR %08X\n", __func__, ERROR_BUS_W);
 		return ERROR_BUS_W;
 	}
 
 	res = wait_for_flash_ready(FLASH_PGM_READY_VAL);
 
 	if (res != OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res | ERROR_FLASH_NOT_READY);
+		pr_err("%s: ERROR %08X\n", __func__, res | ERROR_FLASH_NOT_READY);
 		return res | ERROR_FLASH_NOT_READY;
 		/* Flash not ready within the chosen time, better exit! */
 	}
 
-	LOGI("%s: flash DMA DONE!\n", __func__);
+	pr_info("%s: flash DMA DONE!\n", __func__);
 
 	return OK;
 }
@@ -914,18 +914,18 @@ int flash_dma(u32 address, u8 *data, int size)
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, dram_address,
 						data, size);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, FLASH_DMA_ADDR,
 						cmd, 7);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	res = start_flash_dma();
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	return res;
@@ -956,12 +956,12 @@ int fill_flash(u32 address, u8 *data, int size)
 			to_write = remaining;
 			remaining = 0;
 		}
-		LOGI("%s: Flash address: 0x%08X, write_count: %d bytes\n",
+		pr_info("%s: Flash address: 0x%08X, write_count: %d bytes\n",
 				__func__, start_address, to_write);
 		res = flash_dma(start_address, data + written_already,
 				to_write);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__, res);
+			pr_err("%s: ERROR %08X\n", __func__, res);
 			return res;
 		}
 
@@ -989,14 +989,14 @@ int flash_section_burn(struct firmware_file fw,
 			res = fts_write_hdm(FRAME_BUFFER_ADDR,
 			fw.sections[i].sec_data, fw.sections[i].sec_size);
 			if (res < OK) {
-				LOGE("%s: ERROR %08X\n",
+				pr_err("%s: ERROR %08X\n",
 					__func__, res | ERROR_FLASH_SEC_UPDATE);
 				return res | ERROR_FLASH_SEC_UPDATE;
 			}
 
 			res = fts_hdm_write_request(0);
 			if (res < OK) {
-				LOGE("%s: ERROR %08X\n",
+				pr_err("%s: ERROR %08X\n",
 					__func__, res | ERROR_FLASH_SEC_UPDATE);
 				return res | ERROR_FLASH_SEC_UPDATE;
 			}
@@ -1008,7 +1008,7 @@ int flash_section_burn(struct firmware_file fw,
 			TIMEOUT_FW_REG_STATUS);
 		if (res < OK) {
 			res |=  ERROR_FLASH_SEC_UPDATE;
-			LOGE("%s: ERROR while saving to flash: %08X\n",
+			pr_err("%s: ERROR while saving to flash: %08X\n",
 					__func__, res);
 		}
 	}
@@ -1032,27 +1032,27 @@ int flash_burn(struct fts_ts_info *info, struct firmware_file fw,
 	u8 data[4] = { 0x00 };
 	int section_updated = 0;
 
-	LOGI("%s: FW code version: Current FW|Bin FW: 0x%04X|0x%04X\n",
+	pr_info("%s: FW code version: Current FW|Bin FW: 0x%04X|0x%04X\n",
 		__func__, system_info.u16_fw_ver, fw.fw_ver);
 	if (!force_burn->code_update) {
 		if (system_info.u16_fw_ver != fw.fw_ver) {
-			LOGI("%s: Different FW version: force updating the FW..\n",
+			pr_info("%s: Different FW version: force updating the FW..\n",
 				__func__);
 			force_burn->code_update = 1;
 		} else
-			LOGD("%s: FW version is same.. No need to update FW..\n",
+			pr_debug("%s: FW version is same.. No need to update FW..\n",
 				__func__);
 
 	}
 
-	LOGI("%s: flash code pages allocated: Current|Bin: %d|%d\n",
+	pr_info("%s: flash code pages allocated: Current|Bin: %d|%d\n",
 		__func__, (system_info.u32_flash_org_info & 0xFF),
 		fw.flash_code_pages);
-	LOGI("%s: flash panel info pages allocated: Current|Bin: %d|%d\n",
+	pr_info("%s: flash panel info pages allocated: Current|Bin: %d|%d\n",
 		__func__, ((system_info.u32_flash_org_info & 0xFF00) >> 8),
 		fw.panel_info_pages);
 	if (fw.flash_code_pages > (system_info.u32_flash_org_info & 0xFF))
-		LOGI("%s: WARNING!! No FW or There is change in the number of "
+		pr_info("%s: WARNING!! No FW or There is change in the number of "
 			"pages allocated for FW code. Flashing the new FW will "
 			"delete the CX/Reg/Panel config data already saved in "
 			"the flash..Touch may not work\n",
@@ -1061,44 +1061,44 @@ int flash_burn(struct fts_ts_info *info, struct firmware_file fw,
 	if (force_burn->code_update) {
 		res = flash_update_preset();
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_CODE_UPDATE);
 			return res | ERROR_FLASH_CODE_UPDATE;
 		}
-		LOGI("%s: Erasing flash..\n", __func__);
+		pr_info("%s: Erasing flash..\n", __func__);
 		res = flash_erase(fw.num_code_pages);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_CODE_UPDATE);
 			return res | ERROR_FLASH_CODE_UPDATE;
 		}
-		LOGI("%s: Updating Flash FW Code..\n", __func__);
+		pr_info("%s: Updating Flash FW Code..\n", __func__);
 		res = fill_flash(FLASH_START_ADDR, fw.fw_code_data,
 				fw.fw_code_size);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_CODE_UPDATE);
 			return res | ERROR_FLASH_CODE_UPDATE;
 		}
-		LOGI("%s: Flash Code update finished..\n", __func__);
+		pr_info("%s: Flash Code update finished..\n", __func__);
 
 		res = fts_system_reset(info, 1);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_CODE_UPDATE);
 			return res | ERROR_FLASH_CODE_UPDATE;
 		}
 
 		res = read_sys_info();
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_CODE_UPDATE);
 			return res | ERROR_FLASH_CODE_UPDATE;
 		}
-		LOGI("%s: FW version after FW code update, New FW|Bin FW: 0x%04X|0x%04X\n",
+		pr_info("%s: FW version after FW code update, New FW|Bin FW: 0x%04X|0x%04X\n",
 			__func__, system_info.u16_fw_ver, fw.fw_ver);
 		if (system_info.u16_fw_ver != fw.fw_ver) {
-			LOGE("%s: Different FW version after FW code update\n",
+			pr_err("%s: Different FW version after FW code update\n",
 				__func__);
 			return ERROR_FLASH_CODE_UPDATE;
 		}
@@ -1106,14 +1106,14 @@ int flash_burn(struct fts_ts_info *info, struct firmware_file fw,
 
 	res = fts_read_fw_reg(SYS_ERROR_ADDR + 4, data, 4);
 	if (res < OK) {
-		LOGE("%s: ERROR reading system error registers %08X\n",
+		pr_err("%s: ERROR reading system error registers %08X\n",
 			__func__, res);
 		return ERROR_FLASH_UPDATE;
 	}
-	LOGI("%s: Section System Errors: reg section: %02X, ms_section: %02X, ss_section: %02X\n",
+	pr_info("%s: Section System Errors: reg section: %02X, ms_section: %02X, ss_section: %02X\n",
 		__func__, (data[0] & REG_CRC_MASK), (data[1] & MS_CRC_MASK),
 		(data[1] & SS_CRC_MASK));
-	LOGI("%s: System Crc Errors: misc: %02X, ioff: %02X, pure_raw_ms: %02X\n",
+	pr_info("%s: System Crc Errors: misc: %02X, ioff: %02X, pure_raw_ms: %02X\n",
 		__func__, (data[0] & REG_MISC_MASK), (data[2] & IOFF_CRC_MASK),
 		(data[3] & RAWMS_CRC_MASK));
 	force_burn->section_update[0] = (force_burn->section_update[0] == 1) ?
@@ -1126,27 +1126,27 @@ int flash_burn(struct fts_ts_info *info, struct firmware_file fw,
 		force_burn->panel_init : (((data[0] & REG_MISC_MASK) != 0) ||
 		((data[2] & IOFF_CRC_MASK) != 0) ||
 			((data[3] & RAWMS_CRC_MASK) != 0));
-	LOGI("%s: Force update flags: reg section: %02X, ms_section:%02X, "
+	pr_info("%s: Force update flags: reg section: %02X, ms_section:%02X, "
 		"ss_section: %02X, panel_init: %02X\n",
 		__func__, force_burn->section_update[0],
 		force_burn->section_update[1], force_burn->section_update[2],
 		force_burn->panel_init);
-	LOGI("%s: Reg version before update, Current reg|Bin reg: 0x%04X|0x%04X\n",
+	pr_info("%s: Reg version before update, Current reg|Bin reg: 0x%04X|0x%04X\n",
 		__func__, system_info.u16_reg_ver, fw.sections[0].sec_ver);
 	if ((force_burn->section_update[0]) ||
 		(system_info.u16_reg_ver != fw.sections[0].sec_ver)) {
 		section_updated = 1;
-		LOGI("%s: Updating reg section..\n", __func__);
+		pr_info("%s: Updating reg section..\n", __func__);
 		res = flash_section_burn(fw, FINGERTIP_FW_REG, 1);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__, res);
+			pr_err("%s: ERROR %08X\n", __func__, res);
 			return res | ERROR_FLASH_SEC_UPDATE;
 		}
 
-		LOGI("%s: Flash Reg update done..checking for errors..\n",
+		pr_info("%s: Flash Reg update done..checking for errors..\n",
 			__func__);
 	} else
-		LOGD("%s: No need to update reg section..\n", __func__);
+		pr_debug("%s: No need to update reg section..\n", __func__);
 
 #ifdef MS_GV_METHOD
 	/*check cfg_afe_ver with ms_scr_gv_ver/ms_scr_lp_gv_ver
@@ -1160,29 +1160,29 @@ int flash_burn(struct fts_ts_info *info, struct firmware_file fw,
 	if (section_updated) {
 		res = fts_system_reset(info, 1);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_UPDATE);
 			return res | ERROR_FLASH_UPDATE;
 		}
 		res = read_sys_info();
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__,
+			pr_err("%s: ERROR %08X\n", __func__,
 				res | ERROR_FLASH_UPDATE);
 			return res | ERROR_FLASH_UPDATE;
 		}
 		res = fts_read_fw_reg(SYS_ERROR_ADDR + 4, data, 2);
 		if (res < OK) {
-			LOGE("%s: ERROR reading system error registers %08X\n",
+			pr_err("%s: ERROR reading system error registers %08X\n",
 				__func__, res);
 			return ERROR_FLASH_UPDATE;
 		}
-		LOGI("%s: Section System Errors After section update: reg section: "
+		pr_info("%s: Section System Errors After section update: reg section: "
 			"%02X, ms_section: %02X, ss_section: %02X\n",
 			__func__, (data[0] & REG_CRC_MASK),
 			(data[1] & MS_CRC_MASK), (data[1] & SS_CRC_MASK));
 		if (((data[0] & REG_CRC_MASK) != 0) ||
 			(system_info.u16_reg_ver != fw.sections[0].sec_ver)) {
-			LOGE("%s: Error updating flash reg section\n",
+			pr_err("%s: Error updating flash reg section\n",
 				__func__);
 			return ERROR_FLASH_UPDATE;
 		}
@@ -1230,13 +1230,13 @@ int full_panel_init(struct fts_ts_info *info, struct force_update_flag *force_up
 
 		//Save MPFlag
 		u8 data = MP_FLAG_BOOT;
-		LOGI("%s: Saving MP Flag Boot..\n", __func__);
+		pr_info("%s: Saving MP Flag Boot..\n", __func__);
 		fts_write_fw_reg(MP_FLAG_ADDR, &data, 1);
 
-		LOGI("%s: Starting Init..\n", __func__);
+		pr_info("%s: Starting Init..\n", __func__);
 		res = fts_fw_request(PI_ADDR, 1, 1, TIMEOUT_FPI);
 		if (res < OK) {
-			LOGE("%s: Error performing autotune.. %08X\n",
+			pr_err("%s: Error performing autotune.. %08X\n",
 				__func__, res | ERROR_INIT);
 			return res | ERROR_INIT;
 		}
@@ -1244,16 +1244,16 @@ int full_panel_init(struct fts_ts_info *info, struct force_update_flag *force_up
 		res = poll_for_event(&event_to_search, 1, read_data,
 			TIMEOUT_GENERAL);
 		if (res < OK)
-			LOGE("%s: ERROR %08X\n", __func__, res);
+			pr_err("%s: ERROR %08X\n", __func__, res);
 
 		res = fts_system_reset(info, 1);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__, res | ERROR_INIT);
+			pr_err("%s: ERROR %08X\n", __func__, res | ERROR_INIT);
 			return res | ERROR_INIT;
 		}
 		res = read_sys_info();
 		if (res < OK) {
-			LOGE("%s: Error reading sys info %08X\n",
+			pr_err("%s: Error reading sys info %08X\n",
 				__func__, res);
 			res |= ERROR_INIT;
 		}
@@ -1265,7 +1265,7 @@ int full_panel_init(struct fts_ts_info *info, struct force_update_flag *force_up
 			(system_info.u8_cfg_afe_ver !=
 				system_info.u8_ms_scr_lp_afe_ver)) {
 			res |= ERROR_INIT;
-			LOGE("%s: config afe version doesn't match with MS CX"
+			pr_err("%s: config afe version doesn't match with MS CX"
 				" fields after autotune.. Touch may not work. %08X\n",
 				__func__, res);
 		}
@@ -1276,14 +1276,14 @@ int full_panel_init(struct fts_ts_info *info, struct force_update_flag *force_up
 			(system_info.u8_cfg_afe_ver !=
 			system_info.u8_ss_det_afe_ver)) {
 			res |= ERROR_INIT;
-			LOGE("%s: config afe version doesn't match with SS CX "
+			pr_err("%s: config afe version doesn't match with SS CX "
 				"fields after autotune.. Touch may not work. %08X\n",
 				__func__, res);
 		}
 #endif
-		LOGI("%s: Init completed..\n", __func__);
+		pr_info("%s: Init completed..\n", __func__);
 	} else
-		LOGD("%s: No need to start Init..\n", __func__);
+		pr_debug("%s: No need to start Init..\n", __func__);
 	return res;
 }
 
@@ -1316,12 +1316,12 @@ int flash_update(struct fts_ts_info *info, struct force_update_flag *force_updat
 	}
 	res = read_fw_file(PATH_FILE_FW, &fw);
 	if (res < OK) {
-		LOGE("%s: ERROR reading file %08X\n", __func__, res);
+		pr_err("%s: ERROR reading file %08X\n", __func__, res);
 		goto goto_end;
 	}
 	res = fts_system_reset(info, 1);
 	if (res < OK) {
-		LOGE("%s: Cannot read Controller Ready..No FW or Connection "
+		pr_err("%s: Cannot read Controller Ready..No FW or Connection "
 			"issue.. ERROR %08X\n",
 			__func__, res);
 		force_update->code_update = 1;
@@ -1329,16 +1329,16 @@ int flash_update(struct fts_ts_info *info, struct force_update_flag *force_updat
 
 	res = flash_burn(info, fw, force_update);
 	if (res < OK) {
-		LOGE("%s: ERROR flash update %08X\n", __func__, res);
+		pr_err("%s: ERROR flash update %08X\n", __func__, res);
 		goto goto_end;
 	}
 
 	res = full_panel_init(info, force_update);
 	if (res < OK) {
-		LOGE("%s: ERROR auto tune %08X\n", __func__, res);
+		pr_err("%s: ERROR auto tune %08X\n", __func__, res);
 		res = OK;
 		force_update->panel_init = 0;
-		LOGI("%s: Continue with boot up, production test is skipped "
+		pr_info("%s: Continue with boot up, production test is skipped "
 			"and touch may not work\n",
 			 __func__);
 		goto goto_end;
