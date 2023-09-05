@@ -218,10 +218,10 @@ static int fts_mode_handler(struct fts_ts_info *info, int force)
 		disable_irq_wake(info->client->irq);
 
 	info->mode = SCAN_MODE_HIBERNATE;
-	LOGI("%s: Mode Handler starting...\n", __func__);
+	pr_info("%s: Mode Handler starting...\n", __func__);
 	switch (info->resume_bit) {
 	case 0:	/* screen down */
-		LOGI("%s: Screen OFF...\n", __func__);
+		pr_info("%s: Screen OFF...\n", __func__);
 		/* do sense off in order to avoid the flooding of the fifo with
 		 * touch events if someone is touching the panel during suspend
 		 */
@@ -233,7 +233,7 @@ static int fts_mode_handler(struct fts_ts_info *info, int force)
 		break;
 
 	case 1:	/* screen up */
-		LOGI("%s: Screen ON...\n", __func__);
+		pr_info("%s: Screen ON...\n", __func__);
 		data = SCAN_MODE_ACTIVE;
 		res = fts_write_fw_reg(SCAN_MODE_ADDR, &data, 1);
 		if (res == OK)
@@ -242,13 +242,13 @@ static int fts_mode_handler(struct fts_ts_info *info, int force)
 		break;
 
 	default:
-		LOGE("%s: invalid resume_bit value = %d! ERROR %08X\n",
+		pr_err("%s: invalid resume_bit value = %d! ERROR %08X\n",
 			 __func__, info->resume_bit, ERROR_OP_NOT_ALLOW);
 		res = ERROR_OP_NOT_ALLOW;
 	}
 	/*TODO : For all the gesture related modes */
 
-	LOGI("%s: Mode Handler finished! res = %08X mode = %08X\n",
+	pr_info("%s: Mode Handler finished! res = %08X mode = %08X\n",
 		 __func__, res, info->mode);
 	return res;
 }
@@ -275,7 +275,7 @@ static irqreturn_t fts_interrupt_handler(int irq, void *handle)
 		error = fts_read_fw_reg(FIFO_READ_ADDR,
 			&info->evt_data[count * FIFO_EVENT_SIZE], FIFO_EVENT_SIZE);
 		if (error != OK) {
-			LOGE("%s: Failed to read fifo event (error=%d)",
+			pr_err("%s: Failed to read fifo event (error=%d)",
 				__func__, error);
 			break;
 		}
@@ -290,7 +290,7 @@ static irqreturn_t fts_interrupt_handler(int irq, void *handle)
 	if (evt_data[0] == EVT_ID_NOEVENT)
 		goto exit;
 	if (total_events == MAX_FIFO_EVENT)
-		LOGI("%s: Warnning:  total_events = MAX_FIFO_EVENT(%d)",
+		pr_info("%s: Warnning:  total_events = MAX_FIFO_EVENT(%d)",
 			__func__, MAX_FIFO_EVENT);
 	/*
 	 * Parsing all the events ID and specifically handle the
@@ -380,7 +380,7 @@ static irqreturn_t fts_isr(int irq, void *handle)
 static void fts_nop_event_handler(struct fts_ts_info *info,
 					unsigned char *event)
 {
-	LOGI("%s: Doing nothing for event = %02X %02X %02X %02X %02X %02X %02X %02X\n",
+	pr_info("%s: Doing nothing for event = %02X %02X %02X %02X %02X %02X %02X %02X\n",
 		 __func__, event[0], event[1], event[2], event[3],
 		 event[4], event[5], event[6], event[7]);
 }
@@ -429,14 +429,14 @@ static void fts_enter_pointer_event_handler(struct fts_ts_info *info, unsigned
 	case TOUCH_TYPE_FINGER:
 	case TOUCH_TYPE_GLOVE:
 	case TOUCH_TYPE_LARGE:
-		LOGD("%s: touch type = %d!\n", __func__, touch_type);
+		pr_debug("%s: touch type = %d!\n", __func__, touch_type);
 		tool = MT_TOOL_FINGER;
 		touch_condition = 1;
 		__set_bit(touch_id, &info->touch_id);
 		break;
 
 	case TOUCH_TYPE_FINGER_HOVER:
-		LOGD("%s: touch type = %d!\n", __func__, touch_type);
+		pr_debug("%s: touch type = %d!\n", __func__, touch_type);
 		tool = MT_TOOL_FINGER;
 		touch_condition = 0;	/* need to hover */
 		z = 0;	/* no pressure */
@@ -446,7 +446,7 @@ static void fts_enter_pointer_event_handler(struct fts_ts_info *info, unsigned
 		break;
 
 	default:
-		LOGE("%s: Invalid touch type = %d! No Report...\n",
+		pr_err("%s: Invalid touch type = %d! No Report...\n",
 			  __func__, touch_type);
 		goto no_report;
 	}
@@ -503,12 +503,12 @@ static void fts_leave_pointer_event_handler(struct fts_ts_info *info, unsigned
 	case TOUCH_TYPE_GLOVE:
 	case TOUCH_TYPE_LARGE:
 	case TOUCH_TYPE_FINGER_HOVER:
-		LOGD("%s: touch type = %d!\n", __func__, touch_type);
+		pr_debug("%s: touch type = %d!\n", __func__, touch_type);
 		tool = MT_TOOL_FINGER;
 		__clear_bit(touch_id, &info->touch_id);
 		break;
 	default:
-		LOGE("%s: Invalid touch type = %d! No Report...\n",
+		pr_err("%s: Invalid touch type = %d! No Report...\n",
 			 __func__, touch_type);
 		return;
 	}
@@ -546,7 +546,7 @@ int fts_system_reset(struct fts_ts_info *info, int poll_event)
 		res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE, SYS_RST_ADDR,
 			&data, 1);
 		if (res < OK) {
-			LOGE("%s: ERROR %08X\n", __func__, res);
+			pr_err("%s: ERROR %08X\n", __func__, res);
 			return res;
 		}
 	} else {
@@ -560,7 +560,7 @@ int fts_system_reset(struct fts_ts_info *info, int poll_event)
 		res = poll_for_event(&event_to_search, 1, read_data,
 			TIMEOUT_GENERAL);
 		if (res < OK)
-			LOGE("%s: ERROR %08X\n", __func__, res);
+			pr_err("%s: ERROR %08X\n", __func__, res);
 	} else
 		msleep(100);
 
@@ -568,21 +568,21 @@ int fts_system_reset(struct fts_ts_info *info, int poll_event)
 	res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
 				  FLASH_CTRL_ADDR, &data, 1, DUMMY_BYTE);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 	data |= 0x80;
 	res = fts_write_u8ux(FTS_CMD_HW_REG_W, HW_ADDR_SIZE,
 			     FLASH_CTRL_ADDR, &data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 		return res;
 	}
 #endif
 
 	res = fts_write_fw_reg(add, &int_data, 1);
 	if (res < OK)
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 	if (info->gti)
@@ -606,7 +606,7 @@ static void fts_error_event_handler(struct fts_ts_info *info, unsigned
 {
 	int error = 0;
 
-	LOGW("%s: Received event %02X %02X %02X %02X %02X %02X %02X %02X\n",
+	pr_warn("%s: Received event %02X %02X %02X %02X %02X %02X %02X %02X\n",
 		 __func__, event[0], event[1], event[2], event[3], event[4],
 		 event[5], event[6], event[7]);
 
@@ -631,7 +631,7 @@ static void fts_error_event_handler(struct fts_ts_info *info, unsigned
 		error |= fts_mode_handler(info, 0);
 		error |= fts_set_interrupt(info, true);
 		if (error < OK)
-			LOGE("%s: Cannot reset the device ERROR %08X\n",
+			pr_err("%s: Cannot reset the device ERROR %08X\n",
 				__func__, error);
 	}
 		break;
@@ -648,7 +648,7 @@ static void fts_controller_ready_event_handler(struct fts_ts_info *info,
 {
 	int error;
 
-	LOGI("%s: controller event %02X %02X %02X %02X %02X %02X %02X %02X\n",
+	pr_info("%s: controller event %02X %02X %02X %02X %02X %02X %02X %02X\n",
 		 __func__, event[0], event[1], event[2], event[3], event[4],
 		 event[5], event[6], event[7]);
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
@@ -660,7 +660,7 @@ static void fts_controller_ready_event_handler(struct fts_ts_info *info,
 	set_system_reseted_down(1);
 	error = fts_mode_handler(info, 0);
 	if (error < OK)
-		LOGE("%s: Cannot restore the device status ERROR %08X\n",
+		pr_err("%s: Cannot restore the device status ERROR %08X\n",
 			 __func__, error);
 }
 
@@ -668,13 +668,13 @@ static void fts_controller_ready_event_handler(struct fts_ts_info *info,
 do { \
 	u8 type = evt_ptr[1]; \
 	if (force) \
-		LOGI("%s: %s =" \
+		pr_info("%s: %s =" \
 			" %02X %02X %02X %02X %02X %02X\n", \
 			__func__, event_type_str[type], \
 			evt_ptr[2], evt_ptr[3], evt_ptr[4], \
 			evt_ptr[5], evt_ptr[6], evt_ptr[7]); \
 	else \
-		LOGD("%s: %s =" \
+		pr_debug("%s: %s =" \
 			" %02X %02X %02X %02X %02X %02X\n", \
 			__func__, event_type_str[type], \
 			evt_ptr[2], evt_ptr[3], evt_ptr[4], \
@@ -685,13 +685,13 @@ do { \
 do { \
 	u8 type = evt_ptr[1]; \
 	if (force) \
-		LOGI("%s: %s - %s =" \
+		pr_info("%s: %s - %s =" \
 		" %02X %02X %02X %02X %02X %02X\n", \
 		__func__, event_type_str[type], sub_str, \
 		evt_ptr[2], evt_ptr[3], evt_ptr[4], \
 		evt_ptr[5], evt_ptr[6], evt_ptr[7]); \
 	else \
-		LOGD("%s: %s - %s =" \
+		pr_debug("%s: %s - %s =" \
 		" %02X %02X %02X %02X %02X %02X\n", \
 		__func__, event_type_str[type], sub_str, \
 		evt_ptr[2], evt_ptr[3], evt_ptr[4], \
@@ -771,7 +771,7 @@ static void fts_status_event_handler(struct fts_ts_info *info, u8 *event)
 
 		if (noise_level != event[2] || scanning_frequency != event[3]) {
 			log_status_event2(1, "changed", event);
-			LOGI("%s: level:[%02X->%02X],freq:[%02X->%02X]\n",
+			pr_info("%s: level:[%02X->%02X],freq:[%02X->%02X]\n",
 				__func__, noise_level, event[2],
 				scanning_frequency, event[3]);
 			noise_level = event[2];
@@ -835,7 +835,7 @@ static void fts_status_event_handler(struct fts_ts_info *info, u8 *event)
 		break;
 
 	default:
-		LOGE("%s: Unknown status event (%02X) ="
+		pr_err("%s: Unknown status event (%02X) ="
 			" %02X %02X %02X %02X %02X %02X\n",
 			__func__, event[1], event[2], event[3],
 			event[4], event[5], event[6], event[7]);
@@ -932,7 +932,7 @@ static int fts_interrupt_install(struct fts_ts_info *info)
 	info->event_dispatch_table = kzalloc(sizeof(event_dispatch_handler_t) *
 					     NUM_EVT_ID, GFP_KERNEL);
 	if (!info->event_dispatch_table) {
-		LOGE("%s: OOM allocating event dispatch table\n", __func__);
+		pr_err("%s: OOM allocating event dispatch table\n", __func__);
 		return -ENOMEM;
 	}
 
@@ -953,7 +953,7 @@ static int fts_interrupt_install(struct fts_ts_info *info)
 	error = fts_set_interrupt(info, false);
 	if (error) return error;
 
-	LOGI("%s: Interrupt Mode\n", __func__);
+	pr_info("%s: Interrupt Mode\n", __func__);
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 	if (goog_request_threaded_irq(info->gti, info->client->irq, fts_isr,
 #else
@@ -961,7 +961,7 @@ static int fts_interrupt_install(struct fts_ts_info *info)
 #endif
 		fts_interrupt_handler, IRQF_ONESHOT | IRQF_TRIGGER_LOW,
 		FTS_TS_DRV_NAME, info)) {
-		LOGE("%s: Request irq failed\n", __func__);
+		pr_err("%s: Request irq failed\n", __func__);
 		kfree(info->event_dispatch_table);
 		error = -EBUSY;
 	}
@@ -992,14 +992,14 @@ static int gti_default_handler(void *private_data, enum gti_cmd_type cmd_type,
 		cmd->grip_cmd.setting = (grip_enabled) ?
 			GTI_GRIP_ENABLE : GTI_GRIP_DISABLE;
 		res = 0;
-		LOGI("grip %s.\n", (grip_enabled) ? "enable" : "disable");
+		pr_info("grip %s.\n", (grip_enabled) ? "enable" : "disable");
 		break;
 
 	case GTI_CMD_GET_PALM_MODE:
 		cmd->palm_cmd.setting = (palm_enabled) ?
 			GTI_PALM_ENABLE : GTI_PALM_DISABLE;
 		res = 0;
-		LOGI("palm %s.\n", (palm_enabled) ? "enable" : "disable");
+		pr_info("palm %s.\n", (palm_enabled) ? "enable" : "disable");
 		break;
 
 	case GTI_CMD_NOTIFY_DISPLAY_STATE:
@@ -1018,7 +1018,7 @@ static int gti_default_handler(void *private_data, enum gti_cmd_type cmd_type,
 
 		if (fts_write(spi_buf, sizeof(spi_buf)))
 			res = -EIO;
-		LOGD("%s continuous report %s.\n",
+		pr_debug("%s continuous report %s.\n",
 			(spi_buf[4] == CONTINUOUS_ENABLE) ? "Enable" : "Disable",
 			!res ? "successfully" : "unsuccessfully");
 	}
@@ -1037,7 +1037,7 @@ static int gti_default_handler(void *private_data, enum gti_cmd_type cmd_type,
 		else
 			grip_enabled = spi_buf[4] == GRIP_ENABLE ? true : false;
 
-		LOGI("%s FW grip %s, status(%d).\n",
+		pr_info("%s FW grip %s, status(%d).\n",
 			(spi_buf[4] == GRIP_ENABLE) ? "Enable" : "Disable",
 			!res ? "successfully" : "unsuccessfully",
 			grip_enabled);
@@ -1057,7 +1057,7 @@ static int gti_default_handler(void *private_data, enum gti_cmd_type cmd_type,
 		else
 			palm_enabled = spi_buf[4] == PALM_ENABLE ? true : false;
 
-		LOGI("%s FW palm %s, status(%d).\n",
+		pr_info("%s FW palm %s, status(%d).\n",
 			(spi_buf[4] == PALM_ENABLE) ? "Enable" : "Disable",
 			!res ? "successfully" : "unsuccessfully",
 			palm_enabled);
@@ -1108,15 +1108,15 @@ int goog_get_ms_frame(struct fts_ts_info *info, ms_frame_type_t type)
 		offset = system_info.u16_ms_scr_baseline_addr;
 		break;
 	default:
-		LOGE("%s: Invalid MS type %d\n",  __func__, type);
+		pr_err("%s: Invalid MS type %d\n",  __func__, type);
 		return -EINVAL;
 	}
 
-	LOGD("%s: type = %d Offset = 0x%04X\n", __func__, type, offset);
+	pr_debug("%s: type = %d Offset = 0x%04X\n", __func__, type, offset);
 
 	res = get_frame_data(offset, info->mutual_data_size, info->fw_ms_data);
 	if (res < OK) {
-		LOGE("%s: error while reading sense data ERROR %08X\n",
+		pr_err("%s: error while reading sense data ERROR %08X\n",
 			__func__, res);
 		return -EIO;
 	}
@@ -1124,7 +1124,7 @@ int goog_get_ms_frame(struct fts_ts_info *info, ms_frame_type_t type)
 	/* if you want to access one node i,j,
 	  * compute the offset like: offset = i*columns + j = > frame[i, j] */
 
-	LOGD("%s: Frame acquired!\n", __func__);
+	pr_debug("%s: Frame acquired!\n", __func__);
 	return res;
 	/* return the number of data put inside frame */
 
@@ -1154,7 +1154,7 @@ int goog_get_ss_frame(struct fts_ts_info *info, ss_frame_type_t type)
 
 	if (force_len == 0x00 || sense_len == 0x00 ||
 		force_len == 0xFF || sense_len == 0xFF) {
-		LOGE("%s: number of channels not initialized\n", __func__);
+		pr_err("%s: number of channels not initialized\n", __func__);
 		return -EINVAL;
 	}
 
@@ -1200,11 +1200,11 @@ int goog_get_ss_frame(struct fts_ts_info *info, ss_frame_type_t type)
 		tmp_sense_len = (self_sense_offset == 0) ? 0 : sense_len;
 		break;
 	default:
-		LOGE("%s: Invalid SS type = %d\n", __func__, type);
+		pr_err("%s: Invalid SS type = %d\n", __func__, type);
 		return -EINVAL;
 	}
 
-	LOGD("%s: type = %d Force_len = %d Sense_len = %d"
+	pr_debug("%s: type = %d Force_len = %d Sense_len = %d"
 		" Offset_force = 0x%04X Offset_sense = 0x%04X\n",
 		__func__, type, tmp_force_len, tmp_sense_len,
 		self_force_offset, self_sense_offset);
@@ -1214,7 +1214,7 @@ int goog_get_ss_frame(struct fts_ts_info *info, ss_frame_type_t type)
 		res = get_frame_data(self_force_offset,
 			tmp_force_len * BYTES_PER_NODE, ss_ptr);
 		if (res < OK) {
-			LOGE("%s: error while reading force data ERROR %08X\n",
+			pr_err("%s: error while reading force data ERROR %08X\n",
 				__func__, res);
 			return -EIO;
 		}
@@ -1225,13 +1225,13 @@ int goog_get_ss_frame(struct fts_ts_info *info, ss_frame_type_t type)
 		res = get_frame_data(self_sense_offset,
 			tmp_sense_len * BYTES_PER_NODE, ss_ptr);
 		if (res < OK) {
-			LOGE("%s: error while reading sense data ERROR %08X\n",
+			pr_err("%s: error while reading sense data ERROR %08X\n",
 				__func__, res);
 			return -EIO;
 		}
 	}
 
-	LOGD("%s: Frame acquired!\n", __func__);
+	pr_debug("%s: Frame acquired!\n", __func__);
 	return res;
 }
 
@@ -1240,7 +1240,7 @@ static int get_fw_version(void *private_data, struct gti_fw_version_cmd *cmd)
 	int cmd_buf_size = sizeof(cmd->buffer);
 	ssize_t buf_idx = 0;
 
-	LOGI("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	buf_idx += scnprintf(cmd->buffer + buf_idx, cmd_buf_size - buf_idx,
 		"\nREG Revision: 0x%04X\n", system_info.u16_reg_ver);
 	buf_idx += scnprintf(cmd->buffer + buf_idx, cmd_buf_size - buf_idx,
@@ -1272,13 +1272,13 @@ static int get_mutual_sensor_data(void *private_data, struct gti_sensor_data_cmd
 	else if (cmd->type & TOUCH_DATA_TYPE_RAW)
 		cmd_type = MS_RAW;
 	else {
-		LOGE("%s: Invalid command type(0x%X).\n", __func__, cmd->type);
+		pr_err("%s: Invalid command type(0x%X).\n", __func__, cmd->type);
 		return -EINVAL;
 	}
 
 	res = goog_get_ms_frame(info, cmd_type);
 	if (res < 0) {
-		LOGE("%s: failed with res=0x%08X.\n", __func__, res);
+		pr_err("%s: failed with res=0x%08X.\n", __func__, res);
 		return res;
 	}
 
@@ -1310,13 +1310,13 @@ static int get_self_sensor_data(void *private_data, struct gti_sensor_data_cmd *
 	else if (cmd->type & TOUCH_DATA_TYPE_RAW)
 		cmd_type = SS_RAW;
 	else {
-		LOGE("%s: Invalid command type(0x%X).\n", __func__, cmd->type);
+		pr_err("%s: Invalid command type(0x%X).\n", __func__, cmd->type);
 		return -EINVAL;
 	}
 
 	res = goog_get_ss_frame(info, cmd_type);
 	if (res < 0) {
-		LOGE("%s: failed with res=0x%08X.\n", __func__, res);
+		pr_err("%s: failed with res=0x%08X.\n", __func__, res);
 		return res;
 	}
 	cmd->buffer = (u8 *)info->self_data;
@@ -1333,7 +1333,7 @@ static int get_self_sensor_data(void *private_data, struct gti_sensor_data_cmd *
 static void fts_resume(struct fts_ts_info *info)
 {
 	if (!info->sensor_sleep) return;
-	LOGI("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	pm_stay_awake(info->dev);
 	fts_pinctrl_setup(info, true);
@@ -1351,7 +1351,7 @@ static void fts_resume(struct fts_ts_info *info)
 static void fts_suspend(struct fts_ts_info *info)
 {
 	if (info->sensor_sleep) return;
-	LOGI("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	info->sensor_sleep = true;
 	fts_set_interrupt(info, false);
@@ -1381,17 +1381,17 @@ static int fts_init_sensing(struct fts_ts_info *info)
 	int res = 0;
 
 	error |= fts_interrupt_install(info);
-	LOGI("%s: Sensing on..\n", __func__);
+	pr_info("%s: Sensing on..\n", __func__);
 	error |= fts_mode_handler(info, 0);
 	error |= fts_set_interrupt(info, true); /* enable the interrupt */
 
 	res = fts_write_fw_reg(add, &int_data, 1);
 	if (res < OK) {
-		LOGE("%s: ERROR %08X\n", __func__, res);
+		pr_err("%s: ERROR %08X\n", __func__, res);
 	}
 
 	if (error < OK)
-		LOGE("%s: Init error (ERROR = %08X)\n", __func__, error);
+		pr_err("%s: Init error (ERROR = %08X)\n", __func__, error);
 
 
 	return error;
@@ -1416,24 +1416,24 @@ static int fts_chip_init(struct fts_ts_info *info)
 	force_burn.panel_init = 0;
 	for (; i < FLASH_MAX_SECTIONS; i++)
 		force_burn.section_update[i] = 0;
-	LOGI("%s: [1]: FW UPDATE..\n", __func__);
+	pr_info("%s: [1]: FW UPDATE..\n", __func__);
 	res = flash_update(info, &force_burn);
 	if (res != OK) {
-		LOGE("%s: [1]: FW UPDATE FAILED.. res = %d\n", __func__, res);
+		pr_err("%s: [1]: FW UPDATE FAILED.. res = %d\n", __func__, res);
 		return res;
 	}
 	if (force_burn.panel_init) {
-		LOGI("%s: [2]: MP TEST..\n", __func__);
+		pr_info("%s: [2]: MP TEST..\n", __func__);
 		res = fts_production_test_main(info, LIMITS_FILE, 0, &tests, 0);
 		if (res != OK)
-			LOGE("%s: [2]: MP TEST FAILED.. res = %d\n",
+			pr_err("%s: [2]: MP TEST FAILED.. res = %d\n",
 				__func__, res);
 	}
 
-	LOGI("%s: [3]: TOUCH INIT..\n", __func__);
+	pr_info("%s: [3]: TOUCH INIT..\n", __func__);
 	res = fts_init_sensing(info);
 	if (res != OK) {
-		LOGE("%s: [3]: TOUCH INIT FAILED.. res = %d\n", __func__, res);
+		pr_err("%s: [3]: TOUCH INIT FAILED.. res = %d\n", __func__, res);
 		return res;
 	}
 
@@ -1475,10 +1475,10 @@ static int fts_init(struct fts_ts_info *info)
 	init_test_to_do();
 #ifndef I2C_INTERFACE
 #ifdef SPI4_WIRE
-	LOGI("%s: Configuring SPI4..\n", __func__);
+	pr_info("%s: Configuring SPI4..\n", __func__);
 	res = configure_spi4();
 	if (res < OK) {
-		LOGE("%s: Error configuring IC in spi4 mode: %08X\n",
+		pr_err("%s: Error configuring IC in spi4 mode: %08X\n",
 			__func__, res);
 		return res;
 	}
@@ -1488,13 +1488,13 @@ static int fts_init(struct fts_ts_info *info)
 		res = fts_write_read_u8ux(FTS_CMD_HW_REG_R, HW_ADDR_SIZE,
 			CHIP_ID_ADDRESS, data, 2, DUMMY_BYTE);
 		if (res < OK) {
-			LOGE("%s: Bus Connection issue: %08X\n", __func__, res);
+			pr_err("%s: Bus Connection issue: %08X\n", __func__, res);
 			return res;
 		}
 		chip_id = (u16)((data[0] << 8) + data[1]);
-		LOGI("%s: Chip id: 0x%04X, retry: %d\n", __func__, chip_id, retry_cnt);
+		pr_info("%s: Chip id: 0x%04X, retry: %d\n", __func__, chip_id, retry_cnt);
 		if (chip_id != CHIP_ID) {
-			LOGE("%s: Wrong Chip detected.. Expected|Detected: 0x%04X|0x%04X\n",
+			pr_err("%s: Wrong Chip detected.. Expected|Detected: 0x%04X|0x%04X\n",
 				__func__, CHIP_ID, chip_id);
 			if (retry_cnt >= MAX_PROBE_RETRY)
 				return ERROR_WRONG_CHIP_ID;
@@ -1502,7 +1502,7 @@ static int fts_init(struct fts_ts_info *info)
 		res = fts_system_reset(info, 1);
 		if (res < OK) {
 			if (res == ERROR_BUS_W) {
-				LOGE("%s: Bus Connection issue\n", __func__);
+				pr_err("%s: Bus Connection issue\n", __func__);
 				return res;
 			}
 			/*
@@ -1515,7 +1515,7 @@ static int fts_init(struct fts_ts_info *info)
 
 	res = read_sys_info();
 	if (res < 0)
-		LOGE("%s: Couldnot read sys info.. No FW..\n", __func__);
+		pr_err("%s: Couldnot read sys info.. No FW..\n", __func__);
 	return OK;
 }
 
@@ -1540,7 +1540,7 @@ static int fts_get_reg(struct fts_ts_info *info, bool get)
 	if (of_property_read_bool(info->dev->of_node, "vdd-supply")) {
 		info->vdd_reg = regulator_get(info->dev, "vdd");
 		if (IS_ERR(info->vdd_reg)) {
-			LOGE("%s: Failed to get power regulator\n", __func__);
+			pr_err("%s: Failed to get power regulator\n", __func__);
 			ret_val = -EPROBE_DEFER;
 			goto regulator_put;
 		}
@@ -1549,7 +1549,7 @@ static int fts_get_reg(struct fts_ts_info *info, bool get)
 	if (of_property_read_bool(info->dev->of_node, "avdd-supply")) {
 		info->avdd_reg = regulator_get(info->dev, "avdd");
 		if (IS_ERR(info->avdd_reg)) {
-			LOGE("%s: Failed to get bus pullup regulator\n",
+			pr_err("%s: Failed to get bus pullup regulator\n",
 				__func__);
 			ret_val = -EPROBE_DEFER;
 			goto regulator_put;
@@ -1592,7 +1592,7 @@ static int fts_enable_reg(struct fts_ts_info *info, bool enable)
 	if (info->vdd_reg) {
 		ret_val = regulator_enable(info->vdd_reg);
 		if (ret_val < 0) {
-			LOGE("%s: Failed to enable bus regulator\n", __func__);
+			pr_err("%s: Failed to enable bus regulator\n", __func__);
 			goto exit;
 		}
 	}
@@ -1600,7 +1600,7 @@ static int fts_enable_reg(struct fts_ts_info *info, bool enable)
 	if (info->avdd_reg) {
 		ret_val = regulator_enable(info->avdd_reg);
 		if (ret_val < 0) {
-			LOGE("%s: Failed to enable power regulator\n",
+			pr_err("%s: Failed to enable power regulator\n",
 				__func__);
 			goto disable_bus_reg;
 		}
@@ -1640,7 +1640,7 @@ static int fts_gpio_setup(int gpio, bool config, int dir, int state)
 
 		ret_val = gpio_request(gpio, buf);
 		if (ret_val) {
-			LOGE("%s: Failed to get gpio %d (code: %d)",
+			pr_err("%s: Failed to get gpio %d (code: %d)",
 				__func__, gpio, ret_val);
 			return ret_val;
 		}
@@ -1650,7 +1650,7 @@ static int fts_gpio_setup(int gpio, bool config, int dir, int state)
 		else
 			ret_val = gpio_direction_output(gpio, state);
 		if (ret_val) {
-			LOGE("%s: Failed to set gpio %d direction",
+			pr_err("%s: Failed to set gpio %d direction",
 				__func__, gpio);
 			return ret_val;
 		}
@@ -1672,14 +1672,14 @@ static int fts_set_gpio(struct fts_ts_info *info)
 
 	ret_val = fts_gpio_setup(bdata->irq_gpio, true, 0, 0);
 	if (ret_val < 0) {
-		LOGE("%s: Failed to configure irq GPIO\n", __func__);
+		pr_err("%s: Failed to configure irq GPIO\n", __func__);
 		goto err_gpio_irq;
 	}
 
 	if (bdata->reset_gpio >= 0) {
 		ret_val = fts_gpio_setup(bdata->reset_gpio, true, 1, 0);
 		if (ret_val < 0) {
-			LOGE("%s: Failed to configure reset GPIO\n", __func__);
+			pr_err("%s: Failed to configure reset GPIO\n", __func__);
 			goto err_gpio_reset;
 		}
 	}
@@ -1834,20 +1834,20 @@ static int parse_dt(struct device *dev, struct fts_hw_platform_data *bdata)
 
 	bdata->irq_gpio = of_get_named_gpio_flags(np, "st,irq-gpio", 0, NULL);
 
-	LOGI("%s: irq_gpio = %d\n", __func__, bdata->irq_gpio);
+	pr_info("%s: irq_gpio = %d\n", __func__, bdata->irq_gpio);
 
 	if (of_property_read_bool(np, "st,reset-gpio")) {
 		bdata->reset_gpio = of_get_named_gpio_flags(np,
 				"st,reset-gpio", 0, NULL);
-		LOGI("%s: reset_gpio = %d\n", __func__, bdata->reset_gpio);
+		pr_info("%s: reset_gpio = %d\n", __func__, bdata->reset_gpio);
 	} else
 		bdata->reset_gpio = GPIO_NOT_DEFINED;
 
 	if (of_property_read_u8(np, "st,mm2px", &bdata->mm2px)) {
-		LOGE("%s: Unable to get mm2px, please check dts", __func__);
+		pr_err("%s: Unable to get mm2px, please check dts", __func__);
 		bdata->mm2px = 1;
 	} else {
-		LOGI("%s: mm2px = %d", __func__, bdata->mm2px);
+		pr_info("%s: mm2px = %d", __func__, bdata->mm2px);
 	}
 
 	return OK;
@@ -1882,8 +1882,8 @@ static int fts_probe(struct spi_device *client)
 	struct gti_optional_configuration *options;
 #endif
 
-	LOGI("%s: driver probe begin!\n", __func__);
-	LOGI("%s: driver ver. %s\n", __func__, FTS_TS_DRV_VERSION);
+	pr_info("%s: driver probe begin!\n", __func__);
+	pr_info("%s: driver ver. %s\n", __func__, FTS_TS_DRV_VERSION);
 
 	info = kzalloc(sizeof(struct fts_ts_info), GFP_KERNEL);
 	if (!info) {
@@ -1893,14 +1893,14 @@ static int fts_probe(struct spi_device *client)
 	}
 
 #ifdef I2C_INTERFACE
-	LOGI("%s: I2C interface...\n", __func__);
+	pr_info("%s: I2C interface...\n", __func__);
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-		LOGE("%s: Unsupported I2C functionality\n", __func__);
+		pr_err("%s: Unsupported I2C functionality\n", __func__);
 		error = -EIO;
 		goto probe_error_exit_1;
 	}
 
-	LOGI("%s: I2C address: %x\n", __func__, client->addr);
+	pr_info("%s: I2C address: %x\n", __func__, client->addr);
 	bus_type = BUS_I2C;
 #else
 	client->mode = SPI_MODE_0;
@@ -1911,7 +1911,7 @@ static int fts_probe(struct spi_device *client)
 		client->rt = true;
 		ret_val = spi_setup(client);
 		if (ret_val < 0) {
-			LOGE("%s: setup SPI rt failed(%d)\n", __func__, ret_val);
+			pr_err("%s: setup SPI rt failed(%d)\n", __func__, ret_val);
 			error = -EIO;
 			goto probe_error_exit_1;
 		}
@@ -1920,11 +1920,11 @@ static int fts_probe(struct spi_device *client)
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 	info->dma_mode = goog_check_spi_dma_enabled(client);
 #endif
-	LOGI("%s: SPI interface: dma_mode %d.\n", __func__, info->dma_mode);
+	pr_info("%s: SPI interface: dma_mode %d.\n", __func__, info->dma_mode);
 	bus_type = BUS_SPI;
 #endif
 
-	LOGI("%s: SET Device driver INFO:\n", __func__);
+	pr_info("%s: SET Device driver INFO:\n", __func__);
 
 	info->client = client;
 	info->dev = &info->client->dev;
@@ -1935,7 +1935,7 @@ static int fts_probe(struct spi_device *client)
 					   sizeof(struct fts_hw_platform_data),
 					   GFP_KERNEL);
 		if (!info->board) {
-			LOGE("%s: ERROR:info.board kzalloc failed\n",
+			pr_err("%s: ERROR:info.board kzalloc failed\n",
 				 __func__);
 			goto probe_error_exit_1;
 		}
@@ -1943,25 +1943,25 @@ static int fts_probe(struct spi_device *client)
 		bdata = info->board;
 	}
 
-	LOGI("%s: SET Regulators:\n", __func__);
+	pr_info("%s: SET Regulators:\n", __func__);
 	error = fts_get_reg(info, true);
 	if (error < 0) {
-		LOGE("%s: ERROR:Failed to get regulators\n",
+		pr_err("%s: ERROR:Failed to get regulators\n",
 			 __func__);
 		goto probe_error_exit_1;
 	}
 
 	ret_val = fts_enable_reg(info, true);
 	if (ret_val < 0) {
-		LOGE("%s: ERROR Failed to enable regulators\n",
+		pr_err("%s: ERROR Failed to enable regulators\n",
 			 __func__);
 		goto probe_error_exit_2;
 	}
 
-	LOGI("%s: SET GPIOS_Test:\n", __func__);
+	pr_info("%s: SET GPIOS_Test:\n", __func__);
 	ret_val = fts_set_gpio(info);
 	if (ret_val < 0) {
-		LOGE("%s: ERROR Failed to set up GPIO's\n",
+		pr_err("%s: ERROR Failed to set up GPIO's\n",
 			 __func__);
 		goto probe_error_exit_2;
 	}
@@ -1975,10 +1975,10 @@ static int fts_probe(struct spi_device *client)
 
 	mutex_init(&info->fts_int_mutex);
 
-	LOGI("%s: SET Input Device Property:\n", __func__);
+	pr_info("%s: SET Input Device Property:\n", __func__);
 	info->input_dev = input_allocate_device();
 	if (!info->input_dev) {
-		LOGE("%s: ERROR: No such input device defined!\n", __func__);
+		pr_err("%s: ERROR: No such input device defined!\n", __func__);
 		error = -ENODEV;
 		goto probe_error_exit_2;
 	}
@@ -2018,7 +2018,7 @@ static int fts_probe(struct spi_device *client)
 						DISTANCE_MAX, 0, 0);
 	error = input_register_device(info->input_dev);
 	if (error) {
-		LOGE("%s: ERROR: No such input device\n", __func__);
+		pr_err("%s: ERROR: No such input device\n", __func__);
 		error = -ENODEV;
 		goto probe_error_exit_5;
 	}
@@ -2027,7 +2027,7 @@ static int fts_probe(struct spi_device *client)
 	info->resume_bit = 1;
 	ret_val = fts_init(info);
 	if (ret_val < OK) {
-		LOGE("%s: Initialization fails.. exiting..\n", __func__);
+		pr_err("%s: Initialization fails.. exiting..\n", __func__);
 		if (ret_val == ERROR_WRONG_CHIP_ID)
 			error = -EPROBE_DEFER;
 		else
@@ -2037,21 +2037,21 @@ static int fts_probe(struct spi_device *client)
 
 	ret_val = fts_proc_init(info);
 	if (ret_val < OK)
-		LOGE("%s: Cannot create /proc filenode..\n", __func__);
+		pr_err("%s: Cannot create /proc filenode..\n", __func__);
 
 #if defined(FW_UPDATE_ON_PROBE) && defined(FW_H_FILE)
 	ret_val = fts_chip_init(info);
 	if (ret_val < OK) {
-		LOGE("%s: Flashing FW/Production Test/Touch Init Failed..\n",
+		pr_err("%s: Flashing FW/Production Test/Touch Init Failed..\n",
 			__func__);
 		goto probe_error_exit_6;
 	}
 #else
-	LOGI("%s: SET Auto Fw Update:\n", __func__);
+	pr_info("%s: SET Auto Fw Update:\n", __func__);
 	info->fwu_workqueue = alloc_workqueue("fts-fwu-queue", WQ_UNBOUND |
 					      WQ_HIGHPRI | WQ_CPU_INTENSIVE, 1);
 	if (!info->fwu_workqueue) {
-		LOGE("%s: ERROR: Cannot create fwu work thread\n", __func__);
+		pr_err("%s: ERROR: Cannot create fwu work thread\n", __func__);
 		goto probe_error_exit_6;
 	}
 	INIT_DELAYED_WORK(&info->fwu_work, flash_update_auto);
@@ -2068,7 +2068,7 @@ static int fts_probe(struct spi_device *client)
 		info->mutual_data = (short *)kmalloc(info->mutual_data_size,
 			GFP_KERNEL);
 		if (!info->mutual_data) {
-			LOGE("%s: Failed to allocate mutual_data.\n", __func__);
+			pr_err("%s: Failed to allocate mutual_data.\n", __func__);
 			goto probe_error_exit_6;
 		}
 
@@ -2077,25 +2077,25 @@ static int fts_probe(struct spi_device *client)
 			sizeof(int16_t);
 		info->self_data = kmalloc(info->self_data_size, GFP_KERNEL);
 		if (!info->self_data) {
-			LOGE("%s: Failed to allocate self data.\n", __func__);
+			pr_err("%s: Failed to allocate self data.\n", __func__);
 			goto probe_error_exit_6;
 		}
 
 		info->fw_ms_data = (short *)kmalloc(info->mutual_data_size,
 			GFP_KERNEL);
 		if (!info->fw_ms_data) {
-			LOGE("%s: Failed to allocate fw mutual_data.\n", __func__);
+			pr_err("%s: Failed to allocate fw mutual_data.\n", __func__);
 			goto probe_error_exit_6;
 		}
 	} else {
-		LOGE("%s: Incorrect system information ForceLen=%d SenseLen=%d.\n",
+		pr_err("%s: Incorrect system information ForceLen=%d SenseLen=%d.\n",
 			__func__, system_info.u8_scr_tx_len, system_info.u8_scr_rx_len);
 		goto probe_error_exit_6;
 	}
 
 	options = devm_kzalloc(info->dev, sizeof(struct gti_optional_configuration), GFP_KERNEL);
 	if (!options) {
-		LOGE("%s: GTI optional configuration kzalloc failed.\n",
+		pr_err("%s: GTI optional configuration kzalloc failed.\n",
 			__func__);
 		goto probe_error_exit_6;
 	}
@@ -2108,12 +2108,12 @@ static int fts_probe(struct spi_device *client)
 		info, info->dev, info->input_dev, gti_default_handler, options);
 	ret_val = goog_pm_register_notification(info->gti, &fts_pm_ops);
 	if (ret_val < 0) {
-		LOGE("%s: Failed to register gti pm", __func__);
+		pr_err("%s: Failed to register gti pm", __func__);
 		goto probe_error_exit_7;
 	}
 #endif
 
-	LOGI("%s: Probe Finished!\n", __func__);
+	pr_info("%s: Probe Finished!\n", __func__);
 	return OK;
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 probe_error_exit_7:
@@ -2139,7 +2139,7 @@ probe_error_exit_1:
 	kfree(info);
 
 probe_error_exit_0:
-	LOGE("%s: Probe Failed!\n", __func__);
+	pr_err("%s: Probe Failed!\n", __func__);
 
 	return error;
 }
