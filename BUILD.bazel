@@ -52,6 +52,7 @@ kernel_module_group(
         "//private/google-modules/power/mitigation:bcl",
         "//private/google-modules/power/reset",
         "//private/google-modules/lwis",
+        "//private/google-modules/misc/sscoredump",
         "//private/google-modules/amplifiers/audiometrics",
         "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
         "//private/google-modules/amplifiers/cs35l41",
