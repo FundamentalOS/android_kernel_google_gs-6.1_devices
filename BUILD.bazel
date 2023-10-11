@@ -150,6 +150,9 @@ kernel_module(
     ],
     outs = [
         # keep sorted
+        "drivers/block/zram/zcomp_cpu.ko",
+        "drivers/block/zram/zcomp_eh.ko",
+        "drivers/block/zram/zram_gs.ko",
         "drivers/bts/bts.ko",
         "drivers/clk/gs/clk_exynos_gs.ko",
         "drivers/clocksource/exynos_mct.ko",
@@ -326,8 +329,8 @@ genrule(
     tools = ["//build/kernel:hermetic-tools/cat"],
 )
 
-# TODO: Add support to disable a list of GKI modules
-_GKI_MODULES_LIST = get_gki_modules_list("arm64")
+# Don't load the zram GKI module
+_GKI_MODULES_LIST = [m for m in get_gki_modules_list("arm64") if not m.endswith("zram.ko")]
 
 write_file(
     name = "system_dlkm_modules_list",
