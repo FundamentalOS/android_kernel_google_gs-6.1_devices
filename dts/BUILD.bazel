@@ -5,22 +5,19 @@ load("//build/kernel/kleaf:kernel.bzl", "kernel_dtstree")
 kernel_dtstree(
     name = "tegu.dt",
     srcs = glob([
-        "google/Makefile",
         "google/*.dtsi",
         "google/*.dts",
-        "google/google-dts-base",
-        "google/google-dts-base/Makefile",
         "google/google-dts-base/*.dts",
         "google/google-dts-base/*.dtsi",
-        "google/google-dts-base/devices/ripcurrent",
-        "google/google-dts-base/devices/ripcurrent/Makefile",
         "google/google-dts-base/devices/ripcurrent/*.dts",
         "google/google-dts-base/devices/ripcurrent/*.dtsi",
         "google/google-dts-base/devices/ripcurrent/google-dts-base/*.dtsi",
-        "google/google-dts-base/devices/ripcurrent/google-dts-base/devices/ripcurrent/zuma-ripcurrent-battery-data.dtsi",
     ]) + [
         "Makefile",
-    ] + [
+        "google/Makefile",
+        "google/google-dts-base/Makefile",
+        "google/google-dts-base/devices/ripcurrent/Makefile",
+        "google/google-dts-base/devices/ripcurrent/google-dts-base/devices/ripcurrent/zuma-ripcurrent-battery-data.dtsi",
         "//private/google-modules/soc/gs:gs.dt-bindings",
     ],
     visibility = [
