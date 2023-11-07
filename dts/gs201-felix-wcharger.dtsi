@@ -82,6 +82,7 @@
 		google,fod_fsw_low_thres = <140>;
 		google,light_load;      /* Calibration light load */
 		google,ll-bpp-vout-not-set;
+		google,bpp-cep-on-dl;
 
 		google,alignment_scalar_low_current = <200>;
 		google,alignment_scalar_high_current = <100>;

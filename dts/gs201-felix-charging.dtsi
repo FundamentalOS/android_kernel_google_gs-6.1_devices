@@ -17,6 +17,7 @@
 
 &google_charger {
 	google,fv-max-uv = <4480000>;
+	google,thermal-stats-lvl-map = <0 3 5 8>;
 };
 
 &google_cpm {

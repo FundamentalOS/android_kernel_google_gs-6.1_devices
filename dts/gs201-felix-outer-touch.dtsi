@@ -116,10 +116,8 @@
 		goog,touch_offload_id = /bits/ 8 <'f''1''0''1'>; /* outer: 1; inner 0 */
 		goog,display-resolution = /bits/ 16 <1079 2091>;
 		goog,channel-num = /bits/ 16 <16 31>;
-		goog,offload-caps-cancel-reporting;
 		goog,offload-caps-data-types = /bits/ 16 <0x1f>;
 		goog,offload-caps-scan-types = /bits/ 16 <0xc0>;
-		goog,offload-caps-rotation-reporting;
 		goog,default-grip-disabled;
 		goog,default-palm-disabled;
 		controller-data {
