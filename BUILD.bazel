@@ -134,6 +134,7 @@ ZUMAPRO_SOC_REVS = [
 
 # zumapro dtbo
 _ZUMAPRO_TEGU_DTBOS = [
+    "google/zumapro-tegu-dev1.dtbo",
     "google/zumapro-tegu-proto1_0.dtbo",
 ]
 
