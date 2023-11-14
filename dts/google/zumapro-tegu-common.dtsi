@@ -14,7 +14,7 @@
 #include "google-dts-base/devices/ripcurrent/zuma-ripcurrent-gsa-gsc.dtsi"
 #include "zuma-tegu-wcharger-common.dtsi"
 #include "zuma-tegu-wlan.dtsi"
-// TODO (b/310258213): Add zumapro-board-cp-s5300 dtsi when available
+#include "google-dts-base/zumapro-board-cp-s5300-sit.dtsi"
 #include "google-dts-base/zuma-board-bluetooth.dtsi"
 #include "zuma-tegu-ese.dtsi"
 #include "zuma-tegu-nfc.dtsi"
