@@ -18,7 +18,9 @@ zumapro_tegu_overlays := \
 # zumapro dtb
 zumapro_tegu_dtbs := \
 	google-dts-base/zumapro-a0-foplp.dtb \
-	google-dts-base/zumapro-a0-ipop.dtb
+	google-dts-base/zumapro-a0-ipop.dtb  \
+	google-dts-base/zumapro-a1-foplp.dtb \
+	google-dts-base/zumapro-a1-ipop.dtb
 
 # DPM overlays
 zumapro_tegu_overlays += \

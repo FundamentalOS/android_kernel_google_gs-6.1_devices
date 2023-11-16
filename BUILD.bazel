@@ -130,6 +130,8 @@ _PIXEL_MAKE_GOALS = [
 ZUMAPRO_SOC_REVS = [
     "a0-foplp",
     "a0-ipop",
+    "a1-foplp",
+    "a1-ipop",
 ]
 
 # zumapro dtbo
