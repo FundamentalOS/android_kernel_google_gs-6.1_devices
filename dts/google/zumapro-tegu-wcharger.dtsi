@@ -2,7 +2,7 @@
 /*
  * Wireless Charger device tree entries.
  *
- * Copyright 2022 Google LLC
+ * Copyright 2024 Google LLC
  */
 
 #include <dt-bindings/pinctrl/samsung.h>
@@ -44,11 +44,12 @@
 		bias-pull-up;
 	};
 
-	ldo_en: ldo_en {
-		pins = "gpio3";
+	/* QI_BPP_EPP_GPP_SLCT */
+	wc_slct: wc_slct {
+		pins = "gpio5";
 		function = "gpio";
 		bias-disable;
-		output-low;
+		output-high;
 	};
 };
 
@@ -56,18 +57,17 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	#include "google-dts-base/zuma-wcharger-ra9530.dtsi"
+	#include "zuma-wcharger-p9222.dtsi"
 };
 
-&ra9530 {
+&p9222 {
 	status = "okay";
-	pinctrl-0 = <&wc_irq &det_int &wc_en &ldo_en>;
+	pinctrl-0 = <&wc_irq &wc_en &det_int &wc_slct>;
 
-	idt,gpio_wlc_en = <&max77779_sgpio 1 GPIO_ACTIVE_LOW>;
-	idt,gpio_qien = <&max77779_sgpio 1 GPIO_ACTIVE_LOW>;
-	idt,irq_gpio = <&max77779_sgpio 4 GPIO_ACTIVE_LOW>;
-	idt,irq_det_gpio = <&max77779_sgpio 2 GPIO_ACTIVE_LOW>;
-	idt,gpio_ldo_en = <&max77779_sgpio 3 GPIO_ACTIVE_LOW>;
-
-	idt,ramp-disable;
+	idt,gpio_wlc_en = <&max77779_sgpio 1 GPIO_ACTIVE_LOW>; /* QI_EN_L */
+	idt,gpio_qien = <&max77779_sgpio 1 GPIO_ACTIVE_LOW>; /* QI_EN_L */
+	idt,irq_det_gpio = <&max77779_sgpio 2 GPIO_ACTIVE_LOW>; /* QI_PDET_OD_L */
+	idt,irq_gpio = <&max77779_sgpio 4 GPIO_ACTIVE_LOW>; /* QI_INT_ODL */
+	idt,gpio_slct = <&s2mpg15_gpio 5 GPIO_ACTIVE_HIGH>; /* QI_BPP_EPP_SLCT */
+	idt,gpio_slct_value = <1>;
 };
