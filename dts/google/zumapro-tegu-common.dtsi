@@ -39,5 +39,4 @@
 #include "zuma-tegu-camera.dtsi"
 #include "zuma-tegu-display.dtsi"
 #include "zuma-tegu-ldaf.dtsi"
-#include "zuma-tegu-pmic.dtsi"
 #include "zuma-tegu-touch.dtsi"
