@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//common:modules.bzl", "get_gki_modules_list")
-load("//build/bazel_common_rules/exec:exec.bzl", "exec")
+load("@kernel_toolchain_info//:dict.bzl", "CLANG_VERSION")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
+load("//build/bazel_common_rules/exec:exec.bzl", "exec")
 load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
@@ -15,7 +15,7 @@ load(
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
-load("@kernel_toolchain_info//:dict.bzl", "CLANG_VERSION")
+load("//common:modules.bzl", "get_gki_modules_list")
 
 _SOC_REVS = [
     "a0",
