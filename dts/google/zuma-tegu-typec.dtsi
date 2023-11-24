@@ -17,7 +17,6 @@
 };
 
 &max77759tcpc {
-	chg-psy-name = "main-charger";
 	pinctrl-0 = <&usb_pd_irq>;
 	pullup-supply = <&m_ldo19_reg>;
 	connector {
