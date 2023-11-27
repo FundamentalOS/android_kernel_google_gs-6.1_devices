@@ -19,7 +19,7 @@
 #include "zuma-tegu-ese.dtsi"
 #include "zuma-tegu-nfc.dtsi"
 #include "google-dts-base/zuma-board-ultrasonic-udfps.dtsi"
-#include "zuma-tegu-audio-common.dtsi"
+#include "zuma-tegu-audio-common-tas2572.dtsi"
 #include "zuma-tegu-common-touch.dtsi"
 #include "google-dts-base/zumapro-board-pcie.dtsi"
 #include "google-dts-base/zumapro-board-pcie-cp-s5300.dtsi"
