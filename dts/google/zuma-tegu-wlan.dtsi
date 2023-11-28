@@ -6,6 +6,7 @@
  */
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pci/pci.h>
 #include <dt-bindings/pinctrl/samsung.h>
 #include <dt-bindings/pinctrl/zuma.h>
 
@@ -43,6 +44,7 @@
 &pcie_1 {
 	pinctrl-0 = <&pcie1_clkreq &pcie1_perst &cfg_wlanen &wlan_host_wake &wlan_dev_wake>;
 
+	max-link-speed = <LINK_SPEED_GEN2>;
 	wlan {
 		compatible = "android,bcmdhd_wlan";
 		wl_reg_on = <&gph3 4 0x1>; /* wlan reg_on pin */
