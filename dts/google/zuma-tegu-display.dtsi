@@ -13,9 +13,9 @@
 		1080x2424 {
 			mode-name = "1080x2424";
 			pmsk = <
-				0x2 0xf6 0x3 0x1800 /* p m s k */
+				0x2 0xB3 0x2 0x5CAB /* p m s k */
 				>;
-			hs-clk = <756>;
+			hs-clk = <1102>;
 			esc-clk = <20>;
 		};
 	};
@@ -25,9 +25,9 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	google_tk4b: panel@0 {
-		compatible = "google,tk4b";
-		label = "google-tk4b";
+	google_tg4b: panel@0 {
+		compatible = "google,tg4b";
+		label = "google-tg4b";
 		channel = <0>;
 		touch = <&spitouch>;
 
@@ -39,21 +39,7 @@
 		vddd-gpios = <&gpp21 5 GPIO_ACTIVE_HIGH>;
 	};
 
-	google_tk4a: panel@1 {
-		compatible = "google,tk4a";
-		label = "google-tk4a";
-		channel = <0>;
-		touch = <&spitouch>;
-
-		/* reset, power */
-		reset-gpios = <&gpp0 0 GPIO_ACTIVE_HIGH>;
-		vci-supply = <&m_ldo14_reg>;
-		vddi-supply = <&s_bucka_reg>;
-		vddd-supply = <&disp_vddd>;
-		vddd-gpios = <&gpp21 5 GPIO_ACTIVE_HIGH>;
-	};
-
-	panel@2 {
+	panel@1 {
 		compatible = "samsung,emul";
 		label = "samsung-emul";
 		channel = <0>;
