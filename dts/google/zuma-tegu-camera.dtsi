@@ -11,24 +11,24 @@
 #include <arm64/exynos/exynos-pinctrl.h>
 
 &slg51002_ldo1 {
-	regulator-min-microvolt = <2900000>;
-	regulator-max-microvolt = <2900000>;
+	regulator-min-microvolt = <2250000>;
+	regulator-max-microvolt = <2250000>;
 };
 
 /* As defined on OTP */
 &slg51002_ldo2 {
-	regulator-min-microvolt = <2850000>;
-	regulator-max-microvolt = <2850000>;
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2800000>;
 };
 
 &slg51002_ldo3 {
-	regulator-min-microvolt = <3000000>;
-	regulator-max-microvolt = <3000000>;
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2800000>;
 };
 
 &slg51002_ldo4 {
-	regulator-min-microvolt = <2950000>;
-	regulator-max-microvolt = <2950000>;
+	regulator-min-microvolt = <2900000>;
+	regulator-max-microvolt = <2900000>;
 };
 
 &slg51002_ldo5 {
@@ -38,20 +38,20 @@
 
 /* As defined on OTP */
 &slg51002_ldo6 {
-	regulator-min-microvolt = <1150000>;
-	regulator-max-microvolt = <1150000>;
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
 };
 
 &slg51002_ldo7 {
-	regulator-min-microvolt = <1100000>;
-	regulator-max-microvolt = <1100000>;
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
 };
 
 /* slg51002_ldo8 is not used */
 
 &s_ldo12_reg {
-	regulator-min-microvolt = <1850000>;
-	regulator-max-microvolt = <1850000>;
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
 };
 
 
@@ -191,19 +191,16 @@
 				/* PP1350_CAM    pp1350 */
 				/* Sensor */
 				/* VDDIO         s5mpg15_ldo12 */
+				/* VDDA          ldo2          */
 				/* VDIG          ldo7          */
-				/* VDDA          ldo3          */
 				/* RESET         reset         */
 				/* MCLK_ON       mclk_on       */
-				/* Actuator */
-				/* AF_VM         ldo5          */
 				power-up-seqs =
 					"pp3200_bb",
 					"pp1350",
 					"s2mpg15_ldo12",
+					"ldo2",
 					"ldo7",
-					"ldo3",
-					"ldo5",
 					"reset",
 					"mclk_on";
 				power-up-seq-types =
@@ -212,25 +209,22 @@
 					"regulator",
 					"regulator",
 					"regulator",
-					"regulator",
 					"gpio",
 					"pinctrl";
 				power-up-seq-delays-us =
-					<0
-					 0
-					 0
-					 0
-					 0
+					<1000
 					 1000
 					 1000
-					 8000>;
+					 1000
+					 1000
+					 1000
+					 1000>;
 
 				power-down-seqs =
 					"mclk_off",
 					"reset",
-					"ldo5",
-					"ldo3",
 					"ldo7",
+					"ldo2",
 					"s2mpg15_ldo12",
 					"pp1350",
 					"pp3200_bb";
@@ -241,17 +235,15 @@
 					"regulator",
 					"regulator",
 					"regulator",
-					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
 					<1000
 					 1000
-					 0
-					 0
-					 0
-					 0
-					 2000
-					 2000>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 			};
 
 			/* Power sequence for REAR MAIN CAMERA combo */
@@ -260,72 +252,76 @@
 				/* Common supplies */
 				/* PP3200_BB_CAM pp3200_bb */
 				/* PP1350_CAM    pp1350 */
-				/* Sensor */
 				/* VDDIO         s2mpg15_ldo12 */
-				/* VDIG          enable[0] */
-				/* VDDA          enable[1] */
+				/* Actuator , OIS */
+				/* AVDD          ldo5 */
+				/* AF_VM         ldo4 */
+				/* Sensor */
+				/* VDDA          ldo1 */
+				/* VDIG          vdig_enable */
 				/* RESET         reset */
 				/* MCLK_ON       mclk_on */
-				/* OIS */
-				/* AVDD          ldo1 */
-				/* OIS_VM        enable[2] */
-				/* Actuator */
-				/* AF_VM         ldo4 */
 				power-up-seqs =
 					"pp3200_bb",
 					"pp1350",
 					"s2mpg15_ldo12",
-					"enable",
-					"ldo1",
+					"ldo5",
 					"ldo4",
+					"ldo1",
+					"vdig_enable",
 					"reset",
 					"mclk_on";
 				power-up-seq-types =
 					"regulator",
 					"regulator",
 					"regulator",
+					"regulator",
+					"regulator",
+					"regulator",
 					"gpio",
-					"regulator",
-					"regulator",
 					"gpio",
 					"pinctrl";
 				power-up-seq-delays-us =
-					<0
-					 0
+					<1000
 					 1000
 					 1000
-					 0
-					 0
 					 1000
-					 9000>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 10000>;
 
 				power-down-seqs =
 					"mclk_off",
 					"reset",
-					"ldo4",
+					"vdig_enable",
 					"ldo1",
-					"enable",
+					"ldo4",
+					"ldo5",
 					"s2mpg15_ldo12",
 					"pp1350",
 					"pp3200_bb";
 				power-down-seq-types =
 					"pinctrl",
 					"gpio",
-					"regulator",
-					"regulator",
 					"gpio",
+					"regulator",
+					"regulator",
+					"regulator",
 					"regulator",
 					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
 					<1000
 					 1000
-					 0
-					 0
-					 0
-					 0
-					 2000
-					 2000>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 			};
 
 			/* Power sequence for REAR ULTRA WIDE combo */
@@ -335,20 +331,17 @@
 				/* PP3200_BB_CAM pp3200_bb */
 				/* PP1350_CAM    pp1350 */
 				/* Sensor */
-				/* VDIG          ldo6 */
-				/* VANA          ldo2 */
 				/* VIO           s2mpg15_ldo12 */
+				/* VANA          ldo3 */
+				/* VDIG          ldo6 */
 				/* RESET         reset */
 				/* MCLK_ON       mclk_on */
-				/* Actuator  */
-				/* AF_VM         ldo4 */
 				power-up-seqs =
 					"pp3200_bb",
 					"pp1350",
-					"ldo6",
-					"ldo2",
 					"s2mpg15_ldo12",
-					"ldo4",
+					"ldo3",
+					"ldo6",
 					"reset",
 					"mclk_on";
 				power-up-seq-types =
@@ -357,28 +350,23 @@
 					"regulator",
 					"regulator",
 					"regulator",
-					"regulator",
 					"gpio",
 					"pinctrl";
 				power-up-seq-delays-us =
-					<0
-					 0
-					 0
-					 0
+					<1000
 					 1000
-					 0
-					 0
-					 /* wait OTP settings for 14.4ms */
-					 /* from MCLK clock on to stream on */
-					 14400>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 
 				power-down-seqs =
 					"mclk_off",
 					"reset",
-					"ldo4",
-					"s2mpg15_ldo12",
-					"ldo2",
 					"ldo6",
+					"ldo3",
+					"s2mpg15_ldo12",
 					"pp1350",
 					"pp3200_bb";
 				power-down-seq-types =
@@ -388,17 +376,15 @@
 					"regulator",
 					"regulator",
 					"regulator",
-					"regulator",
 					"regulator";
 				power-down-seq-delays-us =
-					<0
-					 0
+					<1000
 					 1000
-					 0
-					 0
-					 0
-					 2000
-					 2000>;
+					 1000
+					 1000
+					 1000
+					 1000
+					 1000>;
 			};
 
 			/* REAR CAMERA */
@@ -406,11 +392,11 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-boitata";
+				node-name = "sensor-barghest";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_5>;
-				i2c-addr = <0x3D>;
+				i2c-addr = <0x56>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
@@ -419,18 +405,16 @@
 				/* GPIOs */
 				/* RCAM_RST_L GPP10[2] */
 				reset-gpios = <&gpp10 2 GPIO_ACTIVE_HIGH>;
-				/* CAM_LVBUCK_EN, RCAM_VANA_EN, RCAM_OIS_VM_EN */
-				enable-gpios =
-					<&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 2 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 1 GPIO_ACTIVE_HIGH>;
+				/* CAM_LVBUCK_EN */
+				vdig_enable-gpios = <&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH>; /* VDIG */
 
 				/* Power supplies */
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo1-supply = <&slg51002_ldo1>;
-				ldo4-supply = <&slg51002_ldo4>;
+				ldo1-supply = <&slg51002_ldo1>; /* VANA */
+				ldo4-supply = <&slg51002_ldo4>; /* AF Driver IC VM */
+				ldo5-supply = <&slg51002_ldo5>; /* VCM_DRV_ANA (VDDA) */
 
 				clocks =
 					<&clock CIS_CLK3>,
@@ -456,20 +440,20 @@
 				i2c-lock-group-id = <0>;
 			};
 
-			/* FRONT CAMERA */
+			/* FRONT CAMERA LESHEN */
 			sensor1: sensor@1 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-dokkaebi";
+				node-name = "sensor-leshen";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_3>;
-				i2c-addr = <0x10>;
+				i2c-addr = <0x1A>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
-				reg-value-bitwidth = <16>;
+				reg-value-bitwidth = <8>;
 
 				/* GPIOs */
 				/* FCAM_RST_L GPP6[2] */
@@ -479,9 +463,8 @@
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
+				ldo2-supply = <&slg51002_ldo2>;
 				ldo7-supply = <&slg51002_ldo7>;
-				ldo3-supply = <&slg51002_ldo3>;
-				ldo5-supply = <&slg51002_ldo5>;
 
 				clocks =
 					<&clock CIS_CLK1>,
@@ -507,12 +490,12 @@
 				i2c-lock-group-id = <3>;
 			};
 
-			/* REAR ULTRA WIDE CAMERA */
+			/* REAR ULTRA WIDE CAMERA LESHEN */
 			sensor2: sensor@2 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "sensor-taotie-uw";
+				node-name = "sensor-leshen-uw";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_2>;
@@ -529,9 +512,8 @@
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
+				ldo3-supply = <&slg51002_ldo3>;
 				ldo6-supply = <&slg51002_ldo6>;
-				ldo4-supply = <&slg51002_ldo4>;
-				ldo2-supply = <&slg51002_ldo2>;
 
 				clocks =
 					<&clock CIS_CLK0>,
@@ -561,7 +543,7 @@
 			eeprom0: eeprom@0 {
 				compatible = "google,lwis-i2c-device";
 				/* Device node name */
-				node-name = "eeprom-djinn";
+				node-name = "eeprom-nessie";
 				/* I2C */
 				i2c-bus = <&hsi2c_5>;
 				i2c-addr = <0x24>;
@@ -572,18 +554,16 @@
 				/* GPIOs */
 				/* RCAM_RST_L GPP10[2] */
 				reset-gpios = <&gpp10 2 GPIO_ACTIVE_HIGH>;
-				/* CAM_LVBUCK_EN, RCAM_VANA_EN, RCAM_OIS_VM_EN */
-				enable-gpios =
-					<&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 2 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 1 GPIO_ACTIVE_HIGH>;
+				/* CAM_LVBUCK_EN */
+				vdig_enable-gpios = <&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH>; /* VDIG */
 
 				/* Power supplies */
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo1-supply = <&slg51002_ldo1>;
-				ldo4-supply = <&slg51002_ldo4>;
+				ldo1-supply = <&slg51002_ldo1>; /* VANA */
+				ldo4-supply = <&slg51002_ldo4>; /* AF Driver IC VM */
+				ldo5-supply = <&slg51002_ldo5>; /* VCM_DRV_ANA (VDDA) */
 
 				/* MCLK Control */
 				pinctrl-names = "mclk_on", "mclk_off";
@@ -601,7 +581,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "eeprom-smaug-taotie-uw";
+				node-name = "eeprom-smaug-leshen-uw";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_2>;
@@ -619,9 +599,8 @@
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
+				ldo3-supply = <&slg51002_ldo3>;
 				ldo6-supply = <&slg51002_ldo6>;
-				ldo4-supply = <&slg51002_ldo4>;
-				ldo2-supply = <&slg51002_ldo2>;
 
 				/* MCLK Control */
 				pinctrl-names = "mclk_on", "mclk_off";
@@ -634,16 +613,16 @@
 				i2c-lock-group-id = <2>;
 			};
 
-			/* EEPROM for FRONT CAMERA */
+			/* EEPROM for FRONT CAMERA LESHEN-UW*/
 			eeprom2: eeprom@2 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "eeprom-smaug-dokkaebi";
+				node-name = "eeprom-smaug-leshen";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_3>;
-				i2c-addr = <0x51>;
+				i2c-addr = <0x50>;
 
 				/* Registers */
 				reg-addr-bitwidth = <16>;
@@ -657,9 +636,8 @@
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
+				ldo2-supply = <&slg51002_ldo2>;
 				ldo7-supply = <&slg51002_ldo7>;
-				ldo3-supply = <&slg51002_ldo3>;
-				ldo5-supply = <&slg51002_ldo5>;
 
 				/* MCLK Control */
 				pinctrl-names = "mclk_on", "mclk_off";
@@ -675,31 +653,29 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "act-cornerfolk";
+				node-name = "act-nessie";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_5>;
-				i2c-addr = <0xC>;
+				i2c-addr = <0x24>;
 
 				/* Registers */
-				reg-addr-bitwidth = <8>;
-				reg-value-bitwidth = <8>;
+				reg-addr-bitwidth = <16>;
+				reg-value-bitwidth = <32>;
 
 				/* GPIOs */
 				/* RCAM_RST_L GPP10[2] */
 				reset-gpios = <&gpp10 2 GPIO_ACTIVE_HIGH>;
-				/* CAM_LVBUCK_EN, RCAM_VANA_EN, RCAM_OIS_VM_EN */
-				enable-gpios =
-					<&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 2 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 1 GPIO_ACTIVE_HIGH>;
+				/* CAM_LVBUCK_EN */
+				vdig_enable-gpios = <&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH>; /* VDIG */
 
 				/* Power supplies */
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo1-supply = <&slg51002_ldo1>;
-				ldo4-supply = <&slg51002_ldo4>;
+				ldo1-supply = <&slg51002_ldo1>; /* VANA */
+				ldo4-supply = <&slg51002_ldo4>; /* AF Driver IC VM */
+				ldo5-supply = <&slg51002_ldo5>; /* VCM_DRV_ANA (VDDA) */
 
 				/* MCLK Control */
 				pinctrl-names = "mclk_on", "mclk_off";
@@ -715,92 +691,12 @@
 				i2c-lock-group-id = <0>;
 			};
 
-			/* Actuator for FRONT CAMERA */
-			actuator1: actuator@1 {
-				compatible = "google,lwis-i2c-device";
-
-				/* Device node name */
-				node-name = "act-cornerfolk-dokkaebi";
-
-				/* I2C */
-				i2c-bus = <&hsi2c_3>;
-				i2c-addr = <0xC>;
-
-				/* Registers */
-				reg-addr-bitwidth = <8>;
-				reg-value-bitwidth = <8>;
-
-				/* GPIOs */
-				/* FCAM_RST_L GPP6[2] */
-				reset-gpios = <&gpp6 2 GPIO_ACTIVE_HIGH>;
-
-				/* Power supplies */
-				pp3200_bb-supply = <&cam_pp3200_bb>;
-				pp1350-supply = <&cam_pp1350>;
-				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo7-supply = <&slg51002_ldo7>;
-				ldo3-supply = <&slg51002_ldo3>;
-				ldo5-supply = <&slg51002_ldo5>;
-
-				/* MCLK Control */
-				pinctrl-names = "mclk_on", "mclk_off";
-				pinctrl-0 = <&sensor_mclk2_fn>;
-				pinctrl-1 = <&sensor_mclk2_out>;
-
-				/* Power sequence */
-				power-seq = <&front_camera_power_seq>;
-
-				/* Thread priority */
-				transaction-thread-priority = <99>;
-			};
-
-			/* Actuator for REAR ULTRAWIDE CAMERA */
-			actuator2: actuator@2 {
-				compatible = "google,lwis-i2c-device";
-
-				/* Device node name */
-				node-name = "act-cornerfolk-taotie-uw";
-
-				/* I2C */
-				i2c-bus = <&hsi2c_2>;
-				i2c-addr = <0xF>;
-
-				/* Registers */
-				reg-addr-bitwidth = <8>;
-				reg-value-bitwidth = <8>;
-
-				/* GPIOs */
-				/* RUWCAM_RST_L GPP4[2] */
-				reset-gpios = <&gpp4 2 GPIO_ACTIVE_HIGH>;
-
-				/* Power supplies */
-				pp3200_bb-supply = <&cam_pp3200_bb>;
-				pp1350-supply = <&cam_pp1350>;
-				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo6-supply = <&slg51002_ldo6>;
-				ldo4-supply = <&slg51002_ldo4>;
-				ldo2-supply = <&slg51002_ldo2>;
-
-				/* MCLK Control */
-				pinctrl-names = "mclk_on", "mclk_off";
-				pinctrl-0 = <&sensor_mclk1_fn>;
-				pinctrl-1 = <&sensor_mclk1_out>;
-
-				/* Power sequence */
-				power-seq = <&rear_uw_camera_power_seq>;
-
-				/* Thread priority */
-				transaction-thread-priority = <99>;
-
-				i2c-lock-group-id = <2>;
-			};
-
 			/* OIS for REAR CAMERA */
 			ois0: ois@0 {
 				compatible = "google,lwis-i2c-device";
 
 				/* Device node name */
-				node-name = "ois-djinn";
+				node-name = "ois-nessie";
 
 				/* I2C */
 				i2c-bus = <&hsi2c_5>;
@@ -813,18 +709,17 @@
 				/* GPIOs */
 				/* RCAM_RST_L GPP10[2] */
 				reset-gpios = <&gpp10 2 GPIO_ACTIVE_HIGH>;
-				/* CAM_LVBUCK_EN, RCAM_VANA_EN, RCAM_OIS_VM_EN */
-				enable-gpios =
-					<&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 2 GPIO_ACTIVE_HIGH
-					 &s2mpg14_gpio 1 GPIO_ACTIVE_HIGH>;
+				/* CAM_LVBUCK_EN */
+				vdig_enable-gpios = <&s2mpg14_gpio 0 GPIO_ACTIVE_HIGH>; /* VDIG */
+
 
 				/* Power supplies */
 				pp3200_bb-supply = <&cam_pp3200_bb>;
 				pp1350-supply = <&cam_pp1350>;
 				s2mpg15_ldo12-supply = <&s_ldo12_reg>;
-				ldo1-supply = <&slg51002_ldo1>;
-				ldo4-supply = <&slg51002_ldo4>;
+				ldo1-supply = <&slg51002_ldo1>; /* VANA */
+				ldo4-supply = <&slg51002_ldo4>; /* AF Driver IC VM */
+				ldo5-supply = <&slg51002_ldo5>; /* VCM_DRV_ANA (VDDA) */
 
 				/* MCLK Control */
 				pinctrl-names = "mclk_on", "mclk_off";
