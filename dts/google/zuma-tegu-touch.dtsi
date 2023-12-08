@@ -20,13 +20,10 @@
 	goog,default-palm-disabled;
 
 	synaptics,pixels-per-mm = <17>;
-	goog,panel_map = <&google_tk4a 0>,
-			 <&google_tk4b 1>;
+	goog,panel_map = <&google_tg4b 1>;
 
-	synaptics,panel_map = <&google_tk4a>,
-			      <&google_tk4b>;
-	synaptics,firmware_names = "synaptics.img",
-				   "synaptics_b.img";
+	synaptics,panel_map = <&google_tg4b>;
+	synaptics,firmware_names = "synaptics_b.img";
 	synaptics,test_algo = <0 1>;
 
 	synaptics,pt05_high_name = "synaptics,pt05_high", "synaptics,pt05_high_b";
