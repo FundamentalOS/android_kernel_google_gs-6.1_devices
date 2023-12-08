@@ -38,3 +38,4 @@
 #include "zuma-tegu-display.dtsi"
 #include "zuma-tegu-ldaf.dtsi"
 #include "zuma-tegu-touch.dtsi"
+#include "zumapro-tegu-udfps.dtsi"
