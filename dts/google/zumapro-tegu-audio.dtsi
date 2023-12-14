@@ -7,7 +7,7 @@
 
 &aoc {
 	aoc-board-cfg = "TG4";
-	aoc-board-id = <0x40a02>;
+	aoc-board-id = <0x60b02>;
 	aoc-board-rev = <0x10000>;
 	prevent-fw-load = <0x0>;
 };
