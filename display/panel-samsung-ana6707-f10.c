@@ -914,7 +914,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 	if (pmode->exynos_mode.is_lp_mode) {
 		/* set 1Hz while self refresh is active, otherwise clear it */
 		ctx->panel_idle_vrefresh = enable ? 1 : 0;
-		backlight_state_changed(ctx->bl);
+		notify_panel_mode_changed(ctx);
 		return false;
 	}
 
@@ -940,7 +940,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 		}
 
 		ctx->panel_idle_vrefresh = ctx->self_refresh_active ? spanel->hw_idle_vrefresh : 0;
-		backlight_state_changed(ctx->bl);
+		notify_panel_mode_changed(ctx);
 		return false;
 	}
 
@@ -1011,7 +1011,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 	}
 	EXYNOS_DCS_WRITE_TABLE(ctx, lock_cmd_f0);
 
-	backlight_state_changed(ctx->bl);
+	notify_panel_mode_changed(ctx);
 
 	DPU_ATRACE_END(__func__);
 
@@ -1158,6 +1158,14 @@ static int ana6707_f10_set_brightness(struct exynos_panel *ctx, u16 br)
 static const struct exynos_display_underrun_param underrun_param = {
 	.te_idle_us = 350,
 	.te_var = 1,
+};
+
+static const int ana6707_vrefresh_range[] = {
+	1, 10, 30, 60, 120
+};
+
+static const int ana6707_lp_vrefresh_range[] = {
+	1, 30
 };
 
 static const struct drm_dsc_config ana6707_f10_dsc_cfg = {
@@ -1421,8 +1429,12 @@ const struct exynos_panel_desc samsung_ana6707_f10 = {
 	.min_luminance = 5,
 	.modes = ana6707_f10_modes,
 	.num_modes = ARRAY_SIZE(ana6707_f10_modes),
+	.vrefresh_range = ana6707_vrefresh_range,
+	.vrefresh_range_count = ARRAY_SIZE(ana6707_vrefresh_range),
 	.off_cmd_set = &ana6707_f10_off_cmd_set,
 	.lp_mode = &ana6707_f10_lp_mode,
+	.lp_vrefresh_range = ana6707_lp_vrefresh_range,
+	.lp_vrefresh_range_count = ARRAY_SIZE(ana6707_lp_vrefresh_range),
 	.lp_cmd_set = &ana6707_f10_lp_cmd_set,
 	.binned_lp = ana6707_f10_binned_lp,
 	.num_binned_lp = ARRAY_SIZE(ana6707_f10_binned_lp),
