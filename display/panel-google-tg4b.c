@@ -45,8 +45,16 @@ static const struct exynos_dsi_cmd tg4b_lp_cmds[] = {
 
 	/* disable dimming */
 	EXYNOS_DSI_CMD_SEQ(0x53, 0x20),
+
 	/* enter AOD */
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_ENTER_IDLE_MODE),
+
+	/* Setting AOD Hclk */
+	EXYNOS_DSI_CMD_SEQ(0xFF, 0xAA, 0x55, 0xA5, 0x81),
+	EXYNOS_DSI_CMD_SEQ(0x6F, 0x0E),
+	EXYNOS_DSI_CMD_SEQ(0xF5, 0x20),
+
+	/* Lock TE2 30Hz */
 	EXYNOS_DSI_CMD_SEQ(0x5A, 0x04),
 };
 static DEFINE_EXYNOS_CMD_SET(tg4b_lp);
@@ -83,80 +91,27 @@ static const struct exynos_dsi_cmd tg4b_off_cmds[] = {
 static DEFINE_EXYNOS_CMD_SET(tg4b_off);
 
 static const struct exynos_dsi_cmd tg4b_init_cmds[] = {
-	/* CMD2, Page0 */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00),
-	/* b/295134228 correct EM pulse and EM-off time */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x18),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xB2, 0x38, 0xB0, 0x3F, 0xFF),
-
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x1B),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xBA, 0x18),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x1C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x2C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-				0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x3C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x03, 0x03, 0x03, 0x03,
-				0x03, 0x03, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x4C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x0B, 0x0B, 0x0B, 0x0B,
-				0x0B, 0x0B, 0x0B, 0x0B, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x5C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x6C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x7C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x8C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x9C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x11, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0xA4),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xBA, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0xA8),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0xB0),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1),
-				0xBA, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x08),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xBB, 0x01, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x18),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xBB, 0x01, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x1C),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xBB, 0x01, 0x00),
-
 	/* CMD2, Page1 */
 	EXYNOS_DSI_CMD_SEQ(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
 	EXYNOS_DSI_CMD_SEQ(0x6F, 0x05),
 	EXYNOS_DSI_CMD_SEQ(0xC5, 0x15, 0x15, 0x15, 0xDD),
 
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x0A),
-	/* VGSP adjust */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xE3, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6F, 0x18),
-	/* Vin source adjust */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0xD8, 0x38),
+	/* CMD2, Page0 */
+	EXYNOS_DSI_CMD_SEQ(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00),
+	/* Default ELVSS setting */
+	EXYNOS_DSI_CMD_SEQ(0x6F, 0x06),
+	EXYNOS_DSI_CMD_SEQ(0xB5, 0x7F, 0x00, 0x2C, 0x00),
+	EXYNOS_DSI_CMD_SEQ(0x6F, 0x11),
+	EXYNOS_DSI_CMD_SEQ(0xB5, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C),
 
-	/* CMD2, Page7 */
-	EXYNOS_DSI_CMD_SEQ(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x07),
-	/* Round algorithm OFF */
-	EXYNOS_DSI_CMD_SEQ(0xC0, 0x00),
+	EXYNOS_DSI_CMD_SEQ(0x6F, 0x2D),
+	EXYNOS_DSI_CMD_SEQ(0xB5, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A,
+				0x2A, 0x2A, 0x2A, 0x25,0x25, 0x1B, 0x1B, 0x13, 0x13, 0x0C, 0x0C,
+				0x0C, 0x0C, 0x07),
+	EXYNOS_DSI_CMD_SEQ(0x6F, 0x44),
+	EXYNOS_DSI_CMD_SEQ(0xB5, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A, 0x2A,
+				0x2A, 0x2A, 0x2A, 0x25, 0x25, 0x1B, 0x1B, 0x13, 0x13, 0x0C, 0x0C,
+				0x0C, 0x0C, 0x07),
 
 	/* CMD3, Page0 */
 	EXYNOS_DSI_CMD_SEQ(0xFF, 0xAA, 0x55, 0xA5, 0x80),
@@ -207,19 +162,21 @@ static const struct exynos_dsi_cmd tg4b_init_cmds[] = {
 
 	/* CMD1, DPC Temperature 25 */
 	EXYNOS_DSI_CMD_SEQ(0x81, 0x01, 0x19),
+	/* FPR1_EN=1 */
+	EXYNOS_DSI_CMD_SEQ(0x88, 0x01, 0x02, 0x1C, 0x06, 0xDD, 0x00, 0x00, 0x00, 0x00),
 	EXYNOS_DSI_CMD_SEQ(0x03, 0x01),
 	EXYNOS_DSI_CMD_SEQ(0x90, 0x03, 0x03),
 	/* 2DSC & slice high 24 DSC v1.2a */
 	EXYNOS_DSI_CMD_SEQ(0x91, 0x89, 0xA8, 0x00, 0x18, 0xD2, 0x00, 0x02, 0x25, 0x02,
 				0x35, 0x00, 0x07, 0x04, 0x86, 0x04, 0x3D, 0x10, 0xF0),
 	/* Long V = 60Hz */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_GE(PANEL_REV_EVT1), 0x2F, 0x02),
-	/* 60Hz */
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x2F, 0x30),
-	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_LT(PANEL_REV_EVT1), 0x6D, 0x00, 0x00),
+	EXYNOS_DSI_CMD_SEQ(0x2F, 0x02),
 	EXYNOS_DSI_CMD_SEQ_DELAY(60, MIPI_DCS_EXIT_SLEEP_MODE)
 };
 static DEFINE_EXYNOS_CMD_SET(tg4b_init);
+
+static void tg4b_set_local_hbm_mode(struct exynos_panel *ctx,
+				       bool local_hbm_en);
 
 static void tg4b_update_te2(struct exynos_panel *ctx)
 {
@@ -271,28 +228,23 @@ static void tg4b_update_irc(struct exynos_panel *ctx,
 		/* IRC Off */
 		EXYNOS_DCS_BUF_ADD(ctx, 0x5F, 0x01);
 		if (vrefresh == 120) {
-			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x00);
-			EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_GAMMA_CURVE, 0x02);
-			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
-			if (ctx->panel_rev < PANEL_REV_EVT1)
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x32);
-			else
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x40);
-		} else {
-			if (ctx->panel_rev < PANEL_REV_EVT1) {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x30);
+			if (ctx->hbm.local_hbm.enabled) {
 				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0xB0);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xBA, 0x44);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x32);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x04);
+				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x76);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x87, 0x05);
 			} else {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x00);
+				EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_GAMMA_CURVE, 0x02);
 				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
 				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x40);
 			}
+		} else {
+			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x40);
 		}
 	} else {
 		const u8 val1 = level >> 8;
@@ -301,28 +253,23 @@ static void tg4b_update_irc(struct exynos_panel *ctx,
 		/* IRC ON */
 		EXYNOS_DCS_BUF_ADD(ctx, 0x5F, 0x00);
 		if (vrefresh == 120) {
-			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x00);
-			EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_GAMMA_CURVE, 0x00);
-			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
-			if (ctx->panel_rev < PANEL_REV_EVT1)
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x30);
-			else
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x10);
-		} else {
-			if (ctx->panel_rev < PANEL_REV_EVT1) {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x30);
+			if (ctx->hbm.local_hbm.enabled) {
 				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0xB0);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xBA, 0x41);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x30);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x04);
+				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x75);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x87, 0x05);
 			} else {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
+				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x00);
+				EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_GAMMA_CURVE, 0x00);
 				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
 				EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x10);
 			}
+		} else {
+			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x10);
 		}
 		/* sync from bigSurf : restore the dbv value while IRC ON */
 		EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, val1, val2);
@@ -336,31 +283,38 @@ static void tg4b_change_frequency(struct exynos_panel *ctx,
 {
 	int vrefresh = drm_mode_vrefresh(&pmode->mode);
 
-	if (!ctx || (vrefresh != 60 && vrefresh != 120))
+	if (unlikely(!ctx))
 		return;
+
+	if ((vrefresh != 60 && vrefresh != 120)) {
+		dev_warn(ctx->dev, "%s: invalid refresh rate %uhz\n", __func__, vrefresh);
+		return;
+	}
+
+	if (vrefresh != 120 &&
+		ctx->hbm.local_hbm.effective_state != LOCAL_HBM_DISABLED) {
+		dev_err(ctx->dev,
+			"%s: switch to %dhz will fail when LHBM is on, disable LHBM\n",
+			__func__, vrefresh);
+		tg4b_set_local_hbm_mode(ctx, false);
+		ctx->hbm.local_hbm.effective_state = LOCAL_HBM_DISABLED;
+	}
 
 	if (!IS_HBM_ON(ctx->hbm_mode)) {
 		if (vrefresh == 120) {
 			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x00);
 			EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, MIPI_DCS_SET_GAMMA_CURVE, 0x00);
 		} else {
-			if (ctx->panel_rev < PANEL_REV_EVT1) {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x30);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0xB0);
-				EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xBA, 0x41);
-			} else {
-				EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
-				EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-				EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
-				EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xC0, 0x10);
-			}
+			EXYNOS_DCS_BUF_ADD(ctx, 0x2F, 0x02);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x03);
+			EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xC0, 0x10);
 		}
 	} else {
 		tg4b_update_irc(ctx, ctx->hbm_mode, vrefresh);
 	}
 
-	dev_dbg(ctx->dev, "%s: change to %uhz\n", __func__, vrefresh);
+	dev_dbg(ctx->dev, "%s: change to %dhz\n", __func__, vrefresh);
 }
 
 static void tg4b_set_dimming_on(struct exynos_panel *ctx,
@@ -374,7 +328,7 @@ static void tg4b_set_dimming_on(struct exynos_panel *ctx,
 	}
 
 	ctx->dimming_on = dimming_on;
-	EXYNOS_DCS_WRITE_SEQ(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
+	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
 					ctx->dimming_on ? 0x28 : 0x20);
 	dev_dbg(ctx->dev, "%s dimming_on=%d\n", __func__, dimming_on);
 }
@@ -391,6 +345,9 @@ static void tg4b_set_nolp_mode(struct exynos_panel *ctx,
 	EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 	EXYNOS_DCS_BUF_ADD(ctx, 0xC0, 0x54);
 	EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_EXIT_IDLE_MODE);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x0E);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xF5, 0x2B);
 	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0x5A, 0x04);
 
 	tg4b_change_frequency(ctx, pmode);
@@ -481,6 +438,25 @@ static int tg4b_atomic_check(struct exynos_panel *ctx, struct drm_atomic_state *
 	return 0;
 }
 
+static void tg4b_set_local_hbm_background_brightness(struct exynos_panel *ctx, u16 br)
+{
+	u16 level;
+	u8 val1, val2;
+
+	if (IS_HBM_ON_IRC_OFF(ctx->hbm_mode) && ctx->panel_rev >= PANEL_REV_EVT1 &&
+	    br == ctx->desc->brt_capability->hbm.level.max)
+		br = 0x0FFF;
+
+	level = br * 4;
+	val1 = level >> 8;
+	val2 = level & 0xff;
+
+	/* set LHBM background brightness */
+	EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+	EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x4C);
+	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xDF, val1, val2, val1, val2, val1, val2);
+}
+
 static int tg4b_set_brightness(struct exynos_panel *ctx, u16 br)
 {
 	struct tg4b_panel *spanel = to_spanel(ctx);
@@ -500,15 +476,17 @@ static int tg4b_set_brightness(struct exynos_panel *ctx, u16 br)
 		return exynos_dcs_set_brightness(ctx, 0);
 	}
 
-	brightness = (br & 0xff) << 8 | br >> 8;
+	if (ctx->hbm.local_hbm.enabled)
+		tg4b_set_local_hbm_background_brightness(ctx, br);
 
 	if (spanel->idle_exit_dimming_delay_ts &&
 		(ktime_sub(spanel->idle_exit_dimming_delay_ts, ktime_get()) <= 0)) {
-		EXYNOS_DCS_WRITE_SEQ(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
+		EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
 					ctx->dimming_on ? 0x28 : 0x20);
 		spanel->idle_exit_dimming_delay_ts = 0;
 	}
 
+	brightness = (br & 0xff) << 8 | br >> 8;
 	return exynos_dcs_set_brightness(ctx, brightness);
 }
 
@@ -534,6 +512,34 @@ static void tg4b_set_hbm_mode(struct exynos_panel *ctx,
 	dev_info(ctx->dev, "hbm_on=%d hbm_ircoff=%d\n", IS_HBM_ON(ctx->hbm_mode),
 		 IS_HBM_ON_IRC_OFF(ctx->hbm_mode));
 }
+
+static void tg4b_set_local_hbm_mode(struct exynos_panel *ctx,
+				       bool local_hbm_en)
+{
+	const struct exynos_panel_mode *pmode = ctx->current_mode;
+	int vrefresh = drm_mode_vrefresh(&pmode->mode);
+
+	if (local_hbm_en) {
+		u16 level = exynos_panel_get_brightness(ctx);
+
+		if (IS_HBM_ON(ctx->hbm_mode)) {
+			tg4b_update_irc(ctx, ctx->hbm_mode, vrefresh);
+		} else if (vrefresh == 120) {
+			EXYNOS_DCS_BUF_ADD(ctx, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			EXYNOS_DCS_BUF_ADD(ctx, 0x6F, 0x04);
+			EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xC0, 0x75);
+		} else {
+			dev_warn(ctx->dev, "enable LHBM at unexpected state (HBM: %d, vrefresh: %dhz)\n",
+				ctx->hbm_mode, vrefresh);
+		}
+		tg4b_set_local_hbm_background_brightness(ctx, level);
+		EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0x87, 0x05);
+	} else {
+		EXYNOS_DCS_BUF_ADD(ctx, 0x87, 0x00);
+		EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0x2F, 0x00);
+	}
+}
+
 
 static void tg4b_mode_set(struct exynos_panel *ctx,
 			     const struct exynos_panel_mode *pmode)
@@ -568,7 +574,7 @@ static int tg4b_read_id(struct exynos_panel *ctx)
 	char buf[TG4B_DDIC_ID_LEN] = {0};
 	int ret;
 
-	EXYNOS_DCS_WRITE_SEQ(ctx, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
 	ret = mipi_dsi_dcs_read(dsi, 0xF2, buf, TG4B_DDIC_ID_LEN);
 	if (ret != TG4B_DDIC_ID_LEN) {
 		dev_warn(ctx->dev, "Unable to read DDIC id (%d)\n", ret);
@@ -580,12 +586,12 @@ static int tg4b_read_id(struct exynos_panel *ctx)
 	exynos_bin2hex(buf, TG4B_DDIC_ID_LEN,
 		ctx->panel_id, sizeof(ctx->panel_id));
 done:
-	EXYNOS_DCS_WRITE_SEQ(ctx, 0xFF, 0xAA, 0x55, 0xA5, 0x00);
+	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xFF, 0xAA, 0x55, 0xA5, 0x00);
 	return ret;
 }
 
 static const struct exynos_display_underrun_param underrun_param = {
-	.te_idle_us = 200,
+	.te_idle_us = 2510,
 	.te_var = 1,
 };
 
@@ -769,6 +775,7 @@ static const struct exynos_panel_funcs tg4b_exynos_funcs = {
 	.set_nolp_mode = tg4b_set_nolp_mode,
 	.set_binned_lp = exynos_panel_set_binned_lp,
 	.set_hbm_mode = tg4b_set_hbm_mode,
+	.set_local_hbm_mode = tg4b_set_local_hbm_mode,
 	.set_dimming_on = tg4b_set_dimming_on,
 	.is_mode_seamless = tg4b_is_mode_seamless,
 	.mode_set = tg4b_mode_set,
@@ -834,6 +841,7 @@ struct exynos_panel_desc google_tg4b = {
 	.binned_lp = tg4b_binned_lp,
 	.num_binned_lp = ARRAY_SIZE(tg4b_binned_lp),
 	.panel_func = &tg4b_drm_funcs,
+	.lhbm_on_delay_frames = 2,
 	.exynos_panel_func = &tg4b_exynos_funcs,
 	.reset_timing_ms = {1, 1, 20},
 	.reg_ctrl_enable = {
@@ -879,6 +887,6 @@ static struct mipi_dsi_driver exynos_panel_driver = {
 };
 module_mipi_dsi_driver(exynos_panel_driver);
 
-MODULE_AUTHOR("Gil Liu <gilliu@google.com>");
+MODULE_AUTHOR("Shin-Yu Wang <shinyuw@google.com>");
 MODULE_DESCRIPTION("MIPI-DSI based Google tg4b panel driver");
 MODULE_LICENSE("GPL");
