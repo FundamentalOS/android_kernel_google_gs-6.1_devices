@@ -17,7 +17,7 @@
 };
 
 &max77759tcpc {
-	chg-psy-name = "main-charger";
+	chg-psy-name = "gccd";
 	pinctrl-0 = <&usb_pd_irq>;
 	pullup-supply = <&m_ldo19_reg>;
 	connector {
@@ -26,7 +26,7 @@
 				       PDO_FIXED_USB_COMM |
 				       PDO_FIXED_HIGHER_CAP |
 				       PDO_FIXED_DUAL_ROLE)
-			     PDO_FIXED(9000, 2200, 0)
+			     PDO_FIXED(9000, 3000, 0)
 			     PDO_PPS_APDO(5000, 21000, 3000)>;
 	};
 };
