@@ -8,7 +8,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "zumapro-tegu-common.dtsi"
+#include "zumapro-tegu-common-dev1.dtsi"
 #include "google-dts-base/zuma-cp-s5400-phone-gnss.dtsi"
 #include "zuma-tegu-gnss-samsung.dtsi"
 #include "google-dts-base/max777xx-fwupdate.dtsi"
