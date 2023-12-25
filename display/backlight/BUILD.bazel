@@ -12,7 +12,7 @@ kernel_module(
     outs = [
         "rt4539_bl.ko",
     ],
-    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    kernel_build = "//private/google-modules/whi-staging/soc/gs:gs_kernel_build",
     visibility = [
         "//private/devices/google:__subpackages__",
     ],

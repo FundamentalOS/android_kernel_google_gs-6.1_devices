@@ -9,21 +9,21 @@ kernel_module(
         "*.h",
         "Kbuild",
     ]) + [
-        "//private/google-modules/display:headers",
-        "//private/google-modules/display/include:headers",
-        "//private/google-modules/soc/gs:gs_soc_headers",
+        "//private/google-modules/whi-staging/display:headers",
+        "//private/google-modules/whi-staging/display/include:headers",
+        "//private/google-modules/whi-staging/soc/gs:gs_soc_headers",
     ],
     outs = [
         "panel-boe-ts110f5mlg0.ko",
         "panel-csot-ppa957db2d.ko",
     ],
-    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    kernel_build = "//private/google-modules/whi-staging/soc/gs:gs_kernel_build",
     visibility = [
         "//private/devices/google:__subpackages__",
-        "//private/google-modules/display:__pkg__",
-        "//private/google-modules/soc/gs:__pkg__",
+        "//private/google-modules/whi-staging/display:__pkg__",
+        "//private/google-modules/whi-staging/soc/gs:__pkg__",
     ],
     deps = [
-        "//private/google-modules/display:samsung",
+        "//private/google-modules/whi-staging/display:samsung",
     ],
 )
