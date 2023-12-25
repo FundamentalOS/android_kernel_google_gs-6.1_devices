@@ -8,7 +8,7 @@ KBUILD_OPTIONS += CONFIG_DRM_PANEL_SAMSUNG_EA8182_F10=m
 EXTRA_CFLAGS += -DDYNAMIC_DEBUG_MODULE=1
 EXTRA_CFLAGS += -Werror
 
-EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/display/Module.symvers
+EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/whi-staging/display/Module.symvers
 
 modules modules_install clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(M) W=1 \

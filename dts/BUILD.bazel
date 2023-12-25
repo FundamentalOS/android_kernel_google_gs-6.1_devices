@@ -6,18 +6,18 @@ kernel_dtstree(
     name = "felix.dt",
     srcs = glob([
         "Makefile",
-        "**/*.dtsi",
-        "**/*.dts",
-        "google-base",
-        "google-base/Makefile",
-        "google-base/**/*.dts",
-        "google-base/**/*.dtsi",
-        "google-base/**/*.h",
+        "google/Makefile",
+        "google/*.dtsi",
+        "google/*.dts",
+        "google/google-dts-base",
+        "google/google-dts-base/Makefile",
+        "google/google-dts-base/*.dts",
+        "google/google-dts-base/*.dtsi",
     ]) + [
-        "//private/google-modules/soc/gs:gs.dt-bindings",
+        "//private/google-modules/whi-staging/soc/gs:gs.dt-bindings",
     ],
     visibility = [
         "//private/devices/google/felix:__pkg__",
-        "//private/google-modules/soc/gs:__pkg__",
+        "//private/google-modules/whi-staging/soc/gs:__pkg__",
     ],
 )
