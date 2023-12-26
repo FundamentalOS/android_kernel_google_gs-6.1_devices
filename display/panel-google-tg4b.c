@@ -651,7 +651,7 @@ static const struct exynos_panel_mode tg4b_modes[] = {
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
 			.vblank_usec = 120,
-			.te_usec = 8604,
+			.te_usec = 8450,
 			.bpc = 8,
 			TG4B_DSC_CONFIG,
 			.underrun_param = &underrun_param,
@@ -680,7 +680,7 @@ static const struct exynos_panel_mode tg4b_modes[] = {
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
 			.vblank_usec = 120,
-			.te_usec = 274,
+			.te_usec = 275,
 			.bpc = 8,
 			TG4B_DSC_CONFIG,
 			.underrun_param = &underrun_param,
