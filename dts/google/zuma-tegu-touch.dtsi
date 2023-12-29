@@ -23,7 +23,7 @@
 	goog,panel_map = <&google_tg4b 1>;
 
 	synaptics,panel_map = <&google_tg4b>;
-	synaptics,firmware_names = "synaptics.img";
+	synaptics,firmware_names = "synaptics_b.img";
 	synaptics,test_algo = <1>;
 
 	synaptics,pt05_high_name = "synaptics,pt05_high_b";
