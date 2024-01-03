@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2023 Google LLC
+
+build:pantah --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/pantah:gs201_pantah
+build:pantah --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/pantah:gs201_soc.pantah
+
