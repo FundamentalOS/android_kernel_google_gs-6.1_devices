@@ -18,6 +18,7 @@ load(
 load("@kernel_toolchain_info//:dict.bzl", "CLANG_VERSION")
 
 _SOC_REVS = [
+    "a0",
     "b0",
     "b0_v2-ipop",
 ]
