@@ -18,6 +18,7 @@ load(
 load("@kernel_toolchain_info//:dict.bzl", "CLANG_VERSION")
 
 _SOC_REVS = [
+    "a0",
     "b0",
     "b0_v2-ipop",
 ]
@@ -258,6 +259,7 @@ kernel_module(
         "drivers/soc/google/pt/slc_pt.ko",
         "drivers/soc/google/sysrq-hook.ko",
         "drivers/soc/google/vh/kernel/cgroup/vh_cgroup.ko",
+        "drivers/soc/google/vh/kernel/fs/vh_fs.ko",
         "drivers/soc/google/vh/kernel/metrics/pixel_metrics.ko",
         "drivers/soc/google/vh/kernel/mm/vh_mm.ko",
         "drivers/soc/google/vh/kernel/pixel_em/pixel_em.ko",
