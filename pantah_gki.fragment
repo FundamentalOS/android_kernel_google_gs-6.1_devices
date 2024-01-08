@@ -127,6 +127,7 @@ CONFIG_DRM_SAMSUNG=m
 CONFIG_DRM_SAMSUNG_DPP=y
 CONFIG_DRM_SAMSUNG_DP=y # FIXME: gs201 doesn't support SAMSUNG_DP, but needs this to pass the build since it's required by other modules depending on dispaly/samsung:display.samsung
 CONFIG_DRM_SAMSUNG_DP_AUDIO=y # FIXME: gs201 doesn't support SAMSUNG_DP_AUDIO, but needs this to pass the build since it's required by other modules depending on dispaly/samsung:display.samsung
+CONFIG_GS_DRM_PANEL_UNIFIED=m
 CONFIG_MODEM_IF_QOS=m
 CONFIG_ODPM=m
 CONFIG_PCI_EXYNOS_GS=m
