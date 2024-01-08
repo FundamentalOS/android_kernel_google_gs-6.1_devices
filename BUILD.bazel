@@ -15,7 +15,7 @@ load(
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
-load("//common:modules.bzl", "get_gki_modules_list")
+load("//aosp:modules.bzl", "get_gki_modules_list")
 
 _SOC_REVS = [
     "a0",
@@ -80,7 +80,7 @@ kernel_build(
         "dts/**",
     ]) + [
         # keep sorted
-        "//common:kernel_aarch64_sources",
+        "//aosp:kernel_aarch64_sources",
         "//private/devices/google/felix/touch/fst2:fst2.kconfig",
         "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
         "//private/google-modules/whi-staging/power/mitigation:bcl.kconfig",
@@ -98,12 +98,12 @@ kernel_build(
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _FELIX_DTBOS,
-    base_kernel = "//common:kernel_aarch64_download_or_build",
+    base_kernel = "//aosp:kernel_aarch64_download_or_build",
     build_config = "build.config.felix",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/felix/dts:felix.dt",
     kconfig_ext = "//private/google-modules/whi-staging/soc/gs:Kconfig.ext",
-    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    kmi_symbol_list = "//aosp:android/abi_gki_aarch64_pixel",
     module_outs = [
         # keep sorted
         "crypto/crct10dif_common.ko",
@@ -349,7 +349,7 @@ write_file(
 
 kernel_images(
     name = "felix_images",
-    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
+    base_kernel_images = "//aosp:kernel_aarch64_images_download_or_build",
     boot_image_outs = ["dtb.img"],
     build_boot = False,
     build_dtbo = True,
@@ -394,16 +394,16 @@ _felix_dist_targets = [
     # UAPI headers of external modules, while build.sh-style mixed builds
     # always uses kernel-uapi-headers.tar.gz from GKI_DIST_DIR.
     # To use GKI's kernel-uapi-headers.tar.gz in DIST_DIR, use
-    #     //common:kernel_aarch64_uapi_headers
+    #     //aosp:kernel_aarch64_uapi_headers
     # instead.
     ":felix_merged_uapi_headers",
     ":felix_modules_install",
     ":felix_unstripped_modules_archive",
     #":insmod_cfgs",
-    "//common:android/abi_gki_aarch64_pixel",
-    "//common:kernel_aarch64_download_or_build",
-    "//common:kernel_aarch64_headers_download_or_build",
-] + ["//common:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
+    "//aosp:android/abi_gki_aarch64_pixel",
+    "//aosp:kernel_aarch64_download_or_build",
+    "//aosp:kernel_aarch64_headers_download_or_build",
+] + ["//aosp:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
 
 copy_to_dist_dir(
     name = "felix_dist_copy_to_dist_dir",
@@ -419,5 +419,5 @@ exec(
     script = """
         echo {gki_kernel_dir}: $(git -C $BUILD_WORKSPACE_DIRECTORY/{gki_kernel_dir} rev-parse HEAD)
         $(rootpath :felix_dist_copy_to_dist_dir) $@
-    """.format(gki_kernel_dir = "//common"),
+    """.format(gki_kernel_dir = "//aosp"),
 )
