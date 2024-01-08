@@ -3,7 +3,7 @@
 DEVICE_DIR=${KERNEL_DIR}
 SOC_DIR=private/google-modules/whi-staging/soc/gs
 # Compile these modules with the GKI kernel
-KERNEL_DIR="common"
+KERNEL_DIR="aosp"
 DEVICE_REL_DIR=$(realpath ${DEVICE_DIR} --relative-to ${KERNEL_DIR})
 KCONFIG_EXT_PREFIX=${SOC_DIR}
 

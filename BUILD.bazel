@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//common:modules.bzl", "get_gki_modules_list")
+load("//aosp:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load(
@@ -79,7 +79,7 @@ kernel_build(
         "tangorpro_gki.fragment",
     ]) + [
         # keep sorted
-        "//common:kernel_aarch64_sources",
+        "//aosp:kernel_aarch64_sources",
         "//private/google-modules/whi-staging/power/mitigation:bcl.kconfig",
         "//private/google-modules/whi-staging/power/reset:reset.kconfig",
         "//private/google-modules/whi-staging/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
@@ -95,12 +95,12 @@ kernel_build(
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _TANGORPRO_DTBOS,
-    base_kernel = "//common:kernel_aarch64_download_or_build",
+    base_kernel = "//aosp:kernel_aarch64_download_or_build",
     build_config = "build.config.tangorpro",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
     kconfig_ext = "//private/google-modules/whi-staging/soc/gs:Kconfig.ext",
-    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    kmi_symbol_list = "//aosp:android/abi_gki_aarch64_pixel",
     module_outs = [
         # keep sorted
         "crypto/crct10dif_common.ko",
@@ -345,7 +345,7 @@ write_file(
 
 kernel_images(
     name = "tangorpro_images",
-    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
+    base_kernel_images = "//aosp:kernel_aarch64_images_download_or_build",
     boot_image_outs = ["dtb.img"],
     build_boot = False,
     build_dtbo = True,
@@ -390,15 +390,15 @@ _tangorpro_dist_targets = [
     # UAPI headers of external modules, while build.sh-style mixed builds
     # always uses kernel-uapi-headers.tar.gz from GKI_DIST_DIR.
     # To use GKI's kernel-uapi-headers.tar.gz in DIST_DIR, use
-    #     //common:kernel_aarch64_uapi_headers
+    #     //aosp:kernel_aarch64_uapi_headers
     # instead.
     ":tangorpro_merged_uapi_headers",
     ":tangorpro_modules_install",
     ":tangorpro_unstripped_modules_archive",
     ":insmod_cfgs",
-    "//common:android/abi_gki_aarch64_pixel",
-    "//common:kernel_aarch64_download_or_build",
-] + ["//common:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
+    "//aosp:android/abi_gki_aarch64_pixel",
+    "//aosp:kernel_aarch64_download_or_build",
+] + ["//aosp:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
 
 copy_to_dist_dir(
     name = "tangorpro_dist_copy_to_dist_dir",
@@ -414,5 +414,5 @@ exec(
     script = """
         echo {gki_kernel_dir}: $(git -C $BUILD_WORKSPACE_DIRECTORY/{gki_kernel_dir} rev-parse HEAD)
         $(rootpath :tangorpro_dist_copy_to_dist_dir) $@
-    """.format(gki_kernel_dir = "//common"),
+    """.format(gki_kernel_dir = "//aosp"),
 )
