@@ -69,7 +69,7 @@ kernel_module_group(
         "//private/google-modules/whi-staging/trusty",
         "//private/google-modules/whi-staging/video/gchips:video.gchips",
         "//private/google-modules/whi-staging/bluetooth/broadcom:bluetooth.broadcom",
-        "//private/google-modules/wlan/bcmdhd4389",
+        # "//private/google-modules/wlan/bcmdhd4389",
     ],
 )
 
