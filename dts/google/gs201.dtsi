@@ -189,7 +189,7 @@
 		clock-names = "eh-clock";
 		power-domains = <&pd_eh>;
 		google,eh,ignore-gctrl-reset;
-		s2mpu = <&s2mpu_eh>;
+		s2mpus = <&s2mpu_eh>;
 	};
 
 	serial_0: uart@10A00000 {
@@ -788,7 +788,7 @@
 		phyclk_mux = "none";
 		phy_refclk = "phy_ref";
 		phy_ref_clock = <19200000>;
-		s2mpu = <&s2mpu_hsi0>;
+		s2mpus = <&s2mpu_hsi0>;
 
 		/*
 		 * if Main phy has the other phy,
