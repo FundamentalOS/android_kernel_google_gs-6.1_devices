@@ -914,7 +914,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 	if (pmode->exynos_mode.is_lp_mode) {
 		/* set 1Hz while self refresh is active, otherwise clear it */
 		ctx->panel_idle_vrefresh = enable ? 1 : 0;
-		notify_panel_mode_changed(ctx);
+		notify_panel_mode_changed(ctx, true);
 		return false;
 	}
 
@@ -940,7 +940,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 		}
 
 		ctx->panel_idle_vrefresh = ctx->self_refresh_active ? spanel->hw_idle_vrefresh : 0;
-		notify_panel_mode_changed(ctx);
+		notify_panel_mode_changed(ctx, false);
 		return false;
 	}
 
@@ -1011,7 +1011,7 @@ static bool ana6707_f10_set_self_refresh(struct exynos_panel *ctx, bool enable)
 	}
 	EXYNOS_DCS_WRITE_TABLE(ctx, lock_cmd_f0);
 
-	notify_panel_mode_changed(ctx);
+	notify_panel_mode_changed(ctx, false);
 
 	DPU_ATRACE_END(__func__);
 
