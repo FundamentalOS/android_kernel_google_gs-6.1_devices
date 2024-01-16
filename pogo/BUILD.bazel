@@ -9,18 +9,18 @@ kernel_module(
         "*.h",
         "Kbuild",
     ]) + [
-        "//private/google-modules/whi-staging/bms:headers",
-        "//private/google-modules/whi-staging/soc/gs:gs_soc_headers",
+        "//private/google-modules/bms:headers",
+        "//private/google-modules/soc/gs:gs_soc_headers",
     ],
     outs = [
         "pogo_transport.ko",
     ],
-    kernel_build = "//private/google-modules/whi-staging/soc/gs:gs_kernel_build",
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
     visibility = [
         "//private/devices/google:__subpackages__",
     ],
     deps = [
-        "//private/google-modules/whi-staging/bms",
-        "//private/google-modules/whi-staging/soc/gs:gs_soc_module",
+        "//private/google-modules/bms",
+        "//private/google-modules/soc/gs:gs_soc_module",
     ],
 )

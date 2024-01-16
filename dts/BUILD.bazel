@@ -14,10 +14,10 @@ kernel_dtstree(
         "google-base/*.dtsi",
         "google-base/*.h",
     ]) + [
-        "//private/google-modules/whi-staging/soc/gs:gs.dt-bindings",
+        "//private/google-modules/soc/gs:gs.dt-bindings",
     ],
     visibility = [
         "//private/devices/google/tangorpro:__pkg__",
-        "//private/google-modules/whi-staging/soc/gs:__pkg__",
+        "//private/google-modules/soc/gs:__pkg__",
     ],
 )

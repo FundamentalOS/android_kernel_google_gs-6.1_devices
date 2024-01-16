@@ -1,7 +1,7 @@
 # KERNEL_DIR is set by the environment to the directory where the BUILD_CONFIG
 # file is located.
 DEVICE_DIR=${KERNEL_DIR}
-SOC_DIR=private/google-modules/whi-staging/soc/gs
+SOC_DIR=private/google-modules/soc/gs
 # Compile these modules with the GKI kernel
 KERNEL_DIR="aosp"
 DEVICE_REL_DIR=$(realpath ${DEVICE_DIR} --relative-to ${KERNEL_DIR})

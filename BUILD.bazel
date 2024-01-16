@@ -42,30 +42,30 @@ kernel_module_group(
         "//private/devices/google/tangorpro/display:drm_panel.google",
         "//private/devices/google/tangorpro/display/backlight:rt4539",
         "//private/devices/google/tangorpro/pogo:pogo_transport",
-        "//private/google-modules/whi-staging/display:samsung",
-        "//private/google-modules/whi-staging/gpu/mali_kbase",
-        "//private/google-modules/whi-staging/gpu/mali_pixel",
+        "//private/google-modules/display:samsung",
+        "//private/google-modules/gpu/mali_kbase",
+        "//private/google-modules/gpu/mali_pixel",
         "//private/google-modules/edgetpu/janeiro/drivers/edgetpu:edgetpu.janeiro",
-        "//private/google-modules/whi-staging/fingerprint/fpc",
+        "//private/google-modules/fingerprint/fpc",
         "//private/google-modules/gxp/gs201:gxp",
-        "//private/google-modules/whi-staging/bms",
-        "//private/google-modules/whi-staging/power/mitigation:bcl",
-        "//private/google-modules/whi-staging/power/reset",
-        "//private/google-modules/whi-staging/lwis",
-        "//private/google-modules/whi-staging/misc/sscoredump",
-        "//private/google-modules/whi-staging/amplifiers/audiometrics",
-        "//private/google-modules/whi-staging/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
-        "//private/google-modules/whi-staging/amplifiers/cs35l41",
-        "//private/google-modules/whi-staging/amplifiers/cs35l45",
-        "//private/google-modules/whi-staging/amplifiers/cs40l26",
-        "//private/google-modules/whi-staging/amplifiers/drv2624",
-        "//private/google-modules/whi-staging/aoc",
-        "//private/google-modules/whi-staging/aoc/alsa",
-        "//private/google-modules/whi-staging/nfc",
-        "//private/google-modules/whi-staging/touch/common:touch.common",
+        "//private/google-modules/bms",
+        "//private/google-modules/power/mitigation:bcl",
+        "//private/google-modules/power/reset",
+        "//private/google-modules/lwis",
+        "//private/google-modules/misc/sscoredump",
+        "//private/google-modules/amplifiers/audiometrics",
+        "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
+        "//private/google-modules/amplifiers/cs35l41",
+        "//private/google-modules/amplifiers/cs35l45",
+        "//private/google-modules/amplifiers/cs40l26",
+        "//private/google-modules/amplifiers/drv2624",
+        "//private/google-modules/aoc",
+        "//private/google-modules/aoc/alsa",
+        "//private/google-modules/nfc",
+        "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/touch/novatek/nt36xxx",
-        "//private/google-modules/whi-staging/trusty",
-        "//private/google-modules/whi-staging/video/gchips:video.gchips",
+        "//private/google-modules/trusty",
+        "//private/google-modules/video/gchips:video.gchips",
         "//private/google-modules/wlan/dhd43752p:synadhd",
         "//private/google-modules/bluetooth/synaptics:bluetooth.synaptics",
     ],
@@ -80,16 +80,16 @@ kernel_build(
     ]) + [
         # keep sorted
         "//aosp:kernel_aarch64_sources",
-        "//private/google-modules/whi-staging/power/mitigation:bcl.kconfig",
-        "//private/google-modules/whi-staging/power/reset:reset.kconfig",
-        "//private/google-modules/whi-staging/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
-        "//private/google-modules/whi-staging/soc/gs:build.config.gs.common",
-        "//private/google-modules/whi-staging/soc/gs:gs_soc.kconfig",
-        "//private/google-modules/whi-staging/touch/common:common.kconfig",
-        "//private/google-modules/whi-staging/touch/fts/ftm5:ftm5.kconfig",
-        "//private/google-modules/whi-staging/touch/sec:sec.kconfig",
-        "//private/google-modules/whi-staging/trusty:trusty.kconfig",
-        "//private/google-modules/whi-staging/video/gchips:video.gchips.kconfig",
+        "//private/google-modules/power/mitigation:bcl.kconfig",
+        "//private/google-modules/power/reset:reset.kconfig",
+        "//private/google-modules/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
+        "//private/google-modules/soc/gs:build.config.gs.common",
+        "//private/google-modules/soc/gs:gs_soc.kconfig",
+        "//private/google-modules/touch/common:common.kconfig",
+        "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
+        "//private/google-modules/touch/sec:sec.kconfig",
+        "//private/google-modules/trusty:trusty.kconfig",
+        "//private/google-modules/video/gchips:video.gchips.kconfig",
     ],
     outs = [
         "google-base/gs201-{}.dtb".format(soc_rev)
@@ -99,7 +99,7 @@ kernel_build(
     build_config = "build.config.tangorpro",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
-    kconfig_ext = "//private/google-modules/whi-staging/soc/gs:Kconfig.ext",
+    kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
     kmi_symbol_list = "//aosp:android/abi_gki_aarch64_pixel",
     module_outs = [
         # keep sorted
@@ -147,8 +147,8 @@ kernel_abi(
 kernel_module(
     name = "gs201_soc",
     srcs = [
-        "//private/google-modules/whi-staging/soc/gs:gs_soc_sources",
-        "//private/google-modules/whi-staging/trusty:headers",
+        "//private/google-modules/soc/gs:gs_soc_sources",
+        "//private/google-modules/trusty:headers",
     ],
     outs = [
         # keep sorted
@@ -285,15 +285,15 @@ kernel_module(
         "drivers/usb/typec/tcpm/google/usbc_cooling_dev.ko",
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
-    kernel_build = "//private/google-modules/whi-staging/soc/gs:gs_kernel_build",
-    makefile = ["//private/google-modules/whi-staging/soc/gs:Makefile"],
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
         "//private/devices/google:__subpackages__",
         "//private/google-modules:__subpackages__",
     ],
     deps = [
-        "//private/google-modules/whi-staging/trusty",
+        "//private/google-modules/trusty",
     ],
 )
 
@@ -320,7 +320,7 @@ genrule(
     srcs = [
         "vendor_kernel_boot_modules.tangorpro",
         "//build/kernel:hermetic-tools/cat",
-        "//private/google-modules/whi-staging/soc/gs:vendor_kernel_boot_modules.gs201",
+        "//private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201",
     ],
     outs = [
         "vendor_kernel_boot_modules.concat",
@@ -328,7 +328,7 @@ genrule(
     # TODO(b/259274243): switch to using the hermetic-tools cat binary
     cmd = """
         cat $(location vendor_kernel_boot_modules.tangorpro) \\
-            $(location //private/google-modules/whi-staging/soc/gs:vendor_kernel_boot_modules.gs201) \\
+            $(location //private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201) \\
             > $@
     """,
     tools = ["//build/kernel:hermetic-tools/cat"],
@@ -360,17 +360,17 @@ kernel_images(
     # Keep the following in sync with build.config.tangorpro:
     modules_list = ":vendor_kernel_boot_modules.tangorpro-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = "//private/google-modules/whi-staging/soc/gs:system_dlkm.props",
+    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props",
     vendor_dlkm_etc_files = ["//private/devices/google/tangorpro:insmod_cfgs"],
-    vendor_dlkm_modules_blocklist = "//private/google-modules/whi-staging/soc/gs:vendor_dlkm.blocklist.gs201",
+    vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.gs201",
     # No MODULES_BLOCKLIST
-    vendor_dlkm_modules_list = "//private/google-modules/whi-staging/soc/gs:vendor_dlkm_modules.slider",
-    vendor_dlkm_props = "//private/google-modules/whi-staging/soc/gs:vendor_dlkm.props",
+    vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.slider",
+    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props",
     deps = [
         # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
-        "//prebuilts/whi-staging/boot-artifacts/selinux:vendor_dlkm_file_contexts",
-        "//prebuilts/whi-staging/boot-artifacts/selinux:system_dlkm_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:vendor_dlkm_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:system_dlkm_file_contexts",
     ],
 )
 
@@ -384,7 +384,7 @@ filegroup(
 _tangorpro_dist_targets = [
     ":tangorpro",
     ":tangorpro_images",
-    "//private/google-modules/whi-staging/soc/gs:gki_aarch64_boot",
+    "//private/google-modules/soc/gs:gki_aarch64_boot",
     # At the time of writing (2022-02-04), this intentionally diverges from
     # the behavior of build.sh-style mixed builds by also incorporating
     # UAPI headers of external modules, while build.sh-style mixed builds
