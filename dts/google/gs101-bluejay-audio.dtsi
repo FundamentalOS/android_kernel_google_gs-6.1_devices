@@ -65,7 +65,7 @@
 		interrupt-parent = <&gpa6>;
 		interrupts = <5 0 0>;
 
-		reset-gpios = <&gpp24 0 0>;
+		reset-gpios = <&gpp24 0 GPIO_ACTIVE_LOW>;
 
 		cirrus,bst-dcm-en = <0>;
 		cirrus,pwle-zero-cross-en;
