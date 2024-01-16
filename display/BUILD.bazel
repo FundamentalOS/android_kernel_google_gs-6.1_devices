@@ -9,22 +9,22 @@ kernel_module(
         "**/*.h",
         "Kbuild",
     ]) + [
-        "//private/google-modules/whi-staging/display:headers",
-        "//private/google-modules/whi-staging/display/include:headers",
-        "//private/google-modules/whi-staging/soc/gs:gs_soc_headers",
+        "//private/google-modules/display:headers",
+        "//private/google-modules/display/include:headers",
+        "//private/google-modules/soc/gs:gs_soc_headers",
     ],
     outs = [
         # keep sorted
         "panel-samsung-ana6707-f10.ko",
         "panel-samsung-ea8182-f10.ko",
     ],
-    kernel_build = "//private/google-modules/whi-staging/soc/gs:gs_kernel_build",
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
     visibility = [
         "//private/devices/google:__subpackages__",
-        "//private/google-modules/whi-staging/display:__pkg__",
-        "//private/google-modules/whi-staging/soc/gs:__pkg__",
+        "//private/google-modules/display:__pkg__",
+        "//private/google-modules/soc/gs:__pkg__",
     ],
     deps = [
-        "//private/google-modules/whi-staging/display:samsung",
+        "//private/google-modules/display:samsung",
     ],
 )
