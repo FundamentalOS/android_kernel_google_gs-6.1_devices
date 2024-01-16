@@ -63,6 +63,7 @@
 		gpu_pmu_status_reg_offset = <0x2004>;
 		gpu_pmu_status_local_pwr_mask = <0x1>; /*0x1 << 0*/
 		power_policy = "adaptive";
+		firmware_idle_hysteresis_time_ms = <60>;
 
 		/* Memory */
 		physical-memory-group-manager = <&mali_mgm>;
