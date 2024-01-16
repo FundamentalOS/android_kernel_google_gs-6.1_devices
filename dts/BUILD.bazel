@@ -7,6 +7,7 @@ kernel_dtstree(
     srcs = glob([
         "google/*.dts",
         "google/*.dtsi",
+        "google/*.h",
     ]) + [
         "Makefile",
         "google/Makefile",
