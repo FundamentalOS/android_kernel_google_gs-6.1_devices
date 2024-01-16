@@ -338,7 +338,7 @@
 		interrupt-parent = <&gpa8>;
 		interrupts = <1 0 0>;
 
-		reset-gpios = <&gpp24 3 0>;
+		reset-gpios = <&gpp24 3 GPIO_ACTIVE_LOW>;
 
 		/* TODO (b/185767279): check the trigger & refclk pin usage. */
 
