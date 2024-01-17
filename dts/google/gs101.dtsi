@@ -18,7 +18,7 @@
 #include <dt-bindings/soc/google/debug-snapshot-def.h>
 #include "gs101-rmem.dtsi"
 #include "gs101-trusty.dtsi"
-#include "gs101-bigo.dtsi"
+#include "gs101-bigw.dtsi"
 #include "gs101-bts.dtsi"
 #include "gs101-cp-tm.dtsi"
 #include "gs101-cpu.dtsi"
@@ -628,7 +628,7 @@
 			/* vptid 4, size 2048KB, priority 0 (highest), pbha 0 */
 			id_size_priority = < 0x4 0x00040001 0x0 0x0 >;
 		};
-		bigocean {
+		bigwave {
 			/* vptid 3, 512KB-8MB size, priority 0, pbha 0 */
 			id_size_priority = < 0x3 0x007fe001 0x0 0x0 >;
 		};
@@ -839,11 +839,11 @@
 				cal_id = <ACPM_DVFS_MFC>;
 				dm_type_name = "dm_mfc";
 			};
-			devfreq_bo {
+			devfreq_bw {
 				dm-index = <DM_BO>;
 				available = "true";
 				cal_id = <ACPM_DVFS_BO>;
-				dm_type_name = "dm_BO";
+				dm_type_name = "dm_BW";
 			};
 		};
 	};
@@ -1070,11 +1070,11 @@
 			dfs_id = <ACPM_DVFS_MFC>;
 		};
 
-		devfreq_7: devfreq_bo@17000080 {
+		devfreq_7: devfreq_bw@17000080 {
 			compatible = "samsung,exynos-devfreq";
 			reg = <0x0 0x17000080 0x0>;
 			devfreq_type = <DEVFREQ_BO>;
-			devfreq_domain_name = "BO";
+			devfreq_domain_name = "BW";
 			pm_qos_class = <PM_QOS_BO_THROUGHPUT>;
 			pm_qos_class_max = <PM_QOS_BO_THROUGHPUT_MAX>;
 			ess_flag = <ESS_FLAG_BO>;

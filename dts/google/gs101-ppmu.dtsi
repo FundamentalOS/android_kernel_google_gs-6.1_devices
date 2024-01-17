@@ -15,7 +15,7 @@
 	gs101-ppmu {
 		compatible = "samsung,exynos-bcm_dbg";
 
-		pd-name = "pd-csis", "pd-ipp", "pd-tnr", "pd-bo", "pd-g2d",
+		pd-name = "pd-csis", "pd-ipp", "pd-tnr", "pd-bw", "pd-g2d",
 			  "pd-misc", "pd-dpu", "pd-pdp", "pd-g3aa", "pd-dns",
 			  "pd-mcsc", "pd-gdc", "pd-mfc", "pd-hsi2", "pd-eh",
 			  "pd-tpu", "pd-gsa", "pd-aoc", "pd-hsi0", "pd-hsi1";
@@ -94,7 +94,7 @@
 
 		ip-name = "csis_d1", "csis_d0", "ipp", "msa", "d7_tnr",
 			  "d6_tnr", "d5_tnr", "d4_tnr", "d3_tnr", "d2_tnr",
-			  "d1_tnr", "d0_tnr", "bo", "d2_g2d", "d1_g2d",
+			  "d1_tnr", "d0_tnr", "bw", "d2_g2d", "d1_g2d",
 			  "d0_g2d", "misc", "dpu2", "dpu1", "dpu0",
 			  "pdp_vra", "g3aa", "dns", "d1_mcsc", "d0_mcsc",
 			  "d1_itsc", "d0_itsc", "d1_gdc", "d0_gdc", "d_scsc",

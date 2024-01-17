@@ -45,7 +45,7 @@
 		power-domain-id = <0x17410204>;
 	};
 
-	s2mpu_bo: s2mpu@1CA60000 {
+	s2mpu_bw: s2mpu@1CA60000 {
 		compatible = "google,s2mpu";
 		reg = <0x0 0x1CA60000 0x10000>;
 		interrupts = <GIC_SPI IRQ_SYSMMU_S2_BO_BO IRQ_TYPE_LEVEL_HIGH>;

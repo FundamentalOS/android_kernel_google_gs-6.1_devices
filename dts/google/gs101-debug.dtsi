@@ -14,7 +14,7 @@
 		compatible = "google,debug-snapshot";
 		freq_names = "LIT", "MID", "BIG", "INT", "MIF", "ISP",
 				"DISP", "INTCAM", "TPU", "TNR", "MFC",
-				"BO";
+				"BW";
 		memory-region = <&header>, <&log_kevents>, <&log_bcm>, <&log_s2d>,
 				<&log_arrdumpreset>, <&log_arrdumppanic>,
 				<&log_slcdump>, <&log_preslcdump>,
@@ -713,7 +713,7 @@
 		pmu-burnin-ctrl = <0x3cd0>;
 		sel-scanmode-bit = <25>;
 		dbgsel-sw-bit = <4>;
-		blk-list = "AOC", "AOCCORE", "BO", "BOCORE", "BUS0", "BUS1",
+		blk-list = "AOC", "AOCCORE", "BW", "BWCORE", "BUS0", "BUS1",
 			   "BUS2", "CMU", "CORE", "CPUCL0", "CLUSTER0", "CSIS",
 			   "DISP", "DNS", "DPU", "EH", "G2D", "G3AA",
 			   "G3D", "GPU", "GDC", "GSA", "HSI0", "HSI1",
