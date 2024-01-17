@@ -48,8 +48,8 @@
 &s2mpu_aur_inst_data {
 	sysmmu_syncs = <&sysmmu_sync_aur_inst_data>;
 };
-&s2mpu_bo {
-	sysmmu_syncs = <&sysmmu_sync_bo>;
+&s2mpu_bw {
+	sysmmu_syncs = <&sysmmu_sync_bw>;
 };
 &s2mpu_cpucl0 {
 	sysmmu_syncs = <&sysmmu_sync_cpucl0>;

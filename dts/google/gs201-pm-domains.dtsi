@@ -223,7 +223,7 @@
 		#power-domain-cells = <0>;
 	};
 
-	pd_bo: pd-bo@18062880 {
+	pd_bw: pd-bw@18062880 {
 		compatible = "samsung,exynos-pd";
 		reg = <0x0 0x18062880 0x20>;
 		cal_id = <0xB1380017>;
@@ -348,9 +348,9 @@
 		power-domains = <&pd_tnr>;
 	};
 
-	dbgdev-pd-bo {
+	dbgdev-pd-bw {
 		compatible = "samsung,exynos-pd-dbg";
-		power-domains = <&pd_bo>;
+		power-domains = <&pd_bw>;
 	};
 
 	dbgdev-pd-tpu {
