@@ -159,14 +159,25 @@ _GS201_PANTAH_DTBOS = [
     "google/gs201-panther-dvt1.dtbo",
     "google/gs201-panther-pvt1.dtbo",
     "google/gs201-panther-mp.dtbo",
+    # TODO: move lynx dtb files to it's own device folder
+    "google/gs201-lynx-dev1_0.dtbo",
+    "google/gs201-lynx-proto1_0.dtbo",
+    "google/gs201-lynx-proto1_1.dtbo",
+    "google/gs201-lynx-evt1_0.dtbo",
+    "google/gs201-lynx-evt1_1.dtbo",
+    "google/gs201-lynx-evt1_0-wingboard.dtbo",
+    "google/gs201-lynx-dvt1_0.dtbo",
+    "google/gs201-lynx-dvt1_0-gain1.dtbo",
+    "google/gs201-lynx-pvt1_0.dtbo",
+    "google/gs201-lynx-mp1_0.dtbo",
 ]
 
 kernel_module_group(
     name = "pantah_ext_modules",
     srcs = [
         # keep sorted
-        "//private/devices/google/pantah/display:drm_panel.google",
         "//private/devices/google/pantah:gs201_soc.pantah",
+        "//private/devices/google/pantah/display:drm_panel.google",
         "//private/google-modules/amplifiers/audiometrics",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs35l45",
