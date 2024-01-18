@@ -142,6 +142,7 @@ kernel_module_group(
     srcs = [
         # do not sort
         "//private/devices/google/raviole:gs101_soc.raviole",
+        "//private/devices/google/raviole/display:drm_panel.google",
         "//private/google-modules/display/common/gs_drm",
         "//private/google-modules/display/common/gs_panel",
         "//private/google-modules/display/samsung:display.samsung",
