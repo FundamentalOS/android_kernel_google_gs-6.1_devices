@@ -165,6 +165,7 @@ kernel_module_group(
     name = "pantah_ext_modules",
     srcs = [
         # keep sorted
+        "//private/devices/google/pantah/display:drm_panel.google",
         "//private/devices/google/pantah:gs201_soc.pantah",
         "//private/google-modules/amplifiers/audiometrics",
         "//private/google-modules/amplifiers/cs35l41",
