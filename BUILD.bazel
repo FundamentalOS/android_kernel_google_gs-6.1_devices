@@ -70,6 +70,9 @@ kernel_build(
     module_implicit_outs = get_gki_modules_list("arm64"),
     strip_modules = True,
     trim_nonlisted_kmi = True,
+    visibility = [
+        "//private/devices/google/felix:__pkg__",
+    ],
 )
 
 kernel_modules_install(
@@ -83,6 +86,9 @@ kernel_images(
     build_system_dlkm = True,
     kernel_build = "pantah_gki",
     kernel_modules_install = "pantah_gki_modules_install",
+    visibility = [
+        "//private/devices/google/felix:__pkg__",
+    ],
 )
 
 gki_artifacts(
@@ -121,6 +127,9 @@ genrule(
         done
     """,
     tools = ["//build/kernel:hermetic-tools/mv"],
+    visibility = [
+        "//private/devices/google/felix:__pkg__",
+    ],
 )
 
 _PIXEL_MAKE_GOALS = [
@@ -605,6 +614,9 @@ extracted_system_dlkm(
         "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
         "//private/google-modules/soc/gs:gki_aosp_staging": ":pantah_gki_images",
     }),
+    visibility = [
+        "//private/devices/google/felix:__pkg__",
+    ],
 )
 
 copy_to_dist_dir(
