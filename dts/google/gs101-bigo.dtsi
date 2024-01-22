@@ -13,10 +13,10 @@
 		status = "ok";
 		reg = <0x0 0x1CB00000 0x550
 			0x0 0x1CA94000 0xa00>;
-		reg-names = "bo", "ssmt_bo_pid";
+		reg-names = "regs", "ssmt_pid";
 		interrupts = <GIC_SPI IRQ_BO_XINT_BO IRQ_TYPE_LEVEL_HIGH>;
-		bigo-opp-table = <&bigo_opp_table>;
-		bigo-bw-table = <&bigo_bw_table>;
+		vpu-opp-table = <&vpu_opp_table>;
+		vpu-bw-table = <&vpu_bw_table>;
 		iommus = <&sysmmu_bo>;
 		samsung,iommu-group = <&iommu_group_bo>;
 		pt_id = "bigocean";
@@ -24,7 +24,7 @@
 		samsung,tzmp;
 	};
 
-	bigo_opp_table: bigo_opp_table {
+	vpu_opp_table: vpu_opp_table {
 		opp-95000000 {
 			freq-khz = <95000>;
 			/* 1920x1088@30fps */
@@ -47,7 +47,7 @@
 		};
 	};
 
-	bigo_bw_table: bigo_bw_table {
+	vpu_bw_table: vpu_bw_table {
 		bw-1080p-30 {
 			rd-bw = <190000>;
 			wr-bw = <85000>;
