@@ -3,15 +3,11 @@
 DEVICE_DIR=${KERNEL_DIR}
 SOC_DIR=private/google-modules/soc/gs
 # Compile these modules with the GKI kernel
-KERNEL_DIR="aosp"
-DEVICE_REL_DIR=$(realpath ${DEVICE_DIR} --relative-to ${KERNEL_DIR})
-KCONFIG_EXT_PREFIX=${SOC_DIR}
+KERNEL_DIR=${GKI_KERNEL_DIR:-"aosp"}
 
-GKI_FRAGMENT_DEFCONFIG=${SOC_DIR}/arch/arm64/configs/cloudripper_gki.fragment
-. ${ROOT_DIR}/${SOC_DIR}/build.config.gs.common
-
-DEFCONFIG=felix_gki_defconfig
-PRE_DEFCONFIG_CMDS="mkdir -p \${OUT_DIR}/arch/arm64/configs/ && KCONFIG_CONFIG=\${OUT_DIR}/arch/arm64/configs/${DEFCONFIG} ${ROOT_DIR}/${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m -r ${ROOT_DIR}/${KERNEL_DIR}/arch/arm64/configs/gki_defconfig ${ROOT_DIR}/${GKI_FRAGMENT_DEFCONFIG}"
+# These just need to be relative to the ROOT_DIR
+FRAGMENT_CONFIG=${DEVICE_DIR}/felix_gki.fragment
+. ${ROOT_DIR}/${SOC_DIR}/build.config.gs201
 
 MAKE_GOALS="$MAKE_GOALS
 modules
@@ -20,7 +16,3 @@ dtbs
 
 DTC_INCLUDE=${ROOT_DIR}/${SOC_DIR}/include/dtc
 MKDTIMG_FLAGS="--page_size=4096 --id=/:board_id --rev=/:board_rev"
-# These paths need to be relative to KERNEL_DIR.
-MKDTIMG_DTBOS="
-${DEVICE_REL_DIR}/dts/*.dtbo
-"

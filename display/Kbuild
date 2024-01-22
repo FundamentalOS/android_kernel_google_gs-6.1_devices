@@ -1,8 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
 
-subdir-ccflags-y += -I$(srctree)/../private/google-modules/display/include
-subdir-ccflags-y += -I$(srctree)/../private/google-modules/display/include/uapi
-subdir-ccflags-y += -I$(srctree)/../private/google-modules/display
-
 obj-$(CONFIG_DRM_PANEL_SAMSUNG_ANA6707_F10)		+= panel-samsung-ana6707-f10.o
 obj-$(CONFIG_DRM_PANEL_SAMSUNG_EA8182_F10)		+= panel-samsung-ea8182-f10.o
