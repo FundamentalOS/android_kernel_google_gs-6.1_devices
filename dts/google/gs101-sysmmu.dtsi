@@ -18,7 +18,7 @@
 		compatible = "samsung,sysmmu-group";
 	};
 
-	iommu_group_bw: iommu_group_bw {
+	iommu_group_bo: iommu_group_bo {
 		compatible = "samsung,sysmmu-group";
 	};
 
@@ -60,7 +60,7 @@
 		sysmmu,async-fault;
 	};
 
-	sysmmu_bw: sysmmu@1CA40000 {
+	sysmmu_bo: sysmmu@1CA40000 {
 		compatible = "samsung,sysmmu-v8";
 		reg = <0x0 0x1CA40000 0x10000>;
 		interrupts = <0 IRQ_SYSMMU_S1_NS_BO_BO IRQ_TYPE_LEVEL_HIGH>,
@@ -68,9 +68,9 @@
 		qos = <15>;
 		sysmmu,secure-irq;
 		sysmmu,secure_base = <0x1CA50000>;
-		port-name = "BW";
+		port-name = "BO";
 		#iommu-cells = <0>;
-		power-domains = <&pd_bw>;
+		power-domains = <&pd_bo>;
 		sysmmu,no-s2pf;
 		sysmmu,default_tlb = <TLB_CFG(BL1, PREFETCH_PREDICTION)>;
 		sysmmu,tlb_property = <1 TLB_CFG(BL1, PREFETCH_PREDICTION) DIR_READ  SYSMMU_ID_MASK(0x2,  0x1F)>,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Bigwave device tree source
+ * Bigocean device tree source
  *
  * Copyright 2020 Google LLC.
  *
@@ -8,23 +8,23 @@
 
 #include <dt-bindings/clock/gs101.h>
 / {
-	bigwave: bigwave@1CB00000 {
-		compatible = "google,bigwave";
+	bigocean: bigocean@1CB00000 {
+		compatible = "google,bigocean";
 		status = "ok";
 		reg = <0x0 0x1CB00000 0x550
 			0x0 0x1CA94000 0xa00>;
-		reg-names = "bw", "ssmt_bw_pid";
+		reg-names = "bo", "ssmt_bo_pid";
 		interrupts = <GIC_SPI IRQ_BO_XINT_BO IRQ_TYPE_LEVEL_HIGH>;
-		bigw-opp-table = <&bigw_opp_table>;
-		bigw-bw-table = <&bigw_bw_table>;
-		iommus = <&sysmmu_bw>;
-		samsung,iommu-group = <&iommu_group_bw>;
-		pt_id = "bigwave";
-		power-domains = <&pd_bw>;
+		bigo-opp-table = <&bigo_opp_table>;
+		bigo-bw-table = <&bigo_bw_table>;
+		iommus = <&sysmmu_bo>;
+		samsung,iommu-group = <&iommu_group_bo>;
+		pt_id = "bigocean";
+		power-domains = <&pd_bo>;
 		samsung,tzmp;
 	};
 
-	bigw_opp_table: bigw_opp_table {
+	bigo_opp_table: bigo_opp_table {
 		opp-95000000 {
 			freq-khz = <95000>;
 			/* 1920x1088@30fps */
@@ -47,7 +47,7 @@
 		};
 	};
 
-	bigw_bw_table: bigw_bw_table {
+	bigo_bw_table: bigo_bw_table {
 		bw-1080p-30 {
 			rd-bw = <190000>;
 			wr-bw = <85000>;
