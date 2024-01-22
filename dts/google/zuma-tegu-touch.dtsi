@@ -22,7 +22,7 @@
 	synaptics,pixels-per-mm = <17>;
 	goog,panel_map = <&google_tg4b 1>;
 
-	synaptics,panel_map = <&google_tg4b>;
+	synaptics,panel_map = <&google_tg4b 0>;
 	synaptics,firmware_names = "synaptics_b.img";
 	synaptics,test_algo = <1>;
 
