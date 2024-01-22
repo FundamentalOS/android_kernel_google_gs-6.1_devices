@@ -19,11 +19,11 @@
 		power-domains = <&pd_aur>;
 	};
 
-	s2mpu_bw: s2mpu_bw@1ca60000 {
+	s2mpu_bo: s2mpu_bo@1ca60000 {
 		compatible = "google,s2mpu";
 		reg = <0x0 0x1ca60000 0x10000>;
 		interrupts = <GIC_SPI IRQ_SYSMMU_S2_BO_BO IRQ_TYPE_LEVEL_HIGH>;
-		power-domains = <&pd_bw>;
+		power-domains = <&pd_bo>;
 	};
 
 	s2mpu_cpucl0: s2mpu_cpucl0@20c70000 {

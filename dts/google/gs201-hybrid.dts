@@ -104,7 +104,7 @@
  * hybrid emulator.
  */
 
-&sysmmu_bw {
+&sysmmu_bo {
 	power-domains;
 };
 

@@ -15,7 +15,7 @@
 		reg = <0x0 0x25b20000 0x10000>;
 	};
 
-	sysmmu_sync_bw: sysmmu_sync_bw@1caa0000 {
+	sysmmu_sync_bo: sysmmu_sync_bo@1caa0000 {
 		compatible = "google,sysmmu_sync";
 		reg = <0x0 0x1caa0000 0x10000>;
 	};
