@@ -359,7 +359,7 @@
 		interrupt-parent = <&gpa8>;
 		interrupts = <0 0 0>;
 
-		reset-gpios = <&gpp18 2 0>;
+		reset-gpios = <&gpp18 2 GPIO_ACTIVE_LOW>;
 
 		VA-supply = <&s_bucka_reg>;
 		VP-supply = <&V_SYS_dummy>;
@@ -390,7 +390,7 @@
 		interrupt-parent = <&gpa8>;
 		interrupts = <1 0 0>;
 
-		reset-gpios = <&gpp24 3 0>;
+		reset-gpios = <&gpp24 3 GPIO_ACTIVE_LOW>;
 
 		VA-supply = <&s_bucka_reg>;
 		VP-supply = <&V_SYS_dummy>;
