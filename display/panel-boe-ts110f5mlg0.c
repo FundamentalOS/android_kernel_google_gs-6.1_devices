@@ -13,7 +13,7 @@
 #include <uapi/linux/sched/types.h>
 #include <video/mipi_display.h>
 
-#include "samsung/panel/panel-samsung-drv.h"
+#include "panel/panel-samsung-drv.h"
 
 #define TS110F5MLG0_WRCTRLD_DD_BIT	0x08
 #define TS110F5MLG0_WRCTRLD_BL_BIT	0x04

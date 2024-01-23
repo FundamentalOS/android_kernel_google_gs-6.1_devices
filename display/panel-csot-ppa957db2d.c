@@ -13,7 +13,7 @@
 #include <uapi/linux/sched/types.h>
 #include <video/mipi_display.h>
 
-#include "samsung/panel/panel-samsung-drv.h"
+#include "panel/panel-samsung-drv.h"
 
 #define PPA957DB2D_WRCTRLD_DD_BIT	0x08
 #define PPA957DB2D_WRCTRLD_BL_BIT	0x04
