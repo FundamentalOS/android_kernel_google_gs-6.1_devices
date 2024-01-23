@@ -71,7 +71,7 @@ kernel_build(
     strip_modules = True,
     trim_nonlisted_kmi = True,
     visibility = [
-        "//private/devices/google/felix:__pkg__",
+        "//private/devices/google:__subpackages__",
     ],
 )
 
@@ -87,7 +87,7 @@ kernel_images(
     kernel_build = "pantah_gki",
     kernel_modules_install = "pantah_gki_modules_install",
     visibility = [
-        "//private/devices/google/felix:__pkg__",
+        "//private/devices/google:__subpackages__",
     ],
 )
 
@@ -128,7 +128,7 @@ genrule(
     """,
     tools = ["//build/kernel:hermetic-tools/mv"],
     visibility = [
-        "//private/devices/google/felix:__pkg__",
+        "//private/devices/google:__subpackages__",
     ],
 )
 
@@ -615,7 +615,7 @@ extracted_system_dlkm(
         "//private/google-modules/soc/gs:gki_aosp_staging": ":pantah_gki_images",
     }),
     visibility = [
-        "//private/devices/google/felix:__pkg__",
+        "//private/devices/google:__subpackages__",
     ],
 )
 
@@ -626,3 +626,7 @@ copy_to_dist_dir(
     flat = True,
     log = "info",
 )
+
+exports_files([
+    "pantah_gki.fragment",
+])
