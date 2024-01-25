@@ -4,6 +4,7 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//aosp:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
+load("//build/kernel/kleaf:hermetic_tools.bzl", "hermetic_genrule")
 load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
@@ -346,23 +347,20 @@ kernel_unstripped_modules_archive(
     kernel_modules = [":felix_ext_modules"],
 )
 
-genrule(
+hermetic_genrule(
     name = "vendor_kernel_boot_modules.felix-cat",
     srcs = [
         "vendor_kernel_boot_modules.felix",
-        "//build/kernel:hermetic-tools/cat",
         "//private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201",
     ],
     outs = [
         "vendor_kernel_boot_modules.concat",
     ],
-    # TODO(b/259274243): switch to using the hermetic-tools cat binary
     cmd = """
         cat $(location vendor_kernel_boot_modules.felix) \\
             $(location //private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201) \\
             > $@
     """,
-    tools = ["//build/kernel:hermetic-tools/cat"],
 )
 
 # Don't load the zram GKI module
