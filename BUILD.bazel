@@ -74,6 +74,7 @@ kernel_module_group(
         "//private/google-modules/nfc",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/trusty",
+        "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/video/gchips:video.gchips",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
         "//private/google-modules/wlan/bcm4389:bcmdhd4389",
