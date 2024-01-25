@@ -125,14 +125,20 @@ filegroup(
         "//private/google-modules/soc/gs:gki_aosp": ["//aosp:kernel_aarch64_gki_artifacts_download_or_build"],
         "//private/google-modules/soc/gs:gki_aosp_staging": [":raviole_gki_artifacts"],
     }),
-    output_group = "boot_lz4",
 )
 
 hermetic_genrule(
     name = "gki_aarch64_boot",
     srcs = [":gki_aarch64_boot_lz4"],
     outs = ["boot.img"],
-    cmd = "mv $< $@",
+    cmd = """
+        for f in $(locations :gki_aarch64_boot_lz4); do
+            if [[ "$${f##*/}" == "boot-lz4.img" ]]; then
+                cp -L $$f $(location boot.img)
+                break
+            fi
+        done
+    """,
 )
 
 # The list ordering matches EXT_MODULES in build.config.raviole in order to
