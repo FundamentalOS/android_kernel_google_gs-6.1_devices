@@ -106,6 +106,7 @@ kernel_module_group(
         "//private/google-modules/amplifiers/audiometrics",
         "//private/google-modules/aoc",
         "//private/google-modules/aoc/alsa",
+        "//private/google-modules/aoc/usb:aoc.usb",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/touch/fts/ftm5",
         "//private/google-modules/touch/sec",
