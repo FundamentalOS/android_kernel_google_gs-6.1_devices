@@ -121,7 +121,7 @@ kernel_build(
     ] + _FELIX_DTBOS,
     base_kernel = select({
         "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
-        "//private/google-modules/soc/gs:gki_aosp_staging": "//private/devices/google/pantah:pantah_gki",
+        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
     }),
     build_config = ":device_build_config",
     collect_unstripped_modules = True,
@@ -376,7 +376,7 @@ kernel_images(
     name = "gs201_felix_images",
     base_kernel_images = select({
         "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
-        "//private/google-modules/soc/gs:gki_aosp_staging": "//private/devices/google/pantah:pantah_gki_images",
+        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
     }),
     boot_image_outs = ["dtb.img"],
     build_boot = False,
@@ -436,10 +436,9 @@ _gs201_felix_dist_targets = [
         "//aosp:kernel_aarch64_headers_download_or_build",
     ],
     "//private/google-modules/soc/gs:gki_aosp_staging": [
-        "//private/devices/google/pantah:pantah_gki",
-        "//private/devices/google/pantah:pantah_gki_headers",
         "//aosp-staging:android/abi_gki_aarch64_pixel",
-        "//build/kernel:gki_certification_tools",
+        "//aosp-staging:kernel_aarch64_download_or_build",
+        "//aosp-staging:kernel_aarch64_headers_download_or_build",
     ],
 })
 
