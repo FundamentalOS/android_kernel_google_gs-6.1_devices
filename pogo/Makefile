@@ -8,6 +8,7 @@ EXTRA_CFLAGS += -DDYNAMIC_DEBUG_MODULE=1
 EXTRA_CFLAGS += -Werror
 
 EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/bms/Module.symvers
+EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/bms/misc/Module.symvers
 
 include $(KERNEL_SRC)/../private/google-modules/soc/gs/Makefile.include
 

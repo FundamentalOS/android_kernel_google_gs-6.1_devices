@@ -7,8 +7,9 @@ kernel_module(
     srcs = glob([
         "*.c",
         "*.h",
+    ]) + [
         "Kbuild",
-    ]),
+    ],
     outs = [
         "rt4539_bl.ko",
     ],

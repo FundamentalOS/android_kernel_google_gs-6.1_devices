@@ -23,7 +23,6 @@
 #include <linux/regulator/consumer.h>
 #include <linux/spinlock.h>
 #include <linux/usb.h>
-#include <linux/usb/tcpci.h>
 #include <linux/usb/tcpm.h>
 #include <misc/gvotable.h>
 
