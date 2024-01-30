@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@kernel_toolchain_info//:dict.bzl", "CLANG_VERSION")
+load("//aosp:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
+load("//build/kernel/kleaf:hermetic_tools.bzl", "hermetic_genrule")
 load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
@@ -15,7 +16,10 @@ load(
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
-load("//common:modules.bzl", "get_gki_modules_list")
+load(
+    "//private/google-modules/soc/gs:device_build_configs.bzl",
+    "device_build_configs",
+)
 
 _SOC_REVS = [
     "a0",
@@ -41,15 +45,19 @@ kernel_module_group(
     name = "felix_ext_modules",
     srcs = [
         # do not sort
-        "//private/devices/google/felix:gs201_soc",
+        "//private/devices/google/felix:gs201_soc.felix",
         "//private/devices/google/felix/display:drm_panel.google",
-        "//private/google-modules/display:samsung",
+        "//private/google-modules/display/common/gs_drm",
+        "//private/google-modules/display/common/gs_panel",
+        "//private/google-modules/display/samsung:display.samsung",
         "//private/google-modules/gpu/mali_kbase",
         "//private/google-modules/gpu/mali_pixel",
         "//private/google-modules/edgetpu/janeiro/drivers/edgetpu:edgetpu.janeiro",
         "//private/google-modules/fingerprint/fpc",
+        "//private/google-modules/gps/broadcom/bcm47765",
         "//private/google-modules/gxp/gs201:gxp",
         "//private/google-modules/bms",
+        "//private/google-modules/bms/misc:bms-misc",
         "//private/google-modules/power/mitigation:bcl",
         "//private/google-modules/power/reset",
         "//private/google-modules/lwis",
@@ -67,48 +75,68 @@ kernel_module_group(
         "//private/google-modules/nfc",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/trusty",
+        "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/video/gchips:video.gchips",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
-        "//private/google-modules/wlan/bcmdhd4389",
+        "//private/google-modules/wlan/bcm4389:bcmdhd4389",
     ],
 )
 
+device_build_configs(
+    name = "build.config.felix",
+    base_build_config = ":build.config.felix",
+    device_name = "felix",
+)
+
 kernel_build(
-    name = "felix",
+    name = "gs201_felix",
     srcs = glob([
         "build.config.*",
         "dts/**",
+        "felix*.fragment",
     ]) + [
         # keep sorted
-        "//common:kernel_aarch64_sources",
         "//private/devices/google/felix/touch/fst2:fst2.kconfig",
         "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
+        "//private/google-modules/bms/misc:bms-misc.kconfig",
+        "//private/google-modules/display/common:common.kconfig",
+        "//private/google-modules/display/samsung:display.samsung.kconfig",
+        "//private/google-modules/fingerprint/qcom/qfs4008:qbt_handler.kconfig",
         "//private/google-modules/power/mitigation:bcl.kconfig",
         "//private/google-modules/power/reset:reset.kconfig",
-        "//private/google-modules/soc/gs:arch/arm64/configs/cloudripper_gki.fragment",
-        "//private/google-modules/soc/gs:build.config.gs.common",
+        "//private/google-modules/soc/gs:build.config.gs201",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
-        "//private/google-modules/touch/common:common.kconfig",
+        "//private/google-modules/touch/common:touch.common.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/trusty:trusty.kconfig",
-        "//private/google-modules/video/gchips:video.gchips.kconfig",
-    ],
+        "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
+    ] + select({
+        "//private/google-modules/soc/gs:gki_aosp": ["//aosp:kernel_aarch64_sources"],
+        "//private/google-modules/soc/gs:gki_aosp_staging": ["//aosp-staging:kernel_aarch64_sources"],
+    }),
     outs = [
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _FELIX_DTBOS,
-    base_kernel = "//common:kernel_aarch64_download_or_build",
-    build_config = "build.config.felix",
+    base_kernel = select({
+        "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
+        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
+    }),
+    build_config = ":device_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/felix/dts:felix.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
-    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    kmi_symbol_list = select({
+        "//private/google-modules/soc/gs:gki_aosp": "//aosp:android/abi_gki_aarch64_pixel",
+        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:android/abi_gki_aarch64_pixel",
+    }),
     module_outs = [
         # keep sorted
         "crypto/crct10dif_common.ko",
         "crypto/crct10dif_generic.ko",
         "drivers/block/null_blk/null_blk.ko",
+        "drivers/gpu/drm/display/drm_display_helper.ko",
         "drivers/hwtracing/coresight/coresight.ko",
         "drivers/hwtracing/coresight/coresight-etm4x.ko",
         "drivers/hwtracing/coresight/coresight-funnel.ko",
@@ -127,8 +155,6 @@ kernel_build(
         "net/wireless/cfg80211.ko",
     ],
     strip_modules = True,
-    # Keep in sync with build.config.common
-    toolchain_version = CLANG_VERSION,
     visibility = [
         # keep sorted
         "//private/google-modules:__subpackages__",
@@ -136,15 +162,15 @@ kernel_build(
 )
 
 kernel_abi(
-    name = "felix_abi",
-    kernel_build = ":felix",
+    name = "gs201_felix_abi",
+    kernel_build = ":gs201_felix",
     kernel_modules = [":felix_ext_modules"],
     kmi_symbol_list_add_only = True,
     module_grouping = False,
 )
 
 kernel_module(
-    name = "gs201_soc",
+    name = "gs201_soc.felix",
     srcs = [
         "//private/google-modules/soc/gs:gs_soc_sources",
         "//private/google-modules/trusty:headers",
@@ -158,26 +184,26 @@ kernel_module(
         "drivers/clk/gs/clk_exynos_gs.ko",
         "drivers/clocksource/exynos_mct.ko",
         "drivers/cpufreq/exynos-acme.ko",
-        "drivers/devfreq/google/arm-memlat-mon.ko",
-        "drivers/devfreq/google/exynos_devfreq.ko",
-        "drivers/devfreq/google/governor_memlat.ko",
-        "drivers/devfreq/google/memlat-devfreq.ko",
+        "drivers/devfreq-whi/google/arm-memlat-mon.ko",
+        "drivers/devfreq-whi/google/exynos_devfreq.ko",
+        "drivers/devfreq-whi/google/governor_memlat.ko",
+        "drivers/devfreq-whi/google/memlat-devfreq.ko",
         "drivers/dma-buf/heaps/samsung/samsung_dma_heap.ko",
         "drivers/dma/pl330.ko",
         "drivers/dma/samsung-dma.ko",
         "drivers/gpu/exynos/g2d/g2d.ko",
         "drivers/i2c/busses/i2c-acpm.ko",
         "drivers/i2c/busses/i2c-exynos5.ko",
-        "drivers/iio/power/odpm.ko",
+        "drivers/iio/power/odpm-whi.ko",
         "drivers/input/fingerprint/goodixfp.ko",
         "drivers/input/keyboard/s2mpg12-key.ko",
         "drivers/input/keycombo.ko",
         "drivers/input/keydebug.ko",
         "drivers/input/misc/vl53l1/stmvl53l1.ko",
-        "drivers/iommu/exynos-pcie-iommu.ko",
-        "drivers/iommu/samsung-iommu-group.ko",
-        "drivers/iommu/samsung-secure-iova.ko",
-        "drivers/iommu/samsung_iommu.ko",
+        "drivers/iommu-whi/exynos-pcie-iommu.ko",
+        "drivers/iommu-whi/samsung-iommu-group.ko",
+        "drivers/iommu-whi/samsung-secure-iova.ko",
+        "drivers/iommu-whi/samsung_iommu.ko",
         "drivers/media/platform/exynos/mfc/exynos_mfc.ko",
         "drivers/media/platform/exynos/smfc/smfc.ko",
         "drivers/mfd/s2mpg12-mfd.ko",
@@ -185,13 +211,10 @@ kernel_module(
         "drivers/mfd/s2mpg1x-gpio.ko",
         "drivers/mfd/slg51000-core.ko",
         "drivers/mfd/slg51002-core.ko",
-        "drivers/misc/bbdpl/bcm47765.ko",
-        "drivers/misc/gvotable.ko",
-        "drivers/misc/logbuffer.ko",
         "drivers/misc/sbb-mux/sbb-mux.ko",
         "drivers/misc/sscoredump/sscoredump.ko",
-        "drivers/pci/controller/dwc/pcie-exynos-gs.ko",
-        "drivers/pci/controller/dwc/pcie-exynos-gs201-rc-cal.ko",
+        "drivers/pci/controller/dwc-whi/pcie-exynos-gs.ko",
+        "drivers/pci/controller/dwc-whi/pcie-exynos-gs201-rc-cal.ko",
         "drivers/phy/samsung/phy-exynos-mipi.ko",
         "drivers/phy/samsung/phy-exynos-mipi-dsim.ko",
         "drivers/phy/samsung/phy-exynos-usbdrd-super.ko",
@@ -214,11 +237,11 @@ kernel_module(
         "drivers/soc/google/acpm/power_stats.ko",
         "drivers/soc/google/bcm_dbg.ko",
         "drivers/soc/google/cal-if/cmupmucal.ko",
-        "drivers/soc/google/cpif/boot_device_spi.ko",
-        "drivers/soc/google/cpif/cp_thermal_zone.ko",
-        "drivers/soc/google/cpif/cpif.ko",
-        "drivers/soc/google/cpif/cpif_page.ko",
-        "drivers/soc/google/cpif/shm_ipc.ko",
+        "drivers/soc/google/cpif-whi/boot_device_spi.ko",
+        "drivers/soc/google/cpif-whi/cp_thermal_zone.ko",
+        "drivers/soc/google/cpif-whi/cpif.ko",
+        "drivers/soc/google/cpif-whi/cpif_page.ko",
+        "drivers/soc/google/cpif-whi/shm_ipc.ko",
         "drivers/soc/google/dbgcore-dump.ko",
         "drivers/soc/google/debug/debug-snapshot-debug-kinfo.ko",
         "drivers/soc/google/debug/dss.ko",
@@ -253,7 +276,7 @@ kernel_module(
         "drivers/soc/google/gsa/gsa_gsc.ko",
         "drivers/soc/google/hardlockup-debug.ko",
         "drivers/soc/google/hardlockup-watchdog.ko",
-        "drivers/soc/google/kernel-top.ko",
+        # "drivers/soc/google/kernel-top.ko",
         "drivers/soc/google/pixel_stat/mm/pixel_stat_mm.ko",
         "drivers/soc/google/pixel_stat/pixel_stat_sysfs.ko",
         "drivers/soc/google/pkvm-s2mpu/pkvm-s2mpu/pkvm-s2mpu.ko",
@@ -264,7 +287,7 @@ kernel_module(
         "drivers/soc/google/sysrq-hook.ko",
         "drivers/soc/google/vh/kernel/cgroup/vh_cgroup.ko",
         "drivers/soc/google/vh/kernel/fs/vh_fs.ko",
-        "drivers/soc/google/vh/kernel/metrics/pixel_metrics.ko",
+        # "drivers/soc/google/vh/kernel/metrics/pixel_metrics.ko",
         "drivers/soc/google/vh/kernel/mm/vh_mm.ko",
         "drivers/soc/google/vh/kernel/pixel_em/pixel_em.ko",
         "drivers/soc/google/vh/kernel/sched/sched_tp.ko",
@@ -277,13 +300,17 @@ kernel_module(
         "drivers/thermal/samsung/gpu_cooling.ko",
         "drivers/thermal/samsung/gs_thermal.ko",
         "drivers/tty/serial/exynos_tty.ko",
+        "drivers/ufs/ufs-exynos-gs.ko",
         "drivers/usb/dwc3/dwc3-exynos-usb.ko",
         "drivers/usb/gadget/function/usb_f_dm.ko",
         "drivers/usb/gadget/function/usb_f_dm1.ko",
         "drivers/usb/host/xhci-exynos.ko",
         "drivers/usb/typec/tcpm/google/bc_max77759.ko",
+        "drivers/usb/typec/tcpm/google/google_tcpci_shim.ko",
         "drivers/usb/typec/tcpm/google/max77759_contaminant.ko",
         "drivers/usb/typec/tcpm/google/max77759_helper.ko",
+        "drivers/usb/typec/tcpm/google/max77779_contaminant.ko",
+        "drivers/usb/typec/tcpm/google/max777x9_contaminant.ko",
         "drivers/usb/typec/tcpm/google/tcpci_max77759.ko",
         "drivers/usb/typec/tcpm/google/usb_psy.ko",
         "drivers/usb/typec/tcpm/google/usbc_cooling_dev.ko",
@@ -297,45 +324,43 @@ kernel_module(
         "//private/google-modules:__subpackages__",
     ],
     deps = [
+        "//private/google-modules/bms/misc:bms-misc",
         "//private/google-modules/trusty",
     ],
 )
 
 kernel_modules_install(
-    name = "felix_modules_install",
-    kernel_build = ":felix",
+    name = "gs201_felix_modules_install",
+    kernel_build = ":gs201_felix",
     kernel_modules = [":felix_ext_modules"],
 )
 
 merged_kernel_uapi_headers(
-    name = "felix_merged_uapi_headers",
-    kernel_build = ":felix",
+    name = "gs201_felix_merged_uapi_headers",
+    kernel_build = ":gs201_felix",
     kernel_modules = [":felix_ext_modules"],
 )
 
 kernel_unstripped_modules_archive(
-    name = "felix_unstripped_modules_archive",
-    kernel_build = ":felix",
+    name = "gs201_felix_unstripped_modules_archive",
+    kernel_build = ":gs201_felix",
     kernel_modules = [":felix_ext_modules"],
 )
 
-genrule(
+hermetic_genrule(
     name = "vendor_kernel_boot_modules.felix-cat",
     srcs = [
         "vendor_kernel_boot_modules.felix",
-        "//build/kernel:hermetic-tools/cat",
         "//private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201",
     ],
     outs = [
         "vendor_kernel_boot_modules.concat",
     ],
-    # TODO(b/259274243): switch to using the hermetic-tools cat binary
     cmd = """
         cat $(location vendor_kernel_boot_modules.felix) \\
             $(location //private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201) \\
             > $@
     """,
-    tools = ["//build/kernel:hermetic-tools/cat"],
 )
 
 # Don't load the zram GKI module
@@ -348,8 +373,11 @@ write_file(
 )
 
 kernel_images(
-    name = "felix_images",
-    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
+    name = "gs201_felix_images",
+    base_kernel_images = select({
+        "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
+        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
+    }),
     boot_image_outs = ["dtb.img"],
     build_boot = False,
     build_dtbo = True,
@@ -358,23 +386,23 @@ kernel_images(
     build_vendor_dlkm = True,
     build_vendor_kernel_boot = True,
     dedup_dlkm_modules = True,
-    dtbo_srcs = [":felix/" + file for file in _FELIX_DTBOS],
-    kernel_build = ":felix",
-    kernel_modules_install = ":felix_modules_install",
+    dtbo_srcs = [":gs201_felix/" + file for file in _FELIX_DTBOS],
+    kernel_build = ":gs201_felix",
+    kernel_modules_install = ":gs201_felix_modules_install",
     # Keep the following in sync with build.config.felix:
     modules_list = ":vendor_kernel_boot_modules.felix-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props",
+    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props.gs201",
     #vendor_dlkm_etc_files = ["//private/devices/google/felix:insmod_cfgs"],
     vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.gs201",
     # No MODULES_BLOCKLIST
-    vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.slider",
-    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props",
+    vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.gs201",
+    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props.gs201",
     deps = [
         # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
-        "//prebuilts/boot-artifacts/selinux:vendor_dlkm_file_contexts",
-        "//prebuilts/boot-artifacts/selinux:system_dlkm_file_contexts",
+        "//prebuilts/boot-artifacts/selinux:file_contexts",
+        "//prebuilts/boot-artifacts/selinux:system_file_contexts",
     ],
 )
 
@@ -385,39 +413,48 @@ kernel_images(
 #    ]),
 #)
 
-_felix_dist_targets = [
-    ":felix",
-    ":felix_images",
-    "//private/google-modules/soc/gs:gki_aarch64_boot",
+_gs201_felix_dist_targets = [
+    ":gs201_felix",
+    ":gs201_felix_images",
     # At the time of writing (2022-02-04), this intentionally diverges from
     # the behavior of build.sh-style mixed builds by also incorporating
     # UAPI headers of external modules, while build.sh-style mixed builds
     # always uses kernel-uapi-headers.tar.gz from GKI_DIST_DIR.
     # To use GKI's kernel-uapi-headers.tar.gz in DIST_DIR, use
-    #     //common:kernel_aarch64_uapi_headers
+    #     //aosp:kernel_aarch64_uapi_headers
     # instead.
-    ":felix_merged_uapi_headers",
-    ":felix_modules_install",
-    ":felix_unstripped_modules_archive",
+    ":gs201_felix_merged_uapi_headers",
+    ":gs201_felix_modules_install",
+    ":gs201_felix_unstripped_modules_archive",
     #":insmod_cfgs",
-    "//common:android/abi_gki_aarch64_pixel",
-    "//common:kernel_aarch64_download_or_build",
-    "//common:kernel_aarch64_headers_download_or_build",
-] + ["//common:kernel_aarch64/{}".format(m) for m in _GKI_MODULES_LIST]
+    "//private/devices/google/pantah:gki_aarch64_boot",
+    "//private/devices/google/pantah:gs201_pantah_extracted_system_dlkm",
+] + select({
+    "//private/google-modules/soc/gs:gki_aosp": [
+        "//aosp:android/abi_gki_aarch64_pixel",
+        "//aosp:kernel_aarch64_download_or_build",
+        "//aosp:kernel_aarch64_headers_download_or_build",
+    ],
+    "//private/google-modules/soc/gs:gki_aosp_staging": [
+        "//aosp-staging:android/abi_gki_aarch64_pixel",
+        "//aosp-staging:kernel_aarch64_download_or_build",
+        "//aosp-staging:kernel_aarch64_headers_download_or_build",
+    ],
+})
 
 copy_to_dist_dir(
-    name = "felix_dist_copy_to_dist_dir",
-    data = _felix_dist_targets,
+    name = "gs201_felix_dist_copy_to_dist_dir",
+    data = _gs201_felix_dist_targets,
     dist_dir = "out/felix/dist",
     flat = True,
     log = "info",
 )
 
 exec(
-    name = "felix_dist",
-    data = [":felix_dist_copy_to_dist_dir"],
+    name = "gs201_felix_dist",
+    data = [":gs201_felix_dist_copy_to_dist_dir"],
     script = """
         echo {gki_kernel_dir}: $(git -C $BUILD_WORKSPACE_DIRECTORY/{gki_kernel_dir} rev-parse HEAD)
-        $(rootpath :felix_dist_copy_to_dist_dir) $@
-    """.format(gki_kernel_dir = "//common"),
+        $(rootpath :gs201_felix_dist_copy_to_dist_dir) $@
+    """.format(gki_kernel_dir = "//aosp"),
 )

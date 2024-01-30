@@ -350,8 +350,9 @@
 	cs40l26a_haptics_2: cs40l26a@43 {
 		compatible = "cirrus,cs40l26a";
 		reg = <0x43>;
-		dev-name = "cs40l26a";				/* sysfs folder name */
-		input-device-name = "cs40l26_input";		/* input device name */
+		dev-name = "cs40l26a";			/* sysfs folder name */
+		input-device-name = "cs40l26_input";	/* input device name */
+		input-device-id = <0>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&hapt_amp2_irq &hapt_amp2_rst &hapt_amp_trig>;
@@ -359,16 +360,20 @@
 		interrupt-parent = <&gpa8>;
 		interrupts = <0 0 0>;
 
-		reset-gpios = <&gpp18 2 0>;
+		reset-gpios = <&gpp18 2 GPIO_ACTIVE_LOW>;
 
 		VA-supply = <&s_bucka_reg>;
 		VP-supply = <&V_SYS_dummy>;
 
 		cirrus,bst-dcm-en = <0>;
 		cirrus,pwle-zero-cross-en;
+		cirrus,vpbr-enable;
+		cirrus,vpbr-thld-uv = <3008000>;	/* 3.008V */
 		cirrus,bst-expl-mode-disable;
-		cirrus,vpbr-enable = <1>;
-		cirrus,vpbr-thld-mv = <3008>;			/* 3.008V */
+		cirrus,bst-ipk-microamp = <2500000>;	/* 2.5A */
+		cirrus,bst-ctl-microvolt = <11000000>;	/* 11V */
+		cirrus,f0-default = <0x2A8000>;         /* 170 Hz */
+		cirrus,redc-default = <0x48000>;        /* 9 Ohm */
 		status = "okay";
 
 		cs40l26_codec: cs40l26_codec@snd {
@@ -383,6 +388,7 @@
 		reg = <0x42>;
 		dev-name = "cs40l26a-dual";			/* sysfs folder name */
 		input-device-name = "cs40l26_dual_input";	/* input device name */
+		input-device-id = <1>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&hapt_amp_irq &hapt_amp_rst>;
@@ -390,16 +396,21 @@
 		interrupt-parent = <&gpa8>;
 		interrupts = <1 0 0>;
 
-		reset-gpios = <&gpp24 3 0>;
+		reset-gpios = <&gpp24 3 GPIO_ACTIVE_LOW>;
 
 		VA-supply = <&s_bucka_reg>;
 		VP-supply = <&V_SYS_dummy>;
 
 		cirrus,bst-dcm-en = <0>;
 		cirrus,pwle-zero-cross-en;
+		cirrus,vpbr-enable;
+		cirrus,vpbr-thld-uv = <3008000>;	/* 3.008V */
 		cirrus,bst-expl-mode-disable;
-		cirrus,vpbr-enable = <1>;
-		cirrus,vpbr-thld-mv = <3008>;			/* 3.008V */
+		cirrus,bst-ipk-microamp = <2500000>;	/* 2.5A */
+		cirrus,bst-ctl-microvolt = <11000000>;	/* 11V */
+		cirrus,f0-default = <0x2A8000>;         /* 170 Hz */
+		cirrus,redc-default = <0x48000>;        /* 9 Ohm */
+
 		status = "okay";
 
 		cs40l26_codec_2: cs40l26_codec_2@snd {

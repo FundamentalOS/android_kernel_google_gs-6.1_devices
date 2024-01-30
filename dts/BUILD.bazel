@@ -6,13 +6,13 @@ kernel_dtstree(
     name = "felix.dt",
     srcs = glob([
         "Makefile",
-        "**/*.dtsi",
-        "**/*.dts",
+        "*.dtsi",
+        "*.dts",
         "google-base",
         "google-base/Makefile",
-        "google-base/**/*.dts",
-        "google-base/**/*.dtsi",
-        "google-base/**/*.h",
+        "google-base/*.dts",
+        "google-base/*.dtsi",
+        "google-base/*.h",
     ]) + [
         "//private/google-modules/soc/gs:gs.dt-bindings",
     ],

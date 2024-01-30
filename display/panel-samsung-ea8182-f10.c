@@ -15,7 +15,7 @@
 #include <linux/of_platform.h>
 #include <video/mipi_display.h>
 
-#include "samsung/panel/panel-samsung-drv.h"
+#include "panel/panel-samsung-drv.h"
 
 #define EA8182_F10_WRCTRLD_DIMMING_BIT    0x08
 #define EA8182_F10_WRCTRLD_BCTRL_BIT      0x20

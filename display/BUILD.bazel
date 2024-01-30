@@ -7,10 +7,10 @@ kernel_module(
     srcs = glob([
         "**/*.c",
         "**/*.h",
-        "Kbuild",
     ]) + [
-        "//private/google-modules/display:headers",
-        "//private/google-modules/display/include:headers",
+        "Kbuild",
+        "//private/google-modules/display/samsung:headers",
+        "//private/google-modules/display/samsung/include:headers",
         "//private/google-modules/soc/gs:gs_soc_headers",
     ],
     outs = [
@@ -25,6 +25,6 @@ kernel_module(
         "//private/google-modules/soc/gs:__pkg__",
     ],
     deps = [
-        "//private/google-modules/display:samsung",
+        "//private/google-modules/display/samsung:display.samsung",
     ],
 )
