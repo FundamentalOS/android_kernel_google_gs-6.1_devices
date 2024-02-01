@@ -216,7 +216,7 @@ kernel_module_group(
         "//private/google-modules/touch/focaltech/ft3658",
         "//private/google-modules/touch/goodix",
         "//private/google-modules/touch/sec",
-        "//private/google-modules/touch/synaptics:syna_touch",
+        "//private/google-modules/touch/synaptics/syna_c10:syna_touch",
         "//private/google-modules/trusty",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/video/gchips:video.gchips",
