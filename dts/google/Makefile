@@ -14,7 +14,9 @@ DTC_FLAGS_zuma-dpm-userdebug += -a 4096
 zumapro_tegu_overlays := \
 	zumapro-tegu-dev1.dtbo \
 	zumapro-tegu-proto1_0.dtbo \
-	zumapro-tegu-proto1_0-wingboard.dtbo
+	zumapro-tegu-proto1_0-wingboard.dtbo \
+	zumapro-tegu-proto1_1.dtbo \
+	zumapro-tegu-proto1_1-wingboard.dtbo
 
 # zumapro dtb
 zumapro_tegu_dtbs := \
