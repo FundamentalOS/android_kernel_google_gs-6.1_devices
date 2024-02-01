@@ -246,7 +246,6 @@ kernel_module(
         "drivers/regulator/s2mpg11-regulator.ko",
         "drivers/regulator/slg51000-regulator.ko",
         "drivers/rtc/rtc-s2mpg10.ko",
-        "drivers/scsi/ufs/ufs-exynos-gs.ko",
         "drivers/soc/google/acpm/acpm_flexpmu_dbg.ko",
         "drivers/soc/google/acpm/acpm_mbox_test.ko",
         "drivers/soc/google/acpm/gs_acpm.ko",
