@@ -374,6 +374,7 @@
 		cirrus,bst-ctl-microvolt = <11000000>;	/* 11V */
 		cirrus,f0-default = <0x2A8000>;         /* 170 Hz */
 		cirrus,redc-default = <0x48000>;        /* 9 Ohm */
+		cirrus,pm-active-timeout-ms = <5>;
 		status = "okay";
 
 		cs40l26_codec: cs40l26_codec@snd {
@@ -410,6 +411,7 @@
 		cirrus,bst-ctl-microvolt = <11000000>;	/* 11V */
 		cirrus,f0-default = <0x2A8000>;         /* 170 Hz */
 		cirrus,redc-default = <0x48000>;        /* 9 Ohm */
+		cirrus,pm-active-timeout-ms = <5>;
 
 		status = "okay";
 
