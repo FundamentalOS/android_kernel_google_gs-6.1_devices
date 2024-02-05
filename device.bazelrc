@@ -4,3 +4,4 @@
 
 build:felix --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/felix:gs201_felix
 build:felix --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/felix:gs201_soc.felix
+build:felix --//private/google-modules/aoc/alsa:radio=s5300
