@@ -217,6 +217,5 @@ CONFIG_NL80211_TESTMODE=y
 # CONFIG_CFG80211_DEFAULT_PS is not set
 # CONFIG_CFG80211_CRDA_SUPPORT is not set
 CONFIG_MAC80211=m
-# CONFIG_RVH_SCHED_LIB is not set
 CONFIG_LTO_CLANG_FULL=y # WARN: not defined in branch 6.1, added to disable LTO_NONE which prevent generating ufs-pixel-fips140.ko
 CONFIG_RADIO_S5300=y
