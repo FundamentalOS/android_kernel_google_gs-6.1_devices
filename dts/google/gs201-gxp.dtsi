@@ -20,6 +20,9 @@
 		dma-window = <0x30000000 0xC0000000>;
 		/* Prevent crossing DMA boundary. */
 		samsung,iommu-reserved-map = <0x0 0x80000000 0x1000>;
+		gcip-dma-window = <0x30000000 0xC0000000>; /* GCIP IOMMU attribute. */
+		gcip-reserved-map = <0x80000000 0x1000>;
+		pasid-num-bits = <3>;
 		reg = <0x0 0x25C00000 0x01400000
 		       /* Mailboxes */
 		       0x0 0x18380000 0x00001000
