@@ -4,4 +4,4 @@
 
 build:pantah --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/pantah:gs201_pantah
 build:pantah --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/pantah:gs201_soc.pantah
-
+build:pantah --//private/google-modules/aoc/alsa:radio=s5300
