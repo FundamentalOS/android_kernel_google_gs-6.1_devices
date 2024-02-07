@@ -71,6 +71,7 @@ kernel_module_group(
         "//private/google-modules/amplifiers/drv2624",
         "//private/google-modules/aoc",
         "//private/google-modules/aoc/alsa",
+        "//private/google-modules/aoc/usb:aoc.usb",
         "//private/devices/google/felix/touch/fst2",
         "//private/devices/google/felix/touch/ftm5",
         "//private/google-modules/nfc",
