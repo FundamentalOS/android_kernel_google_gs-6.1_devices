@@ -344,6 +344,12 @@
 		interrupts = <GIC_PPI 7 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_HIGH)>;
 	};
 
+	sub_pd_hsi0: sub-pd-hsi0 {
+		compatible = "exynos-pd-hsi0";
+		power-domains = <&pd_hsi0>;
+		status = "okay";
+	};
+
 	exynos-pm {
 		compatible = "samsung,exynos-pm";
 		reg = <0x0 0x174D0000 0x1000>,
