@@ -132,6 +132,7 @@ pixel-debug-test.ko
 pixel-reboot.ko
 pixel-suspend-diag.ko
 pixel_em.ko
+pixel_metrics.ko
 pixel_stat_mm.ko
 pixel_stat_sysfs.ko
 pl330.ko
