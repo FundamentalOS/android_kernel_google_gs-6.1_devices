@@ -3,10 +3,6 @@
  * MIPI-DSI based tg4a AMOLED LCD panel driver.
  *
  * Copyright (c) 2023 Google LLC
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
  */
 
 #include <drm/display/drm_dsc_helper.h>
@@ -17,12 +13,32 @@
 #include "trace/dpu_trace.h"
 #include "panel/panel-samsung-drv.h"
 
+/**
+ * enum tg4a_lhbm_brt - local hbm brightness
+ * @LHBM_R_COARSE: red coarse
+ * @LHBM_GB_COARSE: green and blue coarse
+ * @LHBM_R_FINE: red fine
+ * @LHBM_G_FINE: green fine
+ * @LHBM_B_FINE: blue fine
+ * @LHBM_BRT_LEN: local hbm brightness array length
+ */
+enum tg4a_lhbm_brt {
+	LHBM_R_COARSE,
+	LHBM_GB_COARSE,
+	LHBM_R_FINE,
+	LHBM_G_FINE,
+	LHBM_B_FINE,
+	LHBM_BRT_LEN
+};
+#define LHBM_BRT_CMD_LEN (LHBM_BRT_LEN + 1)
+
+/* DSC1.2 */
 static const struct drm_dsc_config pps_config = {
 	.line_buf_depth = 9,
 	.bits_per_component = 8,
 	.convert_rgb = true,
-	.slice_width = 1080,
-	.slice_height = 24,
+	.slice_width = 540,
+	.slice_height = 101,
 	.simple_422 = false,
 	.pic_width = 1080,
 	.pic_height = 2424,
@@ -33,7 +49,7 @@ static const struct drm_dsc_config pps_config = {
 	.rc_quant_incr_limit1 = 11,
 	.rc_quant_incr_limit0 = 11,
 	.initial_xmit_delay = 512,
-	.initial_dec_delay = 796,
+	.initial_dec_delay = 526,
 	.block_pred_enable = true,
 	.first_line_bpg_offset = 12,
 	.initial_offset = 6144,
@@ -56,7 +72,7 @@ static const struct drm_dsc_config pps_config = {
 		{.range_min_qp = 3, .range_max_qp = 10, .range_bpg_offset = 54},
 		{.range_min_qp = 5, .range_max_qp = 11, .range_bpg_offset = 54},
 		{.range_min_qp = 5, .range_max_qp = 12, .range_bpg_offset = 52},
-		{.range_min_qp = 5, .range_max_qp = 15, .range_bpg_offset = 52},
+		{.range_min_qp = 5, .range_max_qp = 13, .range_bpg_offset = 52},
 		{.range_min_qp = 7, .range_max_qp = 13, .range_bpg_offset = 52},
 		{.range_min_qp = 13, .range_max_qp = 15, .range_bpg_offset = 52}
 	},
@@ -64,14 +80,14 @@ static const struct drm_dsc_config pps_config = {
 	.flatness_min_qp = 3,
 	.flatness_max_qp = 12,
 	.initial_scale_value = 32,
-	.scale_decrement_interval = 15,
-	.scale_increment_interval = 786,
-	.nfl_bpg_offset = 1069,
-	.slice_bpg_offset = 543,
+	.scale_decrement_interval = 7,
+	.scale_increment_interval = 2517,
+	.nfl_bpg_offset = 246,
+	.slice_bpg_offset = 258,
 	.final_offset = 4336,
 	.vbr_enable = false,
-	.slice_chunk_size = 1080,
-	.dsc_version_minor = 1,
+	.slice_chunk_size = 540,
+	.dsc_version_minor = 2,
 	.dsc_version_major = 1,
 	.native_422 = false,
 	.native_420 = false,
@@ -80,12 +96,15 @@ static const struct drm_dsc_config pps_config = {
 	.second_line_offset_adj = 0,
 };
 
-#define TG4A_WRCTRLD_DIMMING_BIT    0x08
-#define TG4A_WRCTRLD_BCTRL_BIT      0x20
+
+#define TG4A_WRCTRLD_DIMMING_BIT	0x08
+#define TG4A_WRCTRLD_BCTRL_BIT		0x20
+#define TG4A_WRCTRLD_LOCAL_HBM_BIT	0x10
+
+#define FREQUENCY_COUNT 2
 
 static const u8 test_key_enable[] = { 0xF0, 0x5A, 0x5A };
 static const u8 test_key_disable[] = { 0xF0, 0xA5, 0xA5 };
-static const u8 ltps_update[] = { 0xF7, 0x0F };
 static const u8 pixel_off[] = { 0x22 };
 
 static const struct exynos_dsi_cmd tg4a_off_cmds[] = {
@@ -95,43 +114,24 @@ static const struct exynos_dsi_cmd tg4a_off_cmds[] = {
 static DEFINE_EXYNOS_CMD_SET(tg4a_off);
 
 static const struct exynos_dsi_cmd tg4a_lp_cmds[] = {
-	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_OFF),
+	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x24),
 };
 static DEFINE_EXYNOS_CMD_SET(tg4a_lp);
 
-static const struct exynos_dsi_cmd tg4a_lp_off_cmds[] = {
-	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_OFF),
-};
-
 static const struct exynos_dsi_cmd tg4a_lp_low_cmds[] = {
-	EXYNOS_DSI_CMD_SEQ_DELAY(34, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x25), /* AOD 10 nit */
-
-	/* Set TE width after AOD mode on */
-	EXYNOS_DSI_CMD0(test_key_enable),
-	EXYNOS_DSI_CMD_SEQ(0xB9, 0x01),
-	EXYNOS_DSI_CMD0(test_key_disable),
-
-	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_ON),
+	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x01, 0x7E),
 };
 
 static const struct exynos_dsi_cmd tg4a_lp_high_cmds[] = {
-	EXYNOS_DSI_CMD_SEQ_DELAY(34, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x24), /* AOD 50 nit */
-
-	/* Set TE width after AOD mode on */
-	EXYNOS_DSI_CMD0(test_key_enable),
-	EXYNOS_DSI_CMD_SEQ(0xB9, 0x01),
-	EXYNOS_DSI_CMD0(test_key_disable),
-
-	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_ON),
+	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x03, 0x1A),
 };
 
 static const struct exynos_binned_lp tg4a_binned_lp[] = {
-	BINNED_LP_MODE("off", 0, tg4a_lp_off_cmds),
 	/* low threshold 40 nits */
-	BINNED_LP_MODE_TIMING("low", 716, tg4a_lp_low_cmds,
-			      12, 12 + 50),
+	BINNED_LP_MODE_TIMING("low", 717, tg4a_lp_low_cmds,
+				12, 12 + 50),
 	BINNED_LP_MODE_TIMING("high", 4095, tg4a_lp_high_cmds,
-			      12, 12 + 50),
+				12, 12 + 50),
 };
 
 static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
@@ -140,18 +140,9 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 
 	/* TE2 setting */
 	EXYNOS_DSI_CMD0(test_key_enable),
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x69, 0xCB),
-	EXYNOS_DSI_CMD_SEQ(0xCB, 0x10, 0x00, 0x2D), /* 60HS TE2 ON */
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0xE9, 0xCB),
-	EXYNOS_DSI_CMD_SEQ(0xCB, 0x10, 0x00, 0x2D), /* 120HS & 90HS TE2 ON */
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x28, 0xF2),
-	EXYNOS_DSI_CMD_SEQ(0xF2, 0xCC), /* 10bit change */
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x01, 0x69, 0xCB),
-	EXYNOS_DSI_CMD_SEQ(0xCB, 0x10, 0x00, 0x2D), /* AOD TE2 ON */
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x28, 0xF2),
-	EXYNOS_DSI_CMD_SEQ(0xF2, 0xC4), /* 8bit change */
-	EXYNOS_DSI_CMD0(ltps_update),
-	EXYNOS_DSI_CMD0(test_key_disable),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x26, 0xB9),
+	EXYNOS_DSI_CMD_SEQ(0xB9, 0x00, 0x00, 0x10, 0x00, 0x00,
+				0x3D, 0x00, 0x09, 0x90, 0x00, 0x09, 0x90),
 
 	/* CASET: 1080 */
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_COLUMN_ADDRESS, 0x00, 0x00, 0x04, 0x37),
@@ -159,24 +150,60 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 	/* PASET: 2424 */
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_PAGE_ADDRESS, 0x00, 0x00, 0x09, 0x77),
 
-	/* FFC 756Mbps @ fosc 180Mhz */
-	EXYNOS_DSI_CMD0(test_key_enable),
+	/* FFC 551Mbps */
 	EXYNOS_DSI_CMD_SEQ(0xFC, 0x5A, 0x5A),
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x2A, 0xC5),
-	EXYNOS_DSI_CMD_SEQ(0xC5, 0x0D, 0x10, 0x80, 0x05),
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x2E, 0xC5),
-	EXYNOS_DSI_CMD_SEQ(0xC5, 0x79, 0xE8),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x3A, 0xC5),
+	EXYNOS_DSI_CMD_SEQ(0xC5, 0x8B, 0xBB), /* 551Mbps FFC Setting */
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x36, 0xC5),
+	EXYNOS_DSI_CMD_SEQ(0xC5, 0x11, 0x10, 0x50, 0x05),
 	EXYNOS_DSI_CMD_SEQ(0xFC, 0xA5, 0xA5),
+
+	/* VDDD LDO Setting, only for Proto 1.1 and EVT 1.0*/
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x58, 0xD7),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xD7, 0x0A),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x5B, 0xD7),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xD7, 0x0A),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xFE, 0x80),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xFE, 0x00),
+
+	/* TSP HSYNC setting */
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x42, 0xB9),
+	EXYNOS_DSI_CMD_SEQ(0xB9, 0x19),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x46, 0xB9),
+	EXYNOS_DSI_CMD_SEQ(0xB9, 0xB0),
+
+	/* FGZ common setting */
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x30, 0x68),
+	EXYNOS_DSI_CMD_SEQ(0x68, 0x32, 0xFF, 0x04, 0x08, 0x10, 0x15, 0x29, 0x67, 0xA5),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x1C, 0x62),
+	EXYNOS_DSI_CMD_SEQ(0x62, 0x1D, 0x5F),
 	EXYNOS_DSI_CMD0(test_key_disable),
 
-	/* FQ_CON setting */
-	EXYNOS_DSI_CMD0(test_key_enable),
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x27, 0xF2),
-	EXYNOS_DSI_CMD_SEQ(0xF2, 0x02),
-	EXYNOS_DSI_CMD0(ltps_update),
-	EXYNOS_DSI_CMD0(test_key_disable),
+	/* TODO: b/315722627: Local HBM Gamma Writing */
 };
 static DEFINE_EXYNOS_CMD_SET(tg4a_init);
+
+static const struct exynos_dsi_cmd tg4a_lhbm_location_cmds[] = {
+	EXYNOS_DSI_CMD0(test_key_enable),
+	/* global para */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0xBC, 0x65),
+	/* box location */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x65, 0x00, 0x00, 0x00, 0x43, 0x79, 0x77),
+	/* global para */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0xC2, 0x65),
+	/* center position set, x: 0x21C, y: 0x6DD, size: 0x64 */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x65, 0x21, 0xC6, 0xDD,
+					0x64, 0x00, 0x00, 0x00, 0x00),
+	EXYNOS_DSI_CMD0(test_key_disable),
+};
+static DEFINE_EXYNOS_CMD_SET(tg4a_lhbm_location);
+
+#define LHBM_GAMMA_CMD_SIZE 6
+
+struct tg4a_lhbm_ctl {
+	/** @brt_normal: normal LHBM brightness parameters */
+	u8 brt_normal[FREQUENCY_COUNT][LHBM_BRT_LEN];
+};
 
 /**
  * struct tg4a_panel - panel specific runtime info
@@ -187,6 +214,16 @@ static DEFINE_EXYNOS_CMD_SET(tg4a_init);
 struct tg4a_panel {
 	/** @base: base panel struct */
 	struct exynos_panel base;
+
+	/** @local_hbm_gamma: lhbm gamma data */
+	struct local_hbm_gamma {
+		u8 hs120_cmd[LHBM_GAMMA_CMD_SIZE];
+		u8 hs60_cmd[LHBM_GAMMA_CMD_SIZE];
+	} local_hbm_gamma;
+
+	/** @lhbm_ctl: lhbm brightness control */
+	struct tg4a_lhbm_ctl lhbm_ctl;
+
 	/**
 	 * @is_pixel_off: pixel-off command is sent to panel. Only sending normal-on or resetting
 	 *		  panel can recover to normal mode after entering pixel-off state.
@@ -195,91 +232,74 @@ struct tg4a_panel {
 };
 #define to_spanel(ctx) container_of(ctx, struct tg4a_panel, base)
 
-static void tg4a_freq_change_command(struct exynos_panel *ctx, const u32 vrefresh)
+enum frequency { HS120, HS60 };
+static const char *frequency_str[] = { "HS120", "HS60" };
+
+static void read_lhbm_gamma(struct exynos_panel *ctx, u8 *cmd, enum frequency freq) {
+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+	u8 index = (freq == HS120) ? 0x06 : 0x0B;
+	int ret;
+
+	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xB0, 0x02, index, 0xBD); /* global para */
+	ret = mipi_dsi_dcs_read(dsi, 0xBD, cmd + 1, LHBM_GAMMA_CMD_SIZE - 1);
+
+	if (ret != (LHBM_GAMMA_CMD_SIZE - 1)) {
+		dev_err(ctx->dev, "fail to read LHBM gamma for %s\n", frequency_str[freq]);
+		return;
+	}
+
+	/* fill in gamma write command 0x6A in offset 0 */
+	cmd[0] = 0x6A;
+	dev_info(ctx->dev, "%s_gamma: %*ph\n", frequency_str[freq],
+		LHBM_GAMMA_CMD_SIZE - 1, cmd + 1);
+}
+
+static void tg4a_lhbm_gamma_read(struct exynos_panel *ctx)
 {
+	struct tg4a_panel *spanel = to_spanel(ctx);
+
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
 
-	/* EM Off Change */
-	if (vrefresh == 60) {
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x01, 0xD4, 0x65);
-		EXYNOS_DCS_BUF_ADD(ctx, 0x65, 0x13, 0x20, 0x11, 0x38, 0x11, 0x38, 0x11, 0x38,
-			0x11, 0x38, 0x10, 0x1D, 0x0E, 0x9B, 0x0D, 0x18,
-			0x0B, 0x94, 0x0A, 0x15, 0x08, 0x97, 0x07, 0x15,
-			0x02, 0x90, 0x02, 0x90, 0x01, 0x48, 0x01, 0x48);
-	} else if (vrefresh == 120) {
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x01, 0xB4, 0x65);
-		EXYNOS_DCS_BUF_ADD(ctx, 0x65, 0x09, 0x90, 0x08, 0x9C, 0x08, 0x9C, 0x08, 0x9C,
-			0x08, 0x9C, 0x08, 0x0E, 0x07, 0x4D, 0x06, 0x8C,
-			0x05, 0xCA, 0x05, 0x0B, 0x04, 0x4C, 0x03, 0x8A,
-			0x01, 0x48, 0x01, 0x48, 0x00, 0xA4, 0x00, 0xA4);
-	} else {
-		/* 90Hz refresh rate */
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x01, 0xB4, 0x65);
-		EXYNOS_DCS_BUF_ADD(ctx, 0x65, 0x0C, 0xC0, 0x0B, 0x78, 0x0B, 0x78, 0x0B, 0x78,
-			0x0B, 0x78, 0x0A, 0xBC, 0x09, 0xBC, 0x08, 0xB8,
-			0x07, 0xB8, 0x06, 0xB9, 0x05, 0xBA, 0x04, 0xB8,
-			0x01, 0xB5, 0x01, 0xB5, 0x00, 0xD9, 0x00, 0xD9);
-	}
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x2A, 0x6A);
+	read_lhbm_gamma(ctx, spanel->local_hbm_gamma.hs120_cmd, HS120);
+	read_lhbm_gamma(ctx, spanel->local_hbm_gamma.hs60_cmd, HS60);
 
-	/* Gamma change */
-	if (vrefresh == 90) {
-		EXYNOS_DCS_BUF_ADD(ctx, 0x6A, 0x07);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x2B, 0x6A);
-		EXYNOS_DCS_BUF_ADD(ctx, 0x6A, 0x00, 0x0C);
-	} else {
-		EXYNOS_DCS_BUF_ADD(ctx, 0x6A, 0x00, 0x00, 0x00);
-	}
-
-	/* Frequency and Porch Change */
-	if (vrefresh == 60) {
-		EXYNOS_DCS_BUF_ADD(ctx, 0x60, 0x00, 0x00);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x0E, 0xF2);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xF2, 0x09, 0x9C);
-	} else if (vrefresh == 120) {
-		EXYNOS_DCS_BUF_ADD(ctx, 0x60, 0x08, 0x00);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x07, 0xF2);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xF2, 0x00, 0x0C);
-	} else {
-		/* 90Hz refresh rate*/
-		EXYNOS_DCS_BUF_ADD(ctx, 0x60, 0x00, 0x04);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x07, 0xF2);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xF2, 0x00, 0xAE);
-	}
 	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 }
 
-static void tg4a_te_change_command(struct exynos_panel *ctx, const u32 vrefresh)
+static void tg4a_lhbm_gamma_write(struct exynos_panel *ctx)
 {
+	struct tg4a_panel *spanel = to_spanel(ctx);
+	const u8 hs120_cmd = spanel->local_hbm_gamma.hs120_cmd[0];
+	const u8 hs60_cmd = spanel->local_hbm_gamma.hs60_cmd[0];
+
+	if (!hs120_cmd && !hs60_cmd) {
+		dev_err(ctx->dev, "%s: no lhbm gamma!\n", __func__);
+		return;
+	}
+
+	dev_dbg(ctx->dev, "%s\n", __func__);
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB9, vrefresh == 90 ? 0x00 : 0x01);
+
+	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0xAE, 0x6A); /* global para */
+	EXYNOS_DCS_BUF_ADD_SET(ctx, spanel->local_hbm_gamma.hs120_cmd); /* write gamma */
+	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0xB3, 0x6A); /* global para */
+	EXYNOS_DCS_BUF_ADD_SET(ctx, spanel->local_hbm_gamma.hs60_cmd); /* write gamma */
+
 	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 }
 
 static void tg4a_change_frequency(struct exynos_panel *ctx,
-									const struct exynos_panel_mode *pmode)
+					const struct exynos_panel_mode *pmode)
 {
 	u32 vrefresh = drm_mode_vrefresh(&pmode->mode);
 
-	if (!ctx || ((vrefresh != 60) && (vrefresh != 90) && (vrefresh != 120)))
+	if (!ctx || (vrefresh != 60 && vrefresh != 120))
 		return;
 
-	/* Global para 10bit set */
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x28, 0xF2);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xF2, 0xCC);
+	EXYNOS_DCS_BUF_ADD(ctx, 0x83, (vrefresh == 120) ? 0x00 : 0x08);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xF7, 0x2F);
 	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
-
-	tg4a_freq_change_command(ctx, vrefresh);
-
-	/* Global para 8bit set */
-	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x28, 0xF2);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xF2, 0xC4);
-	EXYNOS_DCS_BUF_ADD_SET(ctx, ltps_update);
-	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
-
-	tg4a_te_change_command(ctx, vrefresh);
 
 	dev_info(ctx->dev, "%s: change to %uHz\n", __func__, vrefresh);
 	return;
@@ -289,14 +309,16 @@ static void tg4a_update_wrctrld(struct exynos_panel *ctx)
 {
 	u8 val = TG4A_WRCTRLD_BCTRL_BIT;
 
+	if (ctx->hbm.local_hbm.enabled)
+		val |= TG4A_WRCTRLD_LOCAL_HBM_BIT;
+
 	if (ctx->dimming_on)
 		val |= TG4A_WRCTRLD_DIMMING_BIT;
 
 	dev_dbg(ctx->dev,
-		"%s(wrctrld:0x%x, hbm: %s, dimming: %s local_hbm: %s)\n",
-		__func__, val, IS_HBM_ON(ctx->hbm_mode) ? "on" : "off",
-		ctx->dimming_on ? "on" : "off",
-		ctx->hbm.local_hbm.enabled ? "on" : "off");
+		"%s(wrctrld:%#x, hbm: %d, dimming: %d, local_hbm: %d)\n",
+		__func__, val, IS_HBM_ON(ctx->hbm_mode),
+		ctx->dimming_on, ctx->hbm.local_hbm.enabled);
 
 	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, val);
 }
@@ -347,7 +369,7 @@ static int tg4a_set_brightness(struct exynos_panel *ctx, u16 br)
 			max_brightness);
 	}
 
-	brightness = (br & 0xFF) << 8 | br >> 8;
+	brightness = __builtin_bswap16(br);
 
 	return exynos_dcs_set_brightness(ctx, brightness);
 }
@@ -357,76 +379,127 @@ static void tg4a_set_hbm_mode(struct exynos_panel *ctx,
 {
 	ctx->hbm_mode = mode;
 
-	/* FGZ mode */
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x28, 0xF2);
-	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xF2, 0xCC); /* 10bit Change */
 
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x01, 0x22, 0x68);
-	if (IS_HBM_ON_IRC_OFF(ctx->hbm_mode))
-		EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0x1C, 0xE3, 0xFF, 0x94); /* FGZ Mode ON */
-	else
-		EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0x00, 0x00, 0xFF, 0x90); /* FGZ Mode OFF */
+	if (ctx->hbm_mode) {
+		/* FGZ mode setting */
+		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x61, 0x68);
+		if (IS_HBM_ON_IRC_OFF(ctx->hbm_mode)) {
+			/* FGZ Mode ON */
+			EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0xB0, 0x2C, 0x6A,
+						0x80, 0x00, 0x00, 0xF5, 0xC4);
+		} else {
+			/* FGZ Mode OFF */
+			EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0xB0, 0x2C, 0x6A,
+						0x80, 0x00, 0x00, 0x00, 0x00);
+		}
+	} else {
+		/* FGZ Mode OFF */
+		EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0xB0, 0x2C, 0x6A, 0x80,
+						0x00, 0x00, 0x00, 0x00);
+	}
 
-	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00,0x28,0xF2);
-	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xF2, 0xC4); /* 8bit Change */
 	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 
 	dev_info(ctx->dev, "hbm_on=%d hbm_ircoff=%d.\n", IS_HBM_ON(ctx->hbm_mode),
 		 IS_HBM_ON_IRC_OFF(ctx->hbm_mode));
 }
 
-static void tg4a_set_dimming_on(struct exynos_panel *exynos_panel,
-                                bool dimming_on)
+static void tg4a_set_dimming_on(struct exynos_panel *exynos_panel, bool dimming_on)
 {
 	const struct exynos_panel_mode *pmode = exynos_panel->current_mode;
+	exynos_panel->dimming_on = dimming_on;
 
 	if (pmode->exynos_mode.is_lp_mode) {
-		dev_warn(exynos_panel->dev, "in lp mode, skip to update dimming usage\n");
+		dev_warn(exynos_panel->dev, "in lp mode, skip to update\n");
 		return;
 	}
 
-	exynos_panel->dimming_on = dimming_on;
 	tg4a_update_wrctrld(exynos_panel);
 }
 
+static void tg4a_set_local_hbm_mode(struct exynos_panel *ctx, bool local_hbm_en)
+{
+	tg4a_update_wrctrld(ctx);
+
+	if (local_hbm_en) {
+		EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x30);
+		exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_location_cmd_set);
+	} else {
+		EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x20);
+	}
+}
+
 static void tg4a_mode_set(struct exynos_panel *ctx,
-                          const struct exynos_panel_mode *pmode)
+				const struct exynos_panel_mode *pmode)
 {
 	tg4a_change_frequency(ctx, pmode);
 }
 
 static bool tg4a_is_mode_seamless(const struct exynos_panel *ctx,
-                                  const struct exynos_panel_mode *pmode)
+					const struct exynos_panel_mode *pmode)
 {
 	/* seamless mode switch is possible if only changing refresh rate */
 	return drm_mode_equal_no_clocks(&ctx->current_mode->mode, &pmode->mode);
 }
 
+static void tg4a_lhbm_brightness_init(struct exynos_panel *ctx)
+{
+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+	struct tg4a_panel *spanel = to_spanel(ctx);
+	struct tg4a_lhbm_ctl *ctl = &spanel->lhbm_ctl;
+
+	int freq, ret;
+
+	for (freq = 0; freq < FREQUENCY_COUNT; freq++) {
+		EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
+		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x02, (freq == HS120)? 0x06 : 0x0B, 0xBD);
+		ret = mipi_dsi_dcs_read(dsi, 0xBD, ctl->brt_normal[freq], LHBM_BRT_LEN);
+		EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
+
+		if (ret != LHBM_BRT_LEN) {
+			dev_err(ctx->dev, "failed to read lhbm para for %s ret=%d\n",
+				frequency_str[freq], ret);
+			continue;
+		}
+
+		dev_info(ctx->dev, "lhbm normal brightness for %s: %*ph\n",
+			frequency_str[freq], LHBM_BRT_LEN, ctl->brt_normal[freq]);
+	}
+}
+
 static void tg4a_debugfs_init(struct drm_panel *panel, struct dentry *root)
 {
-#ifdef CONFIG_DEBUG_FS
-	struct exynos_panel *ctx = container_of(panel, struct exynos_panel, panel);
-	struct dentry *panel_root, *csroot;
+	if (IS_ENABLED(CONFIG_DEBUG_FS)) {
+		struct exynos_panel *ctx = container_of(panel, struct exynos_panel, panel);
+		struct dentry *panel_root, *csroot;
 
-	if (!ctx)
-		return;
+		if (!ctx)
+			return;
 
-	panel_root = debugfs_lookup("panel", root);
-	if (!panel_root)
-		return;
+		panel_root = debugfs_lookup("panel", root);
+		if (!panel_root)
+			return;
 
-	csroot = debugfs_lookup("cmdsets", panel_root);
-	if (!csroot) {
-		goto panel_out;
-	}
+		csroot = debugfs_lookup("cmdsets", panel_root);
+		if (!csroot)
+			goto panel_out;
 
-	exynos_panel_debugfs_create_cmdset(ctx, csroot, &tg4a_init_cmd_set, "init");
+		exynos_panel_debugfs_create_cmdset(ctx, csroot, &tg4a_init_cmd_set, "init");
 
-	dput(csroot);
+		dput(csroot);
+
 panel_out:
-	dput(panel_root);
-#endif
+		dput(panel_root);
+	}
+}
+
+static void tg4a_panel_init(struct exynos_panel *ctx)
+{
+	tg4a_lhbm_brightness_init(ctx);
+	tg4a_lhbm_gamma_read(ctx);
+	tg4a_lhbm_gamma_write(ctx);
+	exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_location_cmd_set);
 }
 
 static void tg4a_get_panel_rev(struct exynos_panel *ctx, u32 id)
@@ -440,19 +513,10 @@ static void tg4a_get_panel_rev(struct exynos_panel *ctx, u32 id)
 	exynos_panel_get_panel_rev(ctx, rev);
 }
 
-static void tg4a_panel_reset(struct exynos_panel *ctx)
+static void tg4a_set_lp_mode(struct exynos_panel *ctx,
+					const struct exynos_panel_mode *pmode)
 {
-    dev_dbg(ctx->dev, "%s +\n", __func__);
-
-    gpiod_set_value(ctx->reset_gpio, 0);
-    usleep_range(1000, 1010);
-
-    gpiod_set_value(ctx->reset_gpio, 1);
-    usleep_range(5100, 5110);
-
-    dev_dbg(ctx->dev, "%s -\n", __func__);
-
-    exynos_panel_init(ctx);
+	exynos_panel_set_lp_mode(ctx, pmode);
 }
 
 static void tg4a_set_nolp_mode(struct exynos_panel *ctx,
@@ -465,7 +529,10 @@ static void tg4a_set_nolp_mode(struct exynos_panel *ctx,
 	if (!is_panel_active(ctx))
 		return;
 
-	EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_SET_DISPLAY_OFF);
+	/* AOD Mode Off Setting */
+	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
+	EXYNOS_DCS_BUF_ADD(ctx, 0x53, 0x20);
+	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 
 	/* backlight control and dimming */
 	tg4a_update_wrctrld(ctx);
@@ -478,8 +545,6 @@ static void tg4a_set_nolp_mode(struct exynos_panel *ctx,
 	/* Additional sleep time to account for TE variability */
 	usleep_range(1000, 1010);
 	DPU_ATRACE_END("tg4a_wait_one_vblank");
-
-	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, MIPI_DCS_SET_DISPLAY_ON);
 
 	dev_info(ctx->dev, "exit LP mode\n");
 }
@@ -497,7 +562,7 @@ static int tg4a_enable(struct drm_panel *panel)
 
 	dev_info(ctx->dev, "%s\n", __func__);
 
-	tg4a_panel_reset(ctx);
+	exynos_panel_reset(ctx);
 
 	/* sleep out */
 	EXYNOS_DCS_WRITE_SEQ_DELAY(ctx, 120, MIPI_DCS_EXIT_SLEEP_MODE);
@@ -508,21 +573,23 @@ static int tg4a_enable(struct drm_panel *panel)
 	/* frequency */
 	tg4a_change_frequency(ctx, pmode);
 
+	tg4a_lhbm_gamma_write(ctx);
+
 	/* DSC related configuration */
 	exynos_dcs_compression_mode(ctx, 0x1);
 	drm_dsc_pps_payload_pack(&pps_payload, &pps_config);
 	EXYNOS_PPS_WRITE_BUF(ctx, &pps_payload);
 	/* DSC Enable */
+	EXYNOS_DCS_BUF_ADD(ctx, 0xC2, 0x14);
 	EXYNOS_DCS_BUF_ADD(ctx, 0x9D, 0x01);
 
 	/* dimming and HBM */
 	tg4a_update_wrctrld(ctx);
 
-	/* display on */
 	if (pmode->exynos_mode.is_lp_mode)
 		exynos_panel_set_lp_mode(ctx, pmode);
-	else
-		EXYNOS_DCS_WRITE_SEQ(ctx, MIPI_DCS_SET_DISPLAY_ON);
+
+	EXYNOS_DCS_WRITE_SEQ(ctx, MIPI_DCS_SET_DISPLAY_ON);
 
 	return 0;
 }
@@ -547,22 +614,22 @@ static const struct exynos_display_underrun_param underrun_param = {
 
 static const u16 WIDTH_MM = 65, HEIGHT_MM = 146;
 static const u16 HDISPLAY = 1080, VDISPLAY = 2424;
-static const u16 HFP = 32, HSA = 12, HBP = 16;
-static const u16 VFP = 12, VSA = 4, VBP = 15;
+static const u16 HFP = 44, HSA = 16, HBP = 20;
+static const u16 VFP = 10, VSA = 6, VBP = 10;
 
 #define TG4A_DSC {\
 	.enabled = true,\
 	.dsc_count = 1,\
-	.slice_count = 1,\
-	.slice_height = 24,\
+	.slice_count = 2,\
+	.slice_height = 101,\
 	.cfg = &pps_config,\
 }
 
 static const struct exynos_panel_mode tg4a_modes[] = {
 	{
 		.mode = {
-			.name = "1080x2424x60",
-			.clock = 167922,
+			.name = "1080x2424@60:60",
+			.clock = 170520,
 			.hdisplay = HDISPLAY,
 			.hsync_start = HDISPLAY + HFP,
 			.hsync_end = HDISPLAY + HFP + HSA,
@@ -578,7 +645,8 @@ static const struct exynos_panel_mode tg4a_modes[] = {
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
 			.vblank_usec = 120,
-			.te_usec = 8450,
+			/* TODO: b/316356276#comment3 - update TE Pulse width for 60Hz/120Hz */
+			.te_usec = 8605,
 			.bpc = 8,
 			.dsc = TG4A_DSC,
 			.underrun_param = &underrun_param,
@@ -586,8 +654,8 @@ static const struct exynos_panel_mode tg4a_modes[] = {
 	},
 	{
 		.mode = {
-			.name = "1080x2424x120",
-			.clock = 335844,
+			.name = "1080x2424@120:120",
+			.clock = 341040,
 			.hdisplay = HDISPLAY,
 			.hsync_start = HDISPLAY + HFP,
 			.hsync_end = HDISPLAY + HFP + HSA,
@@ -603,32 +671,8 @@ static const struct exynos_panel_mode tg4a_modes[] = {
 		.exynos_mode = {
 			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
 			.vblank_usec = 120,
+			/* TODO: b/316356276#comment3 - update TE Pulse width for 60Hz/120Hz */
 			.te_usec = 276,
-			.bpc = 8,
-			.dsc = TG4A_DSC,
-			.underrun_param = &underrun_param,
-		},
-	},
-	{
-		.mode = {
-			.name = "1080x2424x90",
-			.clock = 251883,
-			.hdisplay = HDISPLAY,
-			.hsync_start = HDISPLAY + HFP,
-			.hsync_end = HDISPLAY + HFP + HSA,
-			.htotal = HDISPLAY + HFP + HSA + HBP,
-			.vdisplay = VDISPLAY,
-			.vsync_start = VDISPLAY + VFP,
-			.vsync_end = VDISPLAY + VFP + VSA,
-			.vtotal = VDISPLAY + VFP + VSA + VBP,
-			.flags = 0,
-			.width_mm = WIDTH_MM,
-			.height_mm = HEIGHT_MM,
-		},
-		.exynos_mode = {
-			.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
-			.vblank_usec = 120,
-			.te_usec = 2860,
 			.bpc = 8,
 			.dsc = TG4A_DSC,
 			.underrun_param = &underrun_param,
@@ -640,7 +684,7 @@ const struct brightness_capability tg4a_brightness_capability = {
 	.normal = {
 		.nits = {
 			.min = 2,
-			.max = 1250,
+			.max = 1200,
 		},
 		.level = {
 			.min = 184,
@@ -648,20 +692,20 @@ const struct brightness_capability tg4a_brightness_capability = {
 		},
 		.percentage = {
 			.min = 0,
-			.max = 68,
+			.max = 67,
 		},
 	},
 	.hbm = {
 		.nits = {
-			.min = 1250,
-			.max = 1850,
+			.min = 1200,
+			.max = 1800,
 		},
 		.level = {
 			.min = 3428,
 			.max = 4095,
 		},
 		.percentage = {
-			.min = 68,
+			.min = 67,
 			.max = 100,
 		},
 	},
@@ -669,7 +713,7 @@ const struct brightness_capability tg4a_brightness_capability = {
 
 static const struct exynos_panel_mode tg4a_lp_mode = {
 	.mode = {
-		.name = "1080x2424x30",
+		.name = "1080x2424@30:30",
 		.clock = 85260,
 		.hdisplay = HDISPLAY,
 		.hsync_start = HDISPLAY + HFP,
@@ -705,13 +749,15 @@ static const struct drm_panel_funcs tg4a_drm_funcs = {
 
 static const struct exynos_panel_funcs tg4a_exynos_funcs = {
 	.set_brightness = tg4a_set_brightness,
-	.set_lp_mode = exynos_panel_set_lp_mode,
+	.set_lp_mode = tg4a_set_lp_mode,
 	.set_nolp_mode = tg4a_set_nolp_mode,
 	.set_binned_lp = exynos_panel_set_binned_lp,
 	.set_dimming_on = tg4a_set_dimming_on,
 	.set_hbm_mode = tg4a_set_hbm_mode,
+	.set_local_hbm_mode = tg4a_set_local_hbm_mode,
 	.is_mode_seamless = tg4a_is_mode_seamless,
 	.mode_set = tg4a_mode_set,
+	.panel_init = tg4a_panel_init,
 	.get_panel_rev = tg4a_get_panel_rev,
 	.read_id = exynos_panel_read_ddic_id,
 };
@@ -720,7 +766,7 @@ const struct exynos_panel_desc google_tg4a = {
 	.data_lane_cnt = 4,
 	.max_brightness = 4095,
 	.min_brightness = 2,
-	.dft_brightness = 1268,    /* 140 nits */
+	.dft_brightness = 1290,	/* 140 nits */
 	.brt_capability = &tg4a_brightness_capability,
 	/* supported HDR format bitmask : 1(DOLBY_VISION), 2(HDR10), 3(HLG) */
 	.hdr_formats = BIT(2) | BIT(3),
@@ -736,13 +782,18 @@ const struct exynos_panel_desc google_tg4a = {
 	.num_binned_lp = ARRAY_SIZE(tg4a_binned_lp),
 	.panel_func = &tg4a_drm_funcs,
 	.exynos_panel_func = &tg4a_exynos_funcs,
+	.reset_timing_ms = {1, 1, 1},
 	.reg_ctrl_enable = {
 		{PANEL_REG_ID_VDDI, 0},
-		{PANEL_REG_ID_VCI, 0},
-		{PANEL_REG_ID_VDDD, 10},
+		{PANEL_REG_ID_VCI, 10},
+	},
+	.reg_ctrl_post_enable = {
+		{PANEL_REG_ID_VDDD, 5},
+	},
+	.reg_ctrl_pre_disable = {
+		{PANEL_REG_ID_VDDD, 0},
 	},
 	.reg_ctrl_disable = {
-		{PANEL_REG_ID_VDDD, 0},
 		{PANEL_REG_ID_VCI, 0},
 		{PANEL_REG_ID_VDDI, 0},
 	},
@@ -764,6 +815,6 @@ static struct mipi_dsi_driver exynos_panel_driver = {
 };
 module_mipi_dsi_driver(exynos_panel_driver);
 
-MODULE_AUTHOR("Safayat Ullah <safayat@google.com>");
+MODULE_AUTHOR("Cathy Hsu <cathsu@google.com>, Safayat Ullah <safayat@google.com>");
 MODULE_DESCRIPTION("MIPI-DSI based Google tg4a panel driver");
 MODULE_LICENSE("GPL");
