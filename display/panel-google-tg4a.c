@@ -150,13 +150,7 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 	/* PASET: 2424 */
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_PAGE_ADDRESS, 0x00, 0x00, 0x09, 0x77),
 
-	/* FFC 551Mbps */
-	EXYNOS_DSI_CMD_SEQ(0xFC, 0x5A, 0x5A),
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x3A, 0xC5),
-	EXYNOS_DSI_CMD_SEQ(0xC5, 0x8B, 0xBB), /* 551Mbps FFC Setting */
-	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x36, 0xC5),
-	EXYNOS_DSI_CMD_SEQ(0xC5, 0x11, 0x10, 0x50, 0x05),
-	EXYNOS_DSI_CMD_SEQ(0xFC, 0xA5, 0xA5),
+	/* TODO: b/315722627: update FFC Setting based on next revision of op manual */
 
 	/* VDDD LDO Setting, only for Proto 1.1 and EVT 1.0*/
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x58, 0xD7),
