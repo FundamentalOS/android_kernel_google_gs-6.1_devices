@@ -437,31 +437,6 @@ static bool tg4a_is_mode_seamless(const struct exynos_panel *ctx,
 	return drm_mode_equal_no_clocks(&ctx->current_mode->mode, &pmode->mode);
 }
 
-static void tg4a_lhbm_brightness_init(struct exynos_panel *ctx)
-{
-	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
-	struct tg4a_panel *spanel = to_spanel(ctx);
-	struct tg4a_lhbm_ctl *ctl = &spanel->lhbm_ctl;
-
-	int freq, ret;
-
-	for (freq = 0; freq < FREQUENCY_COUNT; freq++) {
-		EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x02, (freq == HS120)? 0x06 : 0x0B, 0xBD);
-		ret = mipi_dsi_dcs_read(dsi, 0xBD, ctl->brt_normal[freq], LHBM_BRT_LEN);
-		EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
-
-		if (ret != LHBM_BRT_LEN) {
-			dev_err(ctx->dev, "failed to read lhbm para for %s ret=%d\n",
-				frequency_str[freq], ret);
-			continue;
-		}
-
-		dev_info(ctx->dev, "lhbm normal brightness for %s: %*ph\n",
-			frequency_str[freq], LHBM_BRT_LEN, ctl->brt_normal[freq]);
-	}
-}
-
 static void tg4a_debugfs_init(struct drm_panel *panel, struct dentry *root)
 {
 	if (IS_ENABLED(CONFIG_DEBUG_FS)) {
@@ -490,7 +465,6 @@ panel_out:
 
 static void tg4a_panel_init(struct exynos_panel *ctx)
 {
-	tg4a_lhbm_brightness_init(ctx);
 	tg4a_lhbm_gamma_read(ctx);
 	tg4a_lhbm_gamma_write(ctx);
 	exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_location_cmd_set);
