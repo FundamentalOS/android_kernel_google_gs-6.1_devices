@@ -44,7 +44,6 @@ kernel_module_group(
         # do not sort
         "//private/devices/google/tangorpro:gs201_soc.tangorpro",
         "//private/devices/google/tangorpro/display:drm_panel.google",
-        "//private/devices/google/tangorpro/display/backlight:rt4539",
         "//private/devices/google/tangorpro/pogo:pogo_transport",
         "//private/google-modules/display/common/gs_drm",
         "//private/google-modules/display/common/gs_panel",
@@ -314,6 +313,7 @@ lto_dependant_kernel_module(
         "drivers/usb/typec/tcpm/google/tcpci_max77759.ko",
         "drivers/usb/typec/tcpm/google/usb_psy.ko",
         "drivers/usb/typec/tcpm/google/usbc_cooling_dev.ko",
+        "drivers/video/backlight/rt4539_bl.ko",
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
     kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",

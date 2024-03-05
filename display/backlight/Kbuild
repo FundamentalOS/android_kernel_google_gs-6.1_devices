@@ -1,5 +1,0 @@
-# SPDX-License-Identifier: GPL-2.0
-
-subdir-ccflags-y += -I$(srctree)/drivers/video/backlight
-
-obj-$(CONFIG_BACKLIGHT_RT4539)		+= rt4539_bl.o
