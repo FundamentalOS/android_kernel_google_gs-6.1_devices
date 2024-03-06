@@ -56,3 +56,11 @@
 		#include "zuma-tegu-battery-data.dtsi"
 	};
 };
+
+&max77779_vimon {
+	status = "okay";
+};
+
+&max77779_fwupdate {
+	status = "okay";
+};
