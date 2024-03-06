@@ -8,6 +8,7 @@ load(
     "kernel_abi",
     "kernel_build",
     "kernel_images",
+    "kernel_module",
     "kernel_module_group",
     "kernel_modules_install",
     "kernel_unstripped_modules_archive",
@@ -16,7 +17,6 @@ load(
 load(
     "//private/google-modules/soc/gs:device_build_configs.bzl",
     "device_build_configs",
-    "lto_dependant_kernel_module",
 )
 
 RAVIOLE_DTBOS = [
@@ -198,7 +198,7 @@ kernel_abi(
     module_grouping = False,
 )
 
-lto_dependant_kernel_module(
+kernel_module(
     name = "gs101_soc.raviole",
     srcs = [
         "//private/google-modules/soc/gs:gs_soc_sources",
@@ -344,9 +344,6 @@ lto_dependant_kernel_module(
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
     kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
-    lto_outs = [
-        "drivers/ufs/ufs-pixel-fips140.ko",
-    ],
     makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
