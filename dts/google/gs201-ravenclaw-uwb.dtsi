@@ -35,6 +35,9 @@
 	status = "okay";
 	#address-cells = <1>;
 	#size-cells = <0>;
+	cs-gpios = <&gpp26 3 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
+
 	dw3xxx_prod@0 {
 		compatible = "decawave,dw3000";
 		reg = <0>;
@@ -57,9 +60,6 @@
 
 		status = "okay";
 
-		controller-data {
-			cs-gpio = <&gpp26 3 GPIO_ACTIVE_HIGH>;
-		};
 	};
 };
 
