@@ -100,6 +100,8 @@ _GS201_PANTAH_DTBOS = [
     "google/gs201-lynx-dvt1_0-gain1.dtbo",
     "google/gs201-lynx-pvt1_0.dtbo",
     "google/gs201-lynx-mp1_0.dtbo",
+    # TODO: if we're going to support cloudripper, create a device folder for it
+    "google/gs201-cloudripper-dev.dtbo",
 ]
 
 kernel_module_group(
