@@ -145,7 +145,6 @@ kernel_build(
         "drivers/leds/leds-pwm.ko",
         "drivers/misc/eeprom/at24.ko",
         "drivers/perf/arm_dsu_pmu.ko",
-        "drivers/pps/clients/pps-gpio.ko",
         "drivers/regulator/rt4801-regulator.ko",
         "drivers/regulator/tps65132-regulator.ko",
         "drivers/scsi/scsi_debug.ko",
