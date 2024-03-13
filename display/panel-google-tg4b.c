@@ -457,6 +457,7 @@ static void tg4b_set_local_hbm_background_brightness(struct exynos_panel *ctx, u
 	EXYNOS_DCS_BUF_ADD_AND_FLUSH(ctx, 0xDF, val1, val2, val1, val2, val1, val2);
 }
 
+#define MAX_BR_HBM_IRC_OFF 4095
 static int tg4b_set_brightness(struct exynos_panel *ctx, u16 br)
 {
 	struct tg4b_panel *spanel = to_spanel(ctx);
@@ -476,6 +477,12 @@ static int tg4b_set_brightness(struct exynos_panel *ctx, u16 br)
 		return exynos_dcs_set_brightness(ctx, 0);
 	}
 
+	if (IS_HBM_ON_IRC_OFF(ctx->hbm_mode) &&
+	    br == ctx->desc->brt_capability->hbm.level.max) {
+		br = MAX_BR_HBM_IRC_OFF;
+		dev_dbg(ctx->dev, "apply max DBV when reach hbm max with irc off\n");
+	}
+
 	if (ctx->hbm.local_hbm.enabled)
 		tg4b_set_local_hbm_background_brightness(ctx, br);
 
@@ -486,7 +493,7 @@ static int tg4b_set_brightness(struct exynos_panel *ctx, u16 br)
 		spanel->idle_exit_dimming_delay_ts = 0;
 	}
 
-	brightness = (br & 0xff) << 8 | br >> 8;
+	brightness = __swab16(br);
 	return exynos_dcs_set_brightness(ctx, brightness);
 }
 
