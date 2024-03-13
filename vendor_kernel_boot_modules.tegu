@@ -5,6 +5,6 @@
 google_ccd.ko
 panel-google-bigsurf.ko
 panel-google-shoreline.ko
+panel-google-tg4a.ko
 panel-google-tg4b.ko
-panel-gs-tg4a.ko
 rt9471_charger.ko
