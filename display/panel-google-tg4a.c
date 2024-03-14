@@ -375,9 +375,10 @@ static void tg4a_set_hbm_mode(struct exynos_panel *ctx,
 
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
 
+	/* FGZ mode setting */
+	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x61, 0x68);
+
 	if (ctx->hbm_mode) {
-		/* FGZ mode setting */
-		EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x61, 0x68);
 		if (IS_HBM_ON_IRC_OFF(ctx->hbm_mode)) {
 			/* FGZ Mode ON */
 			EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0xB0, 0x2C, 0x6A,
@@ -392,6 +393,12 @@ static void tg4a_set_hbm_mode(struct exynos_panel *ctx,
 		EXYNOS_DCS_BUF_ADD(ctx, 0x68, 0xB0, 0x2C, 0x6A, 0x80,
 						0x00, 0x00, 0x00, 0x00);
 	}
+
+	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x01, 0xBD);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xBD, ctx->hbm_mode ? 0x80 : 0x81);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x2E, 0xBD);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xBD, 0x00, ctx->hbm_mode ? 0x01 : 0x02);
+	EXYNOS_DCS_BUF_ADD(ctx, 0xF7, 0x2F);
 
 	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 
