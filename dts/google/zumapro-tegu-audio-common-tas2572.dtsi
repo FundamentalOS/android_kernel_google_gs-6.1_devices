@@ -81,7 +81,8 @@
 	tas2572_2_irq: tas2572-2-irq {
 		samsung,pins = "gpa7-2"; /* XEINT_16 */
 		samsung,pin-function = <EXYNOS_PIN_FUNC_EINT>;
-		samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_UP>;
+		samsung,pin-drv = <ZUMA_PIN_DRV_X1>;
 	};
 };
 
@@ -90,7 +91,8 @@
 	tas2572_1_irq: tas2572-1-irq {
 		samsung,pins = "gpa5-5"; /* XEINT_5 */
 		samsung,pin-function = <EXYNOS_PIN_FUNC_EINT>;
-		samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_UP>;
+		samsung,pin-drv = <ZUMA_PIN_DRV_X1>;
 	};
 };
 
@@ -127,13 +129,19 @@
 		#sound-dai-cells = <0>;
 		compatible = "ti,tas25xx";
 		reg = <0x48>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&tas2572_1_irq &tas2572_2_irq
+				&tas2572_1_rst &tas2572_2_rst>;
+
 		ti,max-channels = <2>;
 		ti,channel-0 = <0x48>;
 		ti,channel-1 = <0x49>;
 		ti,reset-gpio = <&gpp6 3 GPIO_ACTIVE_HIGH>;
 		ti,reset-gpio2 = <&gph2 1 GPIO_ACTIVE_HIGH>;
-		ti,irq-gpio = <&gpa5 5 GPIO_ACTIVE_HIGH>;
-		ti,irq-gpio2 = <&gpa7 2 GPIO_ACTIVE_HIGH>;
+		ti,irq-gpio = <&gpa5 5 GPIO_ACTIVE_LOW>;
+		ti,irq-gpio2 = <&gpa7 2 GPIO_ACTIVE_LOW>;
+		ti,irqz-value = <0x60>;
 		status = "ok";
 	};
 };
