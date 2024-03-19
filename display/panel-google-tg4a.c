@@ -171,6 +171,12 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 	EXYNOS_DSI_CMD_SEQ(0x68, 0x32, 0xFF, 0x04, 0x08, 0x10, 0x15, 0x29, 0x67, 0xA5),
 	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x1C, 0x62),
 	EXYNOS_DSI_CMD_SEQ(0x62, 0x1D, 0x5F),
+
+	/* Set back correct OSC setting, only for Proto 1.1 */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x0C, 0xB5),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB5, 0xC0, 0x00, 0x60, 0x00, 0x00),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
+
 	EXYNOS_DSI_CMD0(test_key_disable),
 
 	/* TODO: b/315722627: Local HBM Gamma Writing */
