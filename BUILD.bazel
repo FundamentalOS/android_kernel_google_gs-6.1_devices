@@ -16,7 +16,7 @@ load(
     "merged_kernel_uapi_headers",
 )
 load(
-    "//private/google-modules/soc/gs:device_build_configs.bzl",
+    "//private/devices/google/common:device_build_configs.bzl",
     "device_build_configs",
     "lto_dependant_kernel_module",
 )
@@ -94,6 +94,7 @@ kernel_build(
         "tangorpro*.fragment",
     ]) + [
         # keep sorted
+        "//private/devices/google/common:debug_build_configs",
         "//private/devices/google/pantah:pantah_gki.fragment",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
@@ -111,24 +112,24 @@ kernel_build(
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ] + select({
-        "//private/google-modules/soc/gs:gki_aosp": ["//aosp:kernel_aarch64_sources"],
-        "//private/google-modules/soc/gs:gki_aosp_staging": ["//aosp-staging:kernel_aarch64_sources"],
+        "//private/devices/google/common:gki_aosp": ["//aosp:kernel_aarch64_sources"],
+        "//private/devices/google/common:gki_aosp_staging": ["//aosp-staging:kernel_aarch64_sources"],
     }),
     outs = [
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _TANGORPRO_DTBOS,
     base_kernel = select({
-        "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
-        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
+        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
+        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
     }),
     build_config = ":device_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
     kmi_symbol_list = select({
-        "//private/google-modules/soc/gs:gki_aosp": "//aosp:android/abi_gki_aarch64_pixel",
-        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:android/abi_gki_aarch64_pixel",
+        "//private/devices/google/common:gki_aosp": "//aosp:android/abi_gki_aarch64_pixel",
+        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:android/abi_gki_aarch64_pixel",
     }),
     module_outs = [
         # keep sorted
@@ -377,8 +378,8 @@ write_file(
 kernel_images(
     name = "gs201_tangorpro_images",
     base_kernel_images = select({
-        "//private/google-modules/soc/gs:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
-        "//private/google-modules/soc/gs:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
+        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
+        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
     }),
     boot_image_outs = ["dtb.img"],
     build_boot = False,
@@ -432,12 +433,12 @@ _gs201_tangorpro_dist_targets = [
     "//private/devices/google/pantah:gki_aarch64_boot",
     "//private/devices/google/pantah:gs201_pantah_extracted_system_dlkm",
 ] + select({
-    "//private/google-modules/soc/gs:gki_aosp": [
+    "//private/devices/google/common:gki_aosp": [
         "//aosp:android/abi_gki_aarch64_pixel",
         "//aosp:kernel_aarch64_download_or_build",
         "//aosp:kernel_aarch64_headers_download_or_build",
     ],
-    "//private/google-modules/soc/gs:gki_aosp_staging": [
+    "//private/devices/google/common:gki_aosp_staging": [
         "//aosp-staging:android/abi_gki_aarch64_pixel",
         "//aosp-staging:kernel_aarch64_download_or_build",
         "//aosp-staging:kernel_aarch64_headers_download_or_build",
