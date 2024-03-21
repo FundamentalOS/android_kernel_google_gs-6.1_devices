@@ -11,15 +11,9 @@
 	/* GXP */
 	gxp: gxp@25C00000 {
 		compatible = "google,gxp";
-		/*
-		 * DMA buffers are expected in the last 512 MiB of 32-bit space,
-		 * Addresses > 0xF1C00000 are for debug dumpbuffer/firmware
-		 */
 		#dma-address-cells = <1>;
 		#dma-size-cells = <1>;
-		dma-window = <0x30000000 0xC0000000>;
-		/* Prevent crossing DMA boundary. */
-		samsung,iommu-reserved-map = <0x0 0x80000000 0x1000>;
+		dma-window = <0x00001000 0xFFFFF000>;
 		gcip-dma-window = <0x30000000 0xC0000000>; /* GCIP IOMMU attribute. */
 		gcip-reserved-map = <0x80000000 0x1000>;
 		pasid-num-bits = <3>;
