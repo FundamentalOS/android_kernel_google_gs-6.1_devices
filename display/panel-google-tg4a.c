@@ -150,7 +150,13 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 	/* PASET: 2424 */
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_PAGE_ADDRESS, 0x00, 0x00, 0x09, 0x77),
 
-	/* TODO: b/315722627: update FFC Setting based on next revision of op manual */
+	/* FFC On Set */
+	EXYNOS_DSI_CMD_SEQ(0xFC, 0x5A, 0x5A),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x3C, 0xC5),
+	EXYNOS_DSI_CMD_SEQ(0xC5, 0x45, 0xDE),
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x00, 0x36, 0xC5),
+	EXYNOS_DSI_CMD_SEQ(0xC5, 0x11, 0x10, 0x50, 0x05),
+	EXYNOS_DSI_CMD_SEQ(0xFC, 0xA5, 0xA5),
 
 	/* VDDD LDO Setting, only for Proto 1.1 and EVT 1.0*/
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x58, 0xD7),
@@ -177,14 +183,40 @@ static const struct exynos_dsi_cmd tg4a_init_cmds[] = {
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB5, 0xC0, 0x00, 0x60, 0x00, 0x00),
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
 
+	/* AVC Class AB setting Code */
+	EXYNOS_DSI_CMD_SEQ(0xB0, 0x02, 0x94, 0xF4),
+	EXYNOS_DSI_CMD_SEQ(0xF4, 0x47),
+	EXYNOS_DSI_CMD_SEQ(0xF7, 0x2F),
 	EXYNOS_DSI_CMD0(test_key_disable),
-
-	/* TODO: b/315722627: Local HBM Gamma Writing */
 };
 static DEFINE_EXYNOS_CMD_SET(tg4a_init);
 
+static const struct exynos_dsi_cmd tg4a_lhbm_on_cmds[] = {
+	/* Local HBM Mode AID Setting, only for Proto 1.1 */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x01, 0xF2, 0x69),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x69, 0x10),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x01, 0xFF, 0x69),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x69, 0x00, 0x4B, 0x00, 0x4B),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x02, 0x09, 0x69),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x69, 0x01, 0x01),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x02, 0x0E, 0x69),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x69, 0x00, 0x40, 0x00, 0x40),
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
+
+	/* global para */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x01, 0xBD),
+	/* EM CYC Setting */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xBD, 0x81),
+	/* global para */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x2E, 0xBD),
+	/* EM CYC Setting */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xBD, 0x00, 0x02),
+	/* update key */
+	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
+};
+static DEFINE_EXYNOS_CMD_SET(tg4a_lhbm_on);
+
 static const struct exynos_dsi_cmd tg4a_lhbm_location_cmds[] = {
-	EXYNOS_DSI_CMD0(test_key_enable),
 	/* global para */
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0xBC, 0x65),
 	/* box location */
@@ -194,7 +226,6 @@ static const struct exynos_dsi_cmd tg4a_lhbm_location_cmds[] = {
 	/* center position set, x: 0x21C, y: 0x6DD, size: 0x64 */
 	EXYNOS_DSI_CMD_SEQ_REV(PANEL_REV_PROTO1_1, 0x65, 0x21, 0xC6, 0xDD,
 					0x64, 0x00, 0x00, 0x00, 0x00),
-	EXYNOS_DSI_CMD0(test_key_disable),
 };
 static DEFINE_EXYNOS_CMD_SET(tg4a_lhbm_location);
 
@@ -429,12 +460,23 @@ static void tg4a_set_local_hbm_mode(struct exynos_panel *ctx, bool local_hbm_en)
 {
 	tg4a_update_wrctrld(ctx);
 
+	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_enable);
 	if (local_hbm_en) {
 		EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x30);
 		exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_location_cmd_set);
+		exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_on_cmd_set);
 	} else {
 		EXYNOS_DCS_BUF_ADD(ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x20);
+		if (ctx->panel_rev == PANEL_REV_PROTO1_1) {
+			EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x01, 0xBD);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xBD, (IS_HBM_ON(ctx->hbm_mode)) ? 0x80 : 0x81);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xB0, 0x00, 0x2E, 0xBD);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xBD, 0x00,
+						(IS_HBM_ON(ctx->hbm_mode)) ? 0x01 : 0x02);
+			EXYNOS_DCS_BUF_ADD(ctx, 0xF7, 0x2F);
+		}
 	}
+	EXYNOS_DCS_BUF_ADD_SET_AND_FLUSH(ctx, test_key_disable);
 }
 
 static void tg4a_mode_set(struct exynos_panel *ctx,
@@ -480,7 +522,6 @@ static void tg4a_panel_init(struct exynos_panel *ctx)
 {
 	tg4a_lhbm_gamma_read(ctx);
 	tg4a_lhbm_gamma_write(ctx);
-	exynos_panel_send_cmd_set(ctx, &tg4a_lhbm_location_cmd_set);
 }
 
 static void tg4a_get_panel_rev(struct exynos_panel *ctx, u32 id)

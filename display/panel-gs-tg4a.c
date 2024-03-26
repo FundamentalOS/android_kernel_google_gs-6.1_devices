@@ -136,7 +136,13 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 	/* PASET: 2424 */
 	GS_DSI_CMD(MIPI_DCS_SET_PAGE_ADDRESS, 0x00, 0x00, 0x09, 0x77),
 
-	/* TODO: b/315722627: update FFC Setting based on next revision of op manual */
+	/* FFC On Set */
+	GS_DSI_CMD(0xFC, 0x5A, 0x5A),
+	GS_DSI_CMD(0xB0, 0x00, 0x3C, 0xC5),
+	GS_DSI_CMD(0xC5, 0x45, 0xDE),
+	GS_DSI_CMD(0xB0, 0x00, 0x36, 0xC5),
+	GS_DSI_CMD(0xC5, 0x11, 0x10, 0x50, 0x05),
+	GS_DSI_CMD(0xFC, 0xA5, 0xA5),
 
 	/* VDDD LDO Setting, only for Proto 1.1 and EVT 1.0*/
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x58, 0xD7),
@@ -158,6 +164,11 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 	GS_DSI_CMD(0xB0, 0x00, 0x1C, 0x62),
 	GS_DSI_CMD(0x62, 0x1D, 0x5F),
 
+	/* AVC Class AB setting Code */
+	GS_DSI_CMD(0xB0, 0x02, 0x94, 0xF4),
+	GS_DSI_CMD(0xF4, 0x47),
+	GS_DSI_CMD(0xF7, 0x2F),
+
 	/* Set back correct OSC setting, only for Proto 1.1 */
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x0C, 0xB5),
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB5, 0xC0, 0x00, 0x60, 0x00, 0x00),
@@ -166,8 +177,32 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 };
 static DEFINE_GS_CMDSET(tg4a_init);
 
+static const struct gs_dsi_cmd tg4a_lhbm_on_cmds[] = {
+	/* Local HBM Mode AID Setting, only for Proto 1.1 */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x01, 0xF2, 0x69),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x69, 0x10),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x01, 0xFF, 0x69),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x69, 0x00, 0x4B, 0x00, 0x4B),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x02, 0x09, 0x69),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x69, 0x01, 0x01),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x02, 0x0E, 0x69),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x69, 0x00, 0x40, 0x00, 0x40),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
+
+	/* global para */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x01, 0xBD),
+	/* EM CYC Setting */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xBD, 0x81),
+	/* global para */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x2E, 0xBD),
+	/* EM CYC Setting */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xBD, 0x00, 0x02),
+	/* update key */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
+};
+static DEFINE_GS_CMDSET(tg4a_lhbm_on);
+
 static const struct gs_dsi_cmd tg4a_lhbm_location_cmds[] = {
-	GS_DSI_CMDLIST(test_key_enable),
 	/* global para */
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0xBC, 0x65),
 	/* box location */
@@ -177,7 +212,6 @@ static const struct gs_dsi_cmd tg4a_lhbm_location_cmds[] = {
 	/* center position set, x: 0x21C, y: 0x6DD, size: 0x64 */
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x65, 0x21, 0xC6, 0xDD,
 					0x64, 0x00, 0x00, 0x00, 0x00),
-	GS_DSI_CMDLIST(test_key_disable),
 };
 static DEFINE_GS_CMDSET(tg4a_lhbm_location);
 
@@ -410,12 +444,23 @@ static void tg4a_set_local_hbm_mode(struct gs_panel *ctx, bool local_hbm_en)
 
 	tg4a_update_wrctrld(ctx);
 
+	GS_DCS_BUF_ADD_CMDLIST(dev, test_key_enable);
 	if (local_hbm_en) {
 		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x30);
 		gs_panel_send_cmdset(ctx, &tg4a_lhbm_location_cmdset);
+		gs_panel_send_cmdset(ctx, &tg4a_lhbm_on_cmdset);
 	} else {
 		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x20);
+		if (ctx->panel_rev == PANEL_REV_PROTO1_1) {
+			GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x01, 0xBD);
+			GS_DCS_BUF_ADD_CMD(dev, 0xBD, (GS_IS_HBM_ON(ctx->hbm_mode)) ? 0x80 : 0x81);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x2E, 0xBD);
+			GS_DCS_BUF_ADD_CMD(dev, 0xBD, 0x00,
+						(GS_IS_HBM_ON(ctx->hbm_mode)) ? 0x01 : 0x02);
+			GS_DCS_BUF_ADD_CMD(dev, 0xF7, 0x2F);
+		}
 	}
+	GS_DCS_BUF_ADD_CMDLIST_AND_FLUSH(dev, test_key_disable);
 }
 
 static void tg4a_mode_set(struct gs_panel *ctx,
@@ -461,7 +506,6 @@ static void tg4a_panel_init(struct gs_panel *ctx)
 {
 	tg4a_lhbm_gamma_read(ctx);
 	tg4a_lhbm_gamma_write(ctx);
-	gs_panel_send_cmdset(ctx, &tg4a_lhbm_location_cmdset);
 }
 
 static void tg4a_get_panel_rev(struct gs_panel *ctx, u32 id)
@@ -728,6 +772,8 @@ const struct gs_panel_reg_ctrl_desc tg4a_reg_ctrl_desc = {
 	},
 };
 
+static struct gs_panel_lhbm_desc tg4a_lhbm_desc = {};
+
 const struct gs_panel_desc google_tg4a = {
 	.data_lane_cnt = 4,
 	/* supported HDR format bitmask : 1(DOLBY_VISION), 2(HDR10), 3(HLG) */
@@ -739,6 +785,7 @@ const struct gs_panel_desc google_tg4a = {
 	.lp_cmdset = &tg4a_lp_cmdset,
 	.binned_lp = tg4a_binned_lp,
 	.num_binned_lp = ARRAY_SIZE(tg4a_binned_lp),
+	.lhbm_desc = &tg4a_lhbm_desc,
 	.reg_ctrl_desc = &tg4a_reg_ctrl_desc,
 	.panel_func = &tg4a_drm_funcs,
 	.gs_panel_func = &tg4a_gs_funcs,
