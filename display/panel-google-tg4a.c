@@ -118,6 +118,10 @@ static const struct exynos_dsi_cmd tg4a_lp_cmds[] = {
 };
 static DEFINE_EXYNOS_CMD_SET(tg4a_lp);
 
+static const struct exynos_dsi_cmd tg4a_lp_night_cmd[] = {
+	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x00, 0xB8),
+};
+
 static const struct exynos_dsi_cmd tg4a_lp_low_cmds[] = {
 	EXYNOS_DSI_CMD_SEQ(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x01, 0x7E),
 };
@@ -127,6 +131,9 @@ static const struct exynos_dsi_cmd tg4a_lp_high_cmds[] = {
 };
 
 static const struct exynos_binned_lp tg4a_binned_lp[] = {
+	/* night threshold 4 nits */
+	BINNED_LP_MODE_TIMING("night", 252, tg4a_lp_night_cmd,
+				12, 12 + 50),
 	/* low threshold 40 nits */
 	BINNED_LP_MODE_TIMING("low", 717, tg4a_lp_low_cmds,
 				12, 12 + 50),
