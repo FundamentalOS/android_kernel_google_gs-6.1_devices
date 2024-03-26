@@ -72,5 +72,7 @@
 	idt,gpio_slct_value = <1>;
 	google,q_value = <59>;
 	google,rf_value = <87>;
+	fod = [A5 23 83 2E A1 04 9B 0E 9A 10 A1 00 14 00 00 28];
+	fod_epp = [98 31 7E 42 99 F9 92 0F 99 E0 9F C9 14 00 00 28];
 
 };
