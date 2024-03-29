@@ -100,6 +100,13 @@ static const struct gs_dsi_cmd tg4a_off_cmds[] = {
 static DEFINE_GS_CMDSET(tg4a_off);
 
 static const struct gs_dsi_cmd tg4a_lp_cmds[] = {
+	/* AOD Power Setting */
+	GS_DSI_CMDLIST(test_key_enable),
+	GS_DSI_CMD(0xB0, 0x00, 0x04, 0xF6),
+	GS_DSI_CMD(0xF6, 0x25), /* Default */
+	GS_DSI_CMDLIST(test_key_disable),
+
+	/* AOD Mode On Setting */
 	GS_DSI_CMD(MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x24),
 };
 static DEFINE_GS_CMDSET(tg4a_lp);
@@ -131,10 +138,10 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 	/* TE on */
 	GS_DSI_CMD(MIPI_DCS_SET_TEAR_ON),
 
-	/* TE2 setting */
+	/* TE2 setting, only for Proto 1.1 */
 	GS_DSI_CMDLIST(test_key_enable),
-	GS_DSI_CMD(0xB0, 0x00, 0x26, 0xB9),
-	GS_DSI_CMD(0xB9, 0x00, 0x00, 0x10, 0x00, 0x00,
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x26, 0xB9),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB9, 0x00, 0x00, 0x10, 0x00, 0x00,
 				0x3D, 0x00, 0x09, 0x90, 0x00, 0x09, 0x90),
 
 	/* CASET: 1080 */
@@ -143,33 +150,39 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 	/* PASET: 2424 */
 	GS_DSI_CMD(MIPI_DCS_SET_PAGE_ADDRESS, 0x00, 0x00, 0x09, 0x77),
 
-	/* FFC On Set */
+	/* FFC On Set @ 1102Mbps */
 	GS_DSI_CMD(0xFC, 0x5A, 0x5A),
 	GS_DSI_CMD(0xB0, 0x00, 0x3C, 0xC5),
 	GS_DSI_CMD(0xC5, 0x45, 0xDE),
 	GS_DSI_CMD(0xB0, 0x00, 0x36, 0xC5),
 	GS_DSI_CMD(0xC5, 0x11, 0x10, 0x50, 0x05),
+
+	/* VDDD LDO Setting, only for Proto 1.1 */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x58, 0xD7),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xD7, 0x0A),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x5B, 0xD7),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xD7, 0x0A),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xFE, 0x80),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xFE, 0x00),
 	GS_DSI_CMD(0xFC, 0xA5, 0xA5),
 
-	/* VDDD LDO Setting, only for Proto 1.1 and EVT 1.0*/
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x58, 0xD7),
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xD7, 0x0A),
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xB0, 0x00, 0x5B, 0xD7),
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xD7, 0x0A),
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xFE, 0x80),
-	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1 | PANEL_REV_EVT1, 0xFE, 0x00),
+	/* TSP HSYNC setting, only for Proto 1.1 */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x42, 0xB9),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB9, 0x19),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x46, 0xB9),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB9, 0xB0),
 
-	/* TSP HSYNC setting */
-	GS_DSI_CMD(0xB0, 0x00, 0x42, 0xB9),
-	GS_DSI_CMD(0xB9, 0x19),
-	GS_DSI_CMD(0xB0, 0x00, 0x46, 0xB9),
-	GS_DSI_CMD(0xB9, 0xB0),
+	/* FGZ common setting, only for Proto 1.1 */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x30, 0x68),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x68, 0x32, 0xFF, 0x04, 0x08, 0x10,
+				0x15, 0x29, 0x67, 0xA5),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x1C, 0x62),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0x62, 0x1D, 0x5F),
 
-	/* FGZ common setting */
-	GS_DSI_CMD(0xB0, 0x00, 0x30, 0x68),
-	GS_DSI_CMD(0x68, 0x32, 0xFF, 0x04, 0x08, 0x10, 0x15, 0x29, 0x67, 0xA5),
-	GS_DSI_CMD(0xB0, 0x00, 0x1C, 0x62),
-	GS_DSI_CMD(0x62, 0x1D, 0x5F),
+	/* AVC Class AB setting Code, only for Proto 1.1 */
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x02, 0x94, 0xF4),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF4, 0x47),
+	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
 
 	/* AVC Class AB setting Code */
 	GS_DSI_CMD(0xB0, 0x02, 0x94, 0xF4),
@@ -405,8 +418,12 @@ static void tg4a_set_hbm_mode(struct gs_panel *ctx,
 
 		if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode)) {
 			/* FGZ Mode ON */
-			GS_DCS_BUF_ADD_CMD(dev, 0x68, 0xB0, 0x2C, 0x6A,
-						0x80, 0x00, 0x00, 0xF5, 0xC4);
+			if (ctx->panel_rev == PANEL_REV_PROTO1_1)
+				GS_DCS_BUF_ADD_CMD(dev, 0x68, 0xB0, 0x2C, 0x6A,
+							0x80, 0x00, 0x00, 0xF5, 0xC4);
+			else
+				GS_DCS_BUF_ADD_CMD(dev, 0x68, 0xB0, 0x2C, 0x6A,
+							0x80, 0x00, 0x00, 0xE4, 0xB6);
 		} else {
 			/* FGZ Mode OFF */
 			GS_DCS_BUF_ADD_CMD(dev, 0x68, 0xB0, 0x2C, 0x6A,
@@ -418,11 +435,13 @@ static void tg4a_set_hbm_mode(struct gs_panel *ctx,
 						0x00, 0x00, 0x00, 0x00);
 	}
 
-	GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x01, 0xBD);
-	GS_DCS_BUF_ADD_CMD(dev, 0xBD, ctx->hbm_mode ? 0x80 : 0x81);
-	GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x2E, 0xBD);
-	GS_DCS_BUF_ADD_CMD(dev, 0xBD, 0x00, ctx->hbm_mode ? 0x01 : 0x02);
-	GS_DCS_BUF_ADD_CMD(dev, 0xF7, 0x2F);
+	if (ctx->panel_rev == PANEL_REV_PROTO1_1) {
+		GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x01, 0xBD);
+		GS_DCS_BUF_ADD_CMD(dev, 0xBD, ctx->hbm_mode ? 0x80 : 0x81);
+		GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x2E, 0xBD);
+		GS_DCS_BUF_ADD_CMD(dev, 0xBD, 0x00, ctx->hbm_mode ? 0x01 : 0x02);
+		GS_DCS_BUF_ADD_CMD(dev, 0xF7, 0x2F);
+	}
 
 	GS_DCS_BUF_ADD_CMDLIST_AND_FLUSH(dev, test_key_disable);
 
@@ -559,7 +578,9 @@ static int tg4a_enable(struct drm_panel *panel)
 {
 	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
 	struct device *dev = ctx->dev;
+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 	const struct gs_panel_mode *pmode = ctx->current_mode;
+	u8 ic_trim_pre_check[2];
 
 	if (!pmode) {
 		dev_err(ctx->dev, "no current mode set\n");
@@ -575,6 +596,27 @@ static int tg4a_enable(struct drm_panel *panel)
 
 	/* initial command */
 	gs_panel_send_cmdset(ctx, &tg4a_init_cmdset);
+
+	/* IC Trim Pre Check, only for EVT1.0 */
+	if (ctx->panel_rev == PANEL_REV_EVT1) {
+		GS_DCS_BUF_ADD_CMDLIST_AND_FLUSH(dev, test_key_enable);
+		if (mipi_dsi_dcs_read(dsi, 0xFA, ic_trim_pre_check, 2) == 2) {
+			if (ic_trim_pre_check[0] == 0x31 && ic_trim_pre_check[1] == 0x00) {
+				/* VDDD LDO Setting */
+				GS_DCS_BUF_ADD_CMD(dev, 0xFC, 0x5A, 0x5A);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x58, 0xD7);
+				GS_DCS_BUF_ADD_CMD(dev, 0xD7, 0x0A);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x00, 0x5B, 0xD7);
+				GS_DCS_BUF_ADD_CMD(dev, 0xD7, 0x0A);
+				GS_DCS_BUF_ADD_CMD(dev, 0xFE, 0x80);
+				GS_DCS_BUF_ADD_CMD(dev, 0xFE, 0x00);
+				GS_DCS_BUF_ADD_CMD(dev, 0xFC, 0xA5, 0xA5);
+			}
+		} else {
+			dev_err(dev, "fail to read IC Trim Pre Check parameters\n");
+		}
+		GS_DCS_BUF_ADD_CMDLIST_AND_FLUSH(dev, test_key_disable);
+	}
 
 	/* frequency */
 	tg4a_change_frequency(ctx, pmode);
