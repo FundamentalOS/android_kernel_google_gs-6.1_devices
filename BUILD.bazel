@@ -69,6 +69,11 @@ _ZUMAPRO_TEGU_DTBOS = [
     "google/zumapro-tegu-proto1_0-wingboard.dtbo",
     "google/zumapro-tegu-proto1_1.dtbo",
     "google/zumapro-tegu-proto1_1-wingboard.dtbo",
+    "google/zumapro-tegu-evt1.dtbo",
+    "google/zumapro-tegu-evt1_1.dtbo",
+    "google/zumapro-tegu-dvt1.dtbo",
+    "google/zumapro-tegu-pvt1.dtbo",
+    "google/zumapro-tegu-mp.dtbo",
 ]
 
 _ZUMAPRO_TEGU_DPM_DTBOS = [
