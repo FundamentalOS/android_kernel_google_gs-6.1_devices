@@ -173,6 +173,8 @@ softdog.ko
 spi-s3c64xx.ko
 spidev.ko
 sscoredump.ko
+st33spi.ko
+st54spi.ko
 sysrq-hook.ko
 systrace.ko
 tcpci_fusb307.ko
