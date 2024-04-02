@@ -22,7 +22,7 @@
 				/* S2MPG12X01 -> GPIO_1 -> CHARGE_PUMP_EN */
 				google,dc-en = <&s2mpg12_gpio 1 0>;
 				/* DC enabled by default */
-				google,dc-en-value = <1>;
+				google,google,dc-en-value;
 				google,dc_limit-demand = <560000>;
 				google,dc_limit-vbatt = <4350000>;
 				google,dc_limit-vbatt_min = <3400000>;
