@@ -18,6 +18,8 @@
 	goog,offload-caps-coord-filter;
 	goog,default-grip-disabled;
 	goog,default-palm-disabled;
+	goog,lptw-suppress-coords-enabled;
+	goog,lptw-tracking-area = <440 640 1655 1855>;
 
 	synaptics,pixels-per-mm = <17>;
 	goog,panel_map = <&google_tg4a 0>, <&google_tg4b 1>;
