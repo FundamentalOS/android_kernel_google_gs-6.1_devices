@@ -67,6 +67,9 @@
 		bl-name = "lcd-bl";
 		enable-supply = <&m_ldo25_reg>;
 
+		/* LED driver headroom 400mV  */
+		led-headroom = /bits/ 8 <0x00>;
+
 		bit-selection = /bits/ 8 <12>;
 
 		/* 28% (140 nits) initial brightness */
