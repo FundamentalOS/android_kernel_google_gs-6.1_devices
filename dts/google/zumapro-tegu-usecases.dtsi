@@ -9,9 +9,7 @@
 /* system use cases */
 &max77779_chg {
 	/* external boost */
-	max77779,bst-on = <&s2mpg15_gpio 4 GPIO_ACTIVE_HIGH>;  /* EXT_BST_EN */
-	max77779,extbst-ctl = <&max77759_tcpc_gpio 0 GPIO_ACTIVE_HIGH>; /* OTG_PWR_EN */
-	max77779,extbst-mode = <&s2mpg15_gpio 9 GPIO_ACTIVE_HIGH>; /* EXT_BST_MODE */
+	max77779,extbst-ctl = <&rt9471_gpio 0 GPIO_ACTIVE_HIGH>; /* RT9470 USB_OTG */
 
 	/* for OTG related usecase*/
 	max77779,rx-to-rx-otg-en; /* support RX -> RX+OTG */
