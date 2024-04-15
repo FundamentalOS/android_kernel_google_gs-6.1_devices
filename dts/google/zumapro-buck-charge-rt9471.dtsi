@@ -41,7 +41,6 @@ rt_swchg: rt-swchg@5b {
 		en-safe-tmr;
 		/* en-te; */
 		/* en-jeita; */
-		/* ceb-invert; */
 		/* dis-i2c-tout; */
 		en-qon-rst;
 		/* auto-aicr; */
