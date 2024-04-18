@@ -10,11 +10,6 @@
 	google,max77759-thm2-monitor;
 };
 
-&pca9468_dc {
-	/* irdrop */
-	google,irdrop-limits = <50000 10000 0>;
-};
-
 &google_charger {
 	google,fv-max-uv = <4480000>;
 	google,thermal-stats-lvl-map = <0 3 5 8>;
