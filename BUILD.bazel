@@ -428,6 +428,9 @@ raviole_dist_targets = [
         "//aosp-staging:kernel_aarch64_download_or_build",
         "//aosp-staging:kernel_aarch64_headers_download_or_build",
     ] + ["//aosp-staging:kernel_aarch64/{}".format(m) for m in _GKI_MODULES],
+}) + select({
+    "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
+    "//private/devices/google/common:disable_download_fips140": [],
 })
 
 copy_to_dist_dir(
