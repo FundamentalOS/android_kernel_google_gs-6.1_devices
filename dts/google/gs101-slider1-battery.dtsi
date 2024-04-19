@@ -21,7 +21,7 @@
 				pinctrl-0 = <&charge_pump_en>;
 
 				google,dc-en = <&gpp23 7 0>;
-				google,dc-en-value = <1>;
+				google,google,dc-en-value;
 
 				google,tcpm-power-supply = <&max77759tcpc>;
 				google,pps-awake;
