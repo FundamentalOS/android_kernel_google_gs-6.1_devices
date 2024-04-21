@@ -339,6 +339,46 @@ static void tg4a_change_frequency(struct gs_panel *ctx,
 	return;
 }
 
+static int tg4a_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *state)
+{
+	struct drm_connector *conn = &ctx->gs_connector->base;
+	struct drm_connector_state *new_conn_state =
+		drm_atomic_get_new_connector_state(state, conn);
+	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
+
+	if (!ctx->current_mode || drm_mode_vrefresh(&ctx->current_mode->mode) == 120 ||
+	    !new_conn_state || !new_conn_state->crtc)
+		return 0;
+
+	new_crtc_state = drm_atomic_get_new_crtc_state(state, new_conn_state->crtc);
+	old_crtc_state = drm_atomic_get_old_crtc_state(state, new_conn_state->crtc);
+	if (!old_crtc_state || !new_crtc_state || !new_crtc_state->active)
+		return 0;
+
+	if (!drm_atomic_crtc_effectively_active(old_crtc_state) ||
+		(ctx->current_mode->gs_mode.is_lp_mode &&
+		drm_mode_vrefresh(&new_crtc_state->mode) == 60)) {
+		struct drm_display_mode *mode = &new_crtc_state->adjusted_mode;
+		mode->clock = mode->htotal * mode->vtotal * 120 / 1000;
+
+		if (mode->clock != new_crtc_state->mode.clock) {
+			new_crtc_state->mode_changed = true;
+			ctx->gs_connector->needs_commit = true;
+			dev_dbg(ctx->dev, "raise mode (%s) clock to 120hz on %s\n", mode->name,
+				!drm_atomic_crtc_effectively_active(old_crtc_state) ?
+				"resume" : "lp exit");
+		}
+	} else if (old_crtc_state->adjusted_mode.clock != old_crtc_state->mode.clock) {
+		new_crtc_state->mode_changed = true;
+		new_crtc_state->adjusted_mode.clock = new_crtc_state->mode.clock;
+		ctx->gs_connector->needs_commit = false;
+		dev_dbg(ctx->dev, "restore mode (%s) clock after resume or lp exit\n",
+			new_crtc_state->mode.name);
+	}
+
+	return 0;
+}
+
 static void tg4a_update_wrctrld(struct gs_panel *ctx)
 {
 	struct device *dev = ctx->dev;
@@ -792,6 +832,7 @@ static const struct gs_panel_funcs tg4a_gs_funcs = {
 	.panel_init = tg4a_panel_init,
 	.get_panel_rev = tg4a_get_panel_rev,
 	.read_id = gs_panel_read_slsi_ddic_id,
+	.atomic_check = tg4a_atomic_check,
 };
 
 const struct gs_panel_brightness_desc tg4a_brightness_desc = {
