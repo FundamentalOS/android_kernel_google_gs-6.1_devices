@@ -7,9 +7,9 @@
  */
 
 &spitouch {
-	// goog,offload-enabled;
+	goog,offload-enabled;
 	// goog,v4l2-enabled;
-	goog,touch_offload_ids = /bits/ 8 <'t' 'g' '4' '0'>;
+	goog,touch_offload_id = /bits/ 8 <'t' 'g' '4' '0'>;
 	goog,display-resolution = /bits/ 16 <1080 2424>;
 	goog,channel-num = /bits/ 16 <16 36>;
 	goog,offload-caps-data-types = /bits/ 16 <0x1F>;
