@@ -20,12 +20,9 @@
 	goog,default-palm-disabled;
 
 	synaptics,pixels-per-mm = <17>;
-	goog,panel_map = <&google_tg4a 0>, <&google_tg4b 1>;
+	goog,panel_map = <&google_gs_tg4a 0>, <&google_gs_tg4b 1>, <&google_gs_tg4c 1>;
 
-	synaptics,panel_map = <&google_tg4a 0>, <&google_tg4b 1>;
-	goog,panel_map = <&google_gs_tg4a 0>, <&google_gs_tg4b 1>;
-
-	synaptics,panel_map = <&google_gs_tg4a 0>, <&google_gs_tg4b 1>;
+	synaptics,panel_map = <&google_gs_tg4a 0>, <&google_gs_tg4b 1>, <&google_gs_tg4c 1>;
 	synaptics,firmware_names = "synaptics.img", "synaptics_b.img";
 	synaptics,test_algo = <0 1>;
 
