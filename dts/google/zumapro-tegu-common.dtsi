@@ -10,7 +10,6 @@
 #include "zuma-tegu-battery-common.dtsi"
 #include "zuma-tegu-camera-pmic.dtsi"
 #include "zuma-tegu-charging-common.dtsi"
-#include "zuma-tegu-display-common.dtsi"
 #include "google-dts-base/devices/ripcurrent/zuma-ripcurrent-gsa-gsc.dtsi"
 #include "zuma-tegu-wlan.dtsi"
 #include "google-dts-base/zumapro-board-cp-s5300-sit.dtsi"
