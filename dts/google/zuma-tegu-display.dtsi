@@ -26,15 +26,6 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	panel@0 {
-		compatible = "samsung,emul";
-		label = "samsung-emul";
-		channel = <0>;
-
-		/* reset, power */
-		reset-gpios = <&gpp0 0 GPIO_ACTIVE_HIGH>;
-	};
-
 	ports {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -56,4 +47,26 @@
 &m_ldo14_reg {
 	regulator-min-microvolt = <3100000>;
 	regulator-max-microvolt = <3100000>;
+};
+
+&drmdsim1 {
+	status = "disabled";
+};
+
+&drmdp {
+	status = "okay";
+	aux-orientation = "auto";
+};
+
+&drmdecon0 {
+	status = "okay";
+};
+
+&drmdecon1 {
+	status = "okay";
+	connector = <0x10>;
+};
+
+&drmdecon2 {
+	status = "disabled";
 };
