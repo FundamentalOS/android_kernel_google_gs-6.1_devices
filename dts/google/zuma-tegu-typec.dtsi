@@ -20,6 +20,7 @@
 	chg-psy-name = "gccd";
 	pinctrl-0 = <&usb_pd_irq>;
 	pullup-supply = <&m_ldo19_reg>;
+	manual-disable-vbus;
 	connector {
 		sink-pdos = <PDO_FIXED(5000, 3000,
 				       PDO_FIXED_DATA_SWAP |
