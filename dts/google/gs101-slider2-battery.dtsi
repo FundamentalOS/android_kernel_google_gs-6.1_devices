@@ -17,7 +17,7 @@
 				/* S2MPG11X01 -> GPIO_6 -> CHARGE_PUMP_EN */
 				google,dc-en = <&s2mpg11_gpio 0 0>;
 				/* DC enabled by default */
-				google,google,dc-en-value;
+				google,dc-en-value;
 
 				google,tcpm-power-supply = <&max77759tcpc>;
 				google,pps-awake;
