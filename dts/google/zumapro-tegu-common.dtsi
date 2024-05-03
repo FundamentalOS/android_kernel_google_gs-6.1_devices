@@ -11,7 +11,6 @@
 #include "zuma-tegu-camera-pmic.dtsi"
 #include "zuma-tegu-charging-common.dtsi"
 #include "google-dts-base/devices/ripcurrent/zuma-ripcurrent-gsa-gsc.dtsi"
-#include "zuma-tegu-wlan.dtsi"
 #include "google-dts-base/zumapro-board-cp-s5300-sit.dtsi"
 #include "google-dts-base/zumapro-board-bluetooth.dtsi"
 #include "zuma-tegu-ese.dtsi"
@@ -37,3 +36,4 @@
 #include "zuma-tegu-ldaf.dtsi"
 #include "zuma-tegu-touch.dtsi"
 #include "zumapro-tegu-udfps.dtsi"
+#include "zuma-tegu-wlan.dtsi"
