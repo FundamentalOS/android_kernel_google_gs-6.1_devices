@@ -184,11 +184,6 @@ static const struct gs_dsi_cmd tg4a_init_cmds[] = {
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF4, 0x47),
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xF7, 0x2F),
 
-	/* AVC Class AB setting Code */
-	GS_DSI_CMD(0xB0, 0x02, 0x94, 0xF4),
-	GS_DSI_CMD(0xF4, 0x47),
-	GS_DSI_CMD(0xF7, 0x2F),
-
 	/* Set back correct OSC setting, only for Proto 1.1 */
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB0, 0x00, 0x0C, 0xB5),
 	GS_DSI_REV_CMD(PANEL_REV_PROTO1_1, 0xB5, 0xC0, 0x00, 0x60, 0x00, 0x00),
