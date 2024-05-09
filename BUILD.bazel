@@ -71,6 +71,7 @@ kernel_module_group(
         "//private/google-modules/aoc/usb:aoc.usb",
         "//private/google-modules/nfc",
         "//private/google-modules/touch/common:touch.common",
+        "//private/google-modules/touch/common/usi:touch.common.usi",
         "//private/google-modules/touch/novatek/nt36xxx",
         "//private/google-modules/trusty",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
