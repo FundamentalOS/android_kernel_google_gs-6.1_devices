@@ -7,7 +7,7 @@ KERNEL_DIR=${GKI_KERNEL_DIR:-"aosp"}
 
 # These just need to be relative to the ROOT_DIR
 FRAGMENT_CONFIG=${DEVICE_DIR}/raviole_gki.fragment
-. ${ROOT_DIR}/${SOC_DIR}/build.config.gs101
+. ${ROOT_DIR}/private/devices/google/gs101/build.config.gs101
 
 MAKE_GOALS="$MAKE_GOALS
 modules
