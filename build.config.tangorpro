@@ -7,7 +7,7 @@ KERNEL_DIR=${GKI_KERNEL_DIR:-"aosp"}
 
 # These just need to be relative to the ROOT_DIR
 FRAGMENT_CONFIG="private/devices/google/pantah/pantah_gki.fragment ${DEVICE_DIR}/tangorpro_gki.fragment"
-. ${ROOT_DIR}/${SOC_DIR}/build.config.gs201
+. ${ROOT_DIR}/private/devices/google/gs201/build.config.gs201
 
 MAKE_GOALS="$MAKE_GOALS
 modules

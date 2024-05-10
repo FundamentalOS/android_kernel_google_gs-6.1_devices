@@ -95,6 +95,7 @@ kernel_build(
     ]) + [
         # keep sorted
         "//private/devices/google/common:debug_build_configs",
+        "//private/devices/google/gs201:build.config.gs201",
         "//private/devices/google/pantah:pantah_gki.fragment",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
@@ -104,7 +105,6 @@ kernel_build(
         "//private/google-modules/power/reset:reset.kconfig",
         "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
         "//private/google-modules/radio/samsung/s5400:cpif.kconfig",
-        "//private/google-modules/soc/gs:build.config.gs201",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
         "//private/google-modules/touch/common:touch.common.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
@@ -354,14 +354,14 @@ hermetic_genrule(
     name = "vendor_kernel_boot_modules.tangorpro-cat",
     srcs = [
         "vendor_kernel_boot_modules.tangorpro",
-        "//private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201",
+        "//private/devices/google/gs201:vendor_kernel_boot_modules.gs201",
     ],
     outs = [
         "vendor_kernel_boot_modules.concat",
     ],
     cmd = """
         cat $(location vendor_kernel_boot_modules.tangorpro) \\
-            $(location //private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201) \\
+            $(location //private/devices/google/gs201:vendor_kernel_boot_modules.gs201) \\
             > $@
     """,
 )
@@ -395,12 +395,12 @@ kernel_images(
     # Keep the following in sync with build.config.tangorpro:
     modules_list = ":vendor_kernel_boot_modules.tangorpro-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props.gs201",
+    system_dlkm_props = "//private/devices/google/gs201:system_dlkm.props.gs201",
     vendor_dlkm_etc_files = ["//private/devices/google/tangorpro:insmod_cfgs"],
-    vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.gs201",
+    vendor_dlkm_modules_blocklist = "//private/devices/google/gs201:vendor_dlkm.blocklist.gs201",
     # No MODULES_BLOCKLIST
-    vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.gs201",
-    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props.gs201",
+    vendor_dlkm_modules_list = "//private/devices/google/gs201:vendor_dlkm_modules.gs201",
+    vendor_dlkm_props = "//private/devices/google/gs201:vendor_dlkm.props.gs201",
     deps = [
         # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
