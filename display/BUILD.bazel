@@ -13,12 +13,6 @@ kernel_module(
         "//private/google-modules/display/common:headers",
         "//private/google-modules/soc/gs:gs_soc_headers",
     ],
-    outs = [
-        # keep sorted
-        "panel-gs-tg4a.ko",
-        "panel-gs-tg4b.ko",
-        "panel-gs-tg4c.ko",
-    ],
     kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
     visibility = [
         "//private/devices/google:__subpackages__",
