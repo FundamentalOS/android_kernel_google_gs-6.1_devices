@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//aosp:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
 load("//build/kernel/kleaf:hermetic_tools.bzl", "hermetic_genrule")
@@ -16,8 +15,9 @@ load(
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
+load("//common:modules.bzl", "get_gki_modules_list")
 load(
-    "//private/devices/google/common:device_build_configs.bzl",
+    "//private/devices/google/common/kleaf:device_build_configs.bzl",
     "device_build_configs",
 )
 
@@ -98,6 +98,7 @@ kernel_build(
         "felix*.fragment",
     ]) + [
         # keep sorted
+        "//common:kernel_aarch64_sources",
         "//private/devices/google/common:debug_build_configs",
         "//private/devices/google/felix/touch/fst2:fst2.kconfig",
         "//private/devices/google/felix/touch/ftm5:ftm5.kconfig",
@@ -116,26 +117,17 @@ kernel_build(
         "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
-    ] + select({
-        "//private/devices/google/common:gki_aosp": ["//aosp:kernel_aarch64_sources"],
-        "//private/devices/google/common:gki_aosp_staging": ["//aosp-staging:kernel_aarch64_sources"],
-    }),
+    ],
     outs = [
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _FELIX_DTBOS,
-    base_kernel = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
-    }),
+    base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":device_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/felix/dts:felix.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
-    kmi_symbol_list = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:android/abi_gki_aarch64_pixel",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:android/abi_gki_aarch64_pixel",
-    }),
+    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     module_outs = [
         # keep sorted
         "crypto/crct10dif_common.ko",
@@ -375,10 +367,7 @@ write_file(
 
 kernel_images(
     name = "gs201_felix_images",
-    base_kernel_images = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
-    }),
+    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
     boot_image_outs = ["dtb.img"],
     build_boot = False,
     build_dtbo = True,
@@ -421,26 +410,18 @@ _gs201_felix_dist_targets = [
     # UAPI headers of external modules, while build.sh-style mixed builds
     # always uses kernel-uapi-headers.tar.gz from GKI_DIST_DIR.
     # To use GKI's kernel-uapi-headers.tar.gz in DIST_DIR, use
-    #     //aosp:kernel_aarch64_uapi_headers
+    #     //common:kernel_aarch64_uapi_headers
     # instead.
     ":gs201_felix_merged_uapi_headers",
     ":gs201_felix_modules_install",
     ":gs201_felix_unstripped_modules_archive",
     #":insmod_cfgs",
+    "//common:android/abi_gki_aarch64_pixel",
+    "//common:kernel_aarch64_download_or_build",
+    "//common:kernel_aarch64_headers_download_or_build",
     "//private/devices/google/pantah:gki_aarch64_boot",
     "//private/devices/google/pantah:gs201_pantah_extracted_system_dlkm",
 ] + select({
-    "//private/devices/google/common:gki_aosp": [
-        "//aosp:android/abi_gki_aarch64_pixel",
-        "//aosp:kernel_aarch64_download_or_build",
-        "//aosp:kernel_aarch64_headers_download_or_build",
-    ],
-    "//private/devices/google/common:gki_aosp_staging": [
-        "//aosp-staging:android/abi_gki_aarch64_pixel",
-        "//aosp-staging:kernel_aarch64_download_or_build",
-        "//aosp-staging:kernel_aarch64_headers_download_or_build",
-    ],
-}) + select({
     "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
     "//private/devices/google/common:disable_download_fips140": [],
 })
