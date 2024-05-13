@@ -394,7 +394,7 @@ kernel_images(
     deps = [
         # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
-        "//prebuilts/boot-artifacts/selinux:file_contexts",
+        "//private/devices/google/common:sepolicy",
     ],
 )
 
@@ -416,7 +416,6 @@ raviole_dist_targets = [
     ":gs101_raviole_modules_install",
     ":gs101_raviole_unstripped_modules_archive",
     "vendor_dlkm.props.raviole",
-    "//prebuilts/boot-artifacts/selinux:file_contexts",
 ] + select({
     "//private/devices/google/common:gki_aosp": [
         "//aosp:android/abi_gki_aarch64_pixel",
