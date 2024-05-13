@@ -74,9 +74,9 @@ _ZUMAPRO_TEGU_DTBOS = [
 ]
 
 _ZUMAPRO_TEGU_DPM_DTBOS = [
-    "google/google-dts-base/zumapro-dpm-eng.dtbo",
-    "google/google-dts-base/zumapro-dpm-userdebug.dtbo",
-    "google/google-dts-base/zumapro-dpm-user.dtbo",
+    "google/google-dts-zumapro/zumapro-dpm-eng.dtbo",
+    "google/google-dts-zumapro/zumapro-dpm-userdebug.dtbo",
+    "google/google-dts-zumapro/zumapro-dpm-user.dtbo",
 ]
 
 kernel_module_group(
@@ -152,7 +152,7 @@ kernel_build(
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ],
-    outs = ["google/google-dts-base/zumapro-{}.dtb".format(soc_rev) for soc_rev in ZUMAPRO_SOC_REVS] +
+    outs = ["google/google-dts-zumapro/zumapro-{}.dtb".format(soc_rev) for soc_rev in ZUMAPRO_SOC_REVS] +
            _ZUMAPRO_TEGU_DTBOS + _ZUMAPRO_TEGU_DPM_DTBOS,
     # TODO(b/221278445): Use real GKI
     base_kernel = "//common:kernel_aarch64_download_or_build",
