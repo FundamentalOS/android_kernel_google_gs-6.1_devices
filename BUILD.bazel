@@ -416,6 +416,7 @@ raviole_dist_targets = [
     ":gs101_raviole_modules_install",
     ":gs101_raviole_unstripped_modules_archive",
     "vendor_dlkm.props.raviole",
+    "//private/devices/google/common:sepolicy/vendor_dlkm_file_contexts",
 ] + select({
     "//private/devices/google/common:gki_aosp": [
         "//aosp:android/abi_gki_aarch64_pixel",
