@@ -216,27 +216,6 @@ static void tg4c_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x00);
 }
 
-static void tg4c_set_local_hbm_background_brightness(struct gs_panel *ctx, u16 br)
-{
-	u16 level;
-	u8 val1, val2;
-	struct device *dev = ctx->dev;
-
-	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode) &&
-		br == ctx->desc->brightness_desc->brt_capability->hbm.level.max)
-		br = 0x0FFF;
-
-	level = br * 4;
-	val1 = level >> 8;
-	val2 = level & 0xff;
-
-	/* set LHBM background brightness */
-	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x4C);
-	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xDF, val1, val2, val1, val2, val1, val2);
-}
-
-
 #define LHBM_GAMMASET2 2774
 #define LHBM_GAMMASET3 2186
 
@@ -276,7 +255,6 @@ static void tg4c_set_local_hbm_mode(struct gs_panel *ctx, bool local_hbm_en)
 			dev_warn(dev, "enable LHBM at unexpected state (HBM: %d, vrefresh: %dhz)\n",
 					 ctx->hbm_mode, vrefresh);
 		}
-		tg4c_set_local_hbm_background_brightness(ctx, level);
 		tg4c_set_local_hbm_gamma(ctx, level);
 		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x87, 0x05);
 	} else {
@@ -459,9 +437,6 @@ static int tg4c_set_brightness(struct gs_panel *ctx, u16 br)
 		br = MAX_BR_HBM_IRC_OFF;
 		dev_dbg(dev, "apply max DBV when reach hbm max with irc off\n");
 	}
-
-	if (!gs_is_local_hbm_disabled(ctx))
-		tg4c_set_local_hbm_background_brightness(ctx, br);
 
 	if (ctx->timestamps.idle_exit_dimming_delay_ts &&
 		(ktime_sub(ctx->timestamps.idle_exit_dimming_delay_ts, ktime_get()) <= 0)) {
