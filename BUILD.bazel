@@ -128,6 +128,10 @@ kernel_build(
     dtstree = "//private/devices/google/felix/dts:felix.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    make_goals = [
+        "modules",
+        "dtbs",
+    ],
     module_outs = [
         # keep sorted
         "crypto/crct10dif_common.ko",
