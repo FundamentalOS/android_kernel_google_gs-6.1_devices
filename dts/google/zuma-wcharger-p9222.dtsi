@@ -21,8 +21,8 @@ p9222: p9222@61 {
 	google,epp_dcicl_default_ma = <750000>;
 	google,bpp_iop_vout_mv = <5500>;
 	google,bpp_ask_mod_fet = /bits/ 8 <0xC0>;
-	google,bpp_freq109_icl_ma = <500000>;
-	google,bpp_freq109_vout_mv = <5300>;
+	google,bpp_freq109_icl_ma = <400000>;
+	google,bpp_freq109_vout_mv = <5000>;
 
 
 	pinctrl-names = "default";
