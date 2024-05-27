@@ -9,12 +9,3 @@ FRAGMENT_CONFIG=${DEVICE_DIR}/raviole_gki.fragment
 
 DTC_INCLUDE=${ROOT_DIR}/${SOC_DIR}/include/dtc
 MKDTIMG_FLAGS="--page_size=4096 --id=/:board_id --rev=/:board_rev"
-
-VENDOR_RAMDISK_CMDS="modify_vendor_ramdisk"
-function modify_vendor_ramdisk() {
-  ln -f init.recovery.gs101.rc init.recovery.slider.rc
-  ln -f init.recovery.gs101.rc init.recovery.whitefin.rc
-  ln -f init.recovery.gs101.rc init.recovery.oriole.rc
-  ln -f init.recovery.gs101.rc init.recovery.raven.rc
-  ln -f init.recovery.gs101.rc init.recovery.bluejay.rc
-}
