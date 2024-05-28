@@ -6,6 +6,7 @@ load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
     "kernel_build",
+    "kernel_build_config",
     "kernel_images",
     "kernel_module_group",
     "kernel_modules_install",
@@ -15,7 +16,6 @@ load(
 load("//common:modules.bzl", "get_gki_modules_list")
 load(
     "//private/devices/google/common/kleaf:device_build_configs.bzl",
-    "device_build_configs",
     "lto_dependant_kernel_module",
 )
 
@@ -50,10 +50,13 @@ RAVIOLE_DTBOS = [
     "google/gs101-bluejay-mp1_0.dtbo",
 ]
 
-device_build_configs(
-    name = "build.config.raviole",
-    base_build_config = ":build.config.raviole",
-    device_name = "raviole",
+kernel_build_config(
+    name = "raviole_build_config",
+    srcs = [
+        # do not sort
+        "//common:set_kernel_dir_build_config",
+        "build.config.raviole",
+    ],
 )
 
 filegroup(
@@ -127,7 +130,6 @@ kernel_build(
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
-        "//private/devices/google/common:debug_build_configs",
         "//private/devices/google/gs101:build.config.gs101",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
@@ -149,7 +151,7 @@ kernel_build(
         "google/gs101-b0.dtb",
     ],
     base_kernel = "//common:kernel_aarch64_download_or_build",
-    build_config = ":device_build_config",
+    build_config = ":raviole_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/raviole/dts:raviole.dt",
     implicit_outs = RAVIOLE_DTBOS,
