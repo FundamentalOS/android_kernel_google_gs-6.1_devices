@@ -8,6 +8,7 @@ load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
     "kernel_build",
+    "kernel_build_config",
     "kernel_images",
     "kernel_module_group",
     "kernel_modules_install",
@@ -17,7 +18,6 @@ load(
 load("//common:modules.bzl", "get_gki_modules_list")
 load(
     "//private/devices/google/common/kleaf:device_build_configs.bzl",
-    "device_build_configs",
     "lto_dependant_kernel_module",
 )
 
@@ -81,12 +81,6 @@ kernel_module_group(
     ],
 )
 
-device_build_configs(
-    name = "build.config.tangorpro",
-    base_build_config = ":build.config.tangorpro",
-    device_name = "tangorpro",
-)
-
 kernel_build(
     name = "gs201_tangorpro",
     srcs = glob([
@@ -96,7 +90,6 @@ kernel_build(
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
-        "//private/devices/google/common:debug_build_configs",
         "//private/devices/google/gs201:build.config.gs201",
         "//private/devices/google/pantah:pantah_gki.fragment",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
@@ -119,7 +112,7 @@ kernel_build(
         for soc_rev in _SOC_REVS
     ] + _TANGORPRO_DTBOS,
     base_kernel = "//common:kernel_aarch64_download_or_build",
-    build_config = ":device_build_config",
+    build_config = ":tangorpro_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
@@ -448,4 +441,13 @@ exec(
         echo {gki_kernel_dir}: $(git -C $BUILD_WORKSPACE_DIRECTORY/{gki_kernel_dir} rev-parse HEAD)
         $(rootpath :gs201_tangorpro_dist_copy_to_dist_dir) $@
     """.format(gki_kernel_dir = "//aosp"),
+)
+
+kernel_build_config(
+    name = "tangorpro_build_config",
+    srcs = [
+        # do not sort
+        "//common:set_kernel_dir_build_config",
+        "build.config.tangorpro",
+    ],
 )
