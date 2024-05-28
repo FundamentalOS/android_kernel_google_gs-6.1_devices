@@ -8,6 +8,7 @@ load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
     "kernel_build",
+    "kernel_build_config",
     "kernel_images",
     "kernel_module_group",
     "kernel_modules_install",
@@ -17,15 +18,17 @@ load(
 load("//common:modules.bzl", "get_gki_modules_list")
 load(
     "//private/devices/google/common/kleaf:device_build_configs.bzl",
-    "device_build_configs",
     "extracted_system_dlkm",
     "lto_dependant_kernel_module",
 )
 
-device_build_configs(
-    name = "build.config.tegu",
-    base_build_config = ":build.config.tegu",
-    device_name = "tegu",
+kernel_build_config(
+    name = "tegu_build_config",
+    srcs = [
+        # do not sort
+        "//common:set_kernel_dir_build_config",
+        "build.config.tegu",
+    ],
 )
 
 filegroup(
@@ -135,7 +138,6 @@ kernel_build(
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
-        "//private/devices/google/common:debug_build_configs",
         "//private/devices/google/zumapro:build.config.zumapro",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
@@ -156,7 +158,7 @@ kernel_build(
            _ZUMAPRO_TEGU_DTBOS + _ZUMAPRO_TEGU_DPM_DTBOS,
     # TODO(b/221278445): Use real GKI
     base_kernel = "//common:kernel_aarch64_download_or_build",
-    build_config = ":device_build_config",
+    build_config = ":tegu_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tegu/dts:tegu.dt",
     kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
