@@ -12,7 +12,7 @@
 #include "zuma-tegu-charging-common.dtsi"
 #include "google-dts-ripcurrent/zuma-ripcurrent-gsa-gsc.dtsi"
 #include "google-dts-zumapro/zumapro-board-cp-s5300-sit.dtsi"
-#include "google-dts-zumapro/zumapro-board-bluetooth.dtsi"
+#include "google-dts-zumapro/zumapro-board-bluetooth_wakectrl.dtsi"
 #include "zuma-tegu-ese.dtsi"
 #include "zuma-tegu-nfc.dtsi"
 #include "google-dts-zuma/zuma-board-ultrasonic-udfps.dtsi"
