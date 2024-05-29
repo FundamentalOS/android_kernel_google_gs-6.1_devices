@@ -155,7 +155,7 @@ kernel_build(
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/raviole/dts:raviole.dt",
     implicit_outs = RAVIOLE_DTBOS,
-    kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
+    kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = [
         "modules",
