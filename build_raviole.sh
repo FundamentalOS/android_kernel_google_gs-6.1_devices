@@ -18,5 +18,4 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=raviole \
-    --config=fast \
     //private/devices/google/raviole:gs101_raviole_dist "$@"
