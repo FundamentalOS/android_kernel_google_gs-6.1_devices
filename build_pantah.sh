@@ -18,5 +18,4 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=pantah \
-    --config=fast \
     //private/devices/google/pantah:gs201_pantah_dist "$@"
