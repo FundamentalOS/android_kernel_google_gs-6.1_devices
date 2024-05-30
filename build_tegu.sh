@@ -18,5 +18,4 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=tegu \
-    --config=fast \
     //private/devices/google/tegu:zumapro_tegu_dist "$@"
