@@ -14,9 +14,29 @@
 
 #define TG4C_DDIC_ID_LEN 8
 #define TG4C_DIMMING_FRAME 32
+
+#define MIPI_DSI_FREQ_MBPS_DEFAULT 1102
+#define MIPI_DSI_FREQ_MBPS_ALTERNATIVE 1000
+
 #define WIDTH_MM 64
 #define HEIGHT_MM 145
+
 #define PROJECT "TG4C"
+
+/**
+ * struct tg4c_panel - panel specific runtime info
+ *
+ * This struct maintains tg4c panel specific runtime info, any fixed details about panel
+ * should most likely go into struct gs_panel_desc.
+ */
+struct tg4c_panel {
+	/** @base: base panel struct */
+	struct gs_panel base;
+	/** @is_hbm2_enabled: indicates panel is running in HBM mode 2 */
+	bool is_hbm2_enabled;
+};
+
+#define to_spanel(ctx) container_of(ctx, struct tg4c_panel, base)
 
 static const struct gs_dsi_cmd tg4c_lp_cmds[] = {
 	/* Disable the Black insertion in AoD */
@@ -32,15 +52,21 @@ static const struct gs_dsi_cmd tg4c_lp_cmds[] = {
 	/* enter AOD */
 	GS_DSI_CMD(MIPI_DCS_ENTER_IDLE_MODE),
 	/* DVDD Strong */
-	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
-	GS_DSI_CMD(0x6F, 0x03),
-	GS_DSI_CMD(0xC5, 0x24, 0x29, 0x29),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x03),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xC5, 0x24, 0x29, 0x29),
 };
 static DEFINE_GS_CMDSET(tg4c_lp);
 
 static const struct gs_dsi_cmd tg4c_lp_off_cmds[] = {
 	GS_DSI_CMD(0x6F, 0x04),
 	GS_DSI_CMD(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x00, 0x00),
+};
+
+static const struct gs_dsi_cmd tg4c_lp_night_cmds[] = {
+	/* 2 nit */
+	GS_DSI_CMD(0x6F, 0x04),
+	GS_DSI_CMD(MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x00, 0x03),
 };
 
 static const struct gs_dsi_cmd tg4c_lp_low_cmds[] = {
@@ -57,6 +83,8 @@ static const struct gs_dsi_cmd tg4c_lp_high_cmds[] = {
 
 static const struct gs_binned_lp tg4c_binned_lp[] = {
 	BINNED_LP_MODE("off", 0, tg4c_lp_off_cmds),
+	/* night threshold 4 nits */
+	BINNED_LP_MODE_TIMING("night", 104, tg4c_lp_night_cmds, 0, 45),
 	/* rising = 0, falling = 45 */
 	/* low threshold 40 nits */
 	BINNED_LP_MODE_TIMING("low", 932, tg4c_lp_low_cmds, 0, 45),
@@ -71,12 +99,13 @@ static DEFINE_GS_CMDSET(tg4c_off);
 
 static const struct gs_dsi_cmd tg4c_init_cmds[] = {
 	/* CMD2, Page1 */
-	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
-	GS_DSI_CMD(0xC3, 0xDD),
-	GS_DSI_CMD(0xE5, 0x00),
-	/* CMD2, Page8 */
-	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x08),
-	GS_DSI_CMD(0xE8, 0x13, 0x90, 0x80, 0x00),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xC3, 0xDD),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xE5, 0x00),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x08),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xE8, 0x13, 0x90, 0x80, 0x00),
+
+	/* Page Disable */
 	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x00, 0x00),
 	/* CMD3, Page0 */
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x80),
@@ -86,28 +115,38 @@ static const struct gs_dsi_cmd tg4c_init_cmds[] = {
 	GS_DSI_CMD(0xF8, 0x01, 0x74),
 	GS_DSI_CMD(0x6F, 0x15),
 	GS_DSI_CMD(0xF8, 0x01, 0x8D),
-	GS_DSI_CMD(0x6F, 0x47),
-	GS_DSI_CMD(0xF2, 0x30),
-	GS_DSI_CMD(0x6F, 0x37),
-	GS_DSI_CMD(0xF3, 0xCC, 0xCC),
-	GS_DSI_CMD(0x6F, 0x3C),
-	GS_DSI_CMD(0xF3, 0x0C),
-	GS_DSI_CMD(0x6F, 0x3E),
-	GS_DSI_CMD(0xF3, 0x00),
-	GS_DSI_CMD(0x6F, 0x02),
-	GS_DSI_CMD(0xF4, 0x00),
-	GS_DSI_CMD(0x6F, 0x37),
-	GS_DSI_CMD(0xF4, 0xF6, 0xF6),
+
+	/* AOD Source power saving */
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x47),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF2, 0x30),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x37),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF3, 0xCC, 0xCC),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x3C),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF3, 0x0C),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x3E),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF3, 0x00),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x02),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF4, 0x00),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x37),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF4, 0xF6, 0xF6),
+
 	/* CMD3, Page1 */
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x81),
 	GS_DSI_CMD(0x6F, 0x0E),
 	GS_DSI_CMD(0xF5, 0x2A),
-	GS_DSI_CMD(0x6F, 0x0D),
-	GS_DSI_CMD(0xFB, 0x80),
+
+	/* TE output @skip mode */
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x0D),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xFB, 0x80),
+
+	/* BOIS Clk, idle vfp clk off */
 	GS_DSI_CMD(0x6F, 0x0F),
 	GS_DSI_CMD(0xF5, 0x22),
-	GS_DSI_CMD(0x6F, 0x02),
-	GS_DSI_CMD(0xF9, 0x84),
+
+	/* VESA_PS_build */
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x02),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF9, 0x84),
+
 	GS_DSI_CMD(0x5F, 0x00, 0x00),
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x81),
 	GS_DSI_CMD(0x6F, 0x0B),
@@ -115,12 +154,18 @@ static const struct gs_dsi_cmd tg4c_init_cmds[] = {
 	/* CMD3, Page2 */
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x82),
 	GS_DSI_CMD(0x6F, 0x09),
-	GS_DSI_CMD(0xF2, 0xFF),
-	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x83),
-	/* CMD3, Page4 */
-	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x84),
-	GS_DSI_CMD(0x6F, 0x26),
-	GS_DSI_CMD(0xF2, 0x00),
+
+	/* MIPI timing optimize */
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF2, 0xFF),
+	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_EVT1_1), 0xF2, 0x55),
+
+	/* DBI */
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xFF, 0xAA, 0x55, 0xA5, 0x83),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xFF, 0xAA, 0x55, 0xA5, 0x84),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0x6F, 0x26),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xF2, 0x00),
+
+	/* CMD Disable */
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x00),
 	GS_DSI_CMD(0x35),
 	GS_DSI_CMD(0x6F, 0x01),
@@ -143,9 +188,45 @@ static const struct gs_dsi_cmd tg4c_init_cmds[] = {
 	/* 60Hz */
 	GS_DSI_CMD(0x2F, 0x02),
 
+	/* FFC off */
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01),
+	GS_DSI_CMD(0xC3, 0x00),
+	/* FFC setting (MIPI: 1102) */
+	GS_DSI_CMD(0xC3, 0x00, 0x06, 0x20, 0x11, 0xFF, 0x00, 0x06, 0x20, 0x11, 0xFF, 0x00, 0x05,
+				0xBD, 0x1F, 0x06, 0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06, 0x4F, 0x19, 0x05, 0xBD,
+				0x1F, 0x06, 0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06, 0x4F, 0x19, 0x05, 0xBD, 0x1F,
+				0x06, 0x4F, 0x19),
+
+	/* b/343332437: Extend DBI Flash Data Update Cycle time */
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04),
+	GS_DSI_CMD(0xBB, 0xB3, 0x01, 0x1F),
+
 	GS_DSI_DELAY_CMD(60, MIPI_DCS_EXIT_SLEEP_MODE)
 };
 static DEFINE_GS_CMDSET(tg4c_init);
+
+static bool _is_max_hbm_level(u16 level, struct gs_panel * ctx) {
+	return level == ctx->desc->brightness_desc->brt_capability->hbm.level.max;
+}
+
+static void tg4c_update_acd(struct gs_panel *ctx, u16 level) {
+	struct device *dev = ctx->dev;
+	struct tg4c_panel *spanel = to_spanel(ctx);
+
+	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode) && _is_max_hbm_level(level, ctx)) {
+		spanel->is_hbm2_enabled = true;
+		/* set ACD Level 3 */
+		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x55, 0x04);
+	} else {
+		if (spanel->is_hbm2_enabled) {
+			/* set ACD off */
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x55, 0x00);
+		}
+		spanel->is_hbm2_enabled = false;
+	}
+	dev_info(ctx->dev, "%s: is HBM2 enabled : %d\n",
+				__func__, spanel->is_hbm2_enabled);
+}
 
 static void tg4c_update_te2(struct gs_panel *ctx)
 {
@@ -189,8 +270,11 @@ static void tg4c_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 	if (GS_IS_HBM_ON_IRC_OFF(hbm_mode)) {
 		/* sync from bigSurf : to achieve the max brightness with IRC off which
 		 * need to set dbv to 0xFFF */
-		if (level == ctx->desc->brightness_desc->brt_capability->hbm.level.max)
+		if (_is_max_hbm_level(level, ctx)) {
+			/* set brightness to hbm2 */
 			GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x0F, 0xFF);
+		}
+		tg4c_update_acd(ctx, level);
 
 		/* IRC Off */
 		GS_DCS_BUF_ADD_CMD(dev, 0x5F, 0x01, 0x00);
@@ -215,6 +299,26 @@ static void tg4c_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 	/* Empty command is for flush */
 	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x00);
 }
+
+static void tg4c_set_local_hbm_background_brightness(struct gs_panel *ctx, u16 br)
+{
+	u16 level;
+	u8 val1, val2;
+	struct device *dev = ctx->dev;
+
+	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode) && _is_max_hbm_level(br, ctx))
+		br = 0x0FFF;
+
+	level = br * 4;
+	val1 = level >> 8;
+	val2 = level & 0xff;
+
+	/* set LHBM background brightness */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x4C);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xDF, val1, val2, val1, val2, val1, val2);
+}
+
 
 #define LHBM_GAMMASET2 2774
 #define LHBM_GAMMASET3 2186
@@ -255,6 +359,7 @@ static void tg4c_set_local_hbm_mode(struct gs_panel *ctx, bool local_hbm_en)
 			dev_warn(dev, "enable LHBM at unexpected state (HBM: %d, vrefresh: %dhz)\n",
 					 ctx->hbm_mode, vrefresh);
 		}
+		tg4c_set_local_hbm_background_brightness(ctx, level);
 		tg4c_set_local_hbm_gamma(ctx, level);
 		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x87, 0x05);
 	} else {
@@ -319,9 +424,11 @@ static void tg4c_set_nolp_mode(struct gs_panel *ctx, const struct gs_panel_mode 
 	/* exit AOD */
 	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 	GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x54);
-	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
-	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
-	GS_DCS_BUF_ADD_CMD(dev, 0xC5, 0x00, 0x24, 0x24);
+	if (ctx->panel_rev < PANEL_REV_EVT1_1) {
+		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+		GS_DCS_BUF_ADD_CMD(dev, 0xC5, 0x00, 0x24, 0x24);
+	}
 	GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_EXIT_IDLE_MODE);
 	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
 	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
@@ -380,6 +487,23 @@ static int tg4c_enable(struct drm_panel *panel)
 
 	GS_DCS_WRITE_CMD(dev, MIPI_DCS_SET_DISPLAY_ON);
 
+	ctx->dsi_hs_clk_mbps = MIPI_DSI_FREQ_MBPS_DEFAULT;
+
+	return 0;
+}
+
+static int tg4c_disable(struct drm_panel *panel)
+{
+	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
+	struct tg4c_panel *spanel = to_spanel(ctx);
+	int ret;
+
+	spanel->is_hbm2_enabled = false;
+
+	ret = gs_panel_disable(panel);
+	if (ret)
+		return ret;
+
 	return 0;
 }
 
@@ -420,22 +544,75 @@ static int tg4c_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *stat
 	return 0;
 }
 
+static void tg4c_pre_update_ffc(struct gs_panel *ctx)
+{
+	struct device *dev = ctx->dev;
+
+	dev_dbg(ctx->dev, "%s\n", __func__);
+
+	PANEL_ATRACE_BEGIN(__func__);
+
+	/* FFC off */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC3, 0x00);
+
+	PANEL_ATRACE_END(__func__);
+}
+
+static void tg4c_update_ffc(struct gs_panel *ctx, unsigned int hs_clk_mbps)
+{
+	struct device *dev = ctx->dev;
+
+	dev_dbg(ctx->dev, "%s: hs_clk_mbps: current=%d, target=%d\n",
+		__func__, ctx->dsi_hs_clk_mbps, hs_clk_mbps);
+
+	PANEL_ATRACE_BEGIN(__func__);
+
+	if (hs_clk_mbps != MIPI_DSI_FREQ_MBPS_DEFAULT &&
+	    hs_clk_mbps != MIPI_DSI_FREQ_MBPS_ALTERNATIVE) {
+		dev_warn(ctx->dev, "invalid hs_clk_mbps=%d for FFC\n", hs_clk_mbps);
+	} else if (ctx->dsi_hs_clk_mbps != hs_clk_mbps) {
+		dev_info(ctx->dev, "%s: updating for hs_clk_mbps=%d\n", __func__, hs_clk_mbps);
+		ctx->dsi_hs_clk_mbps = hs_clk_mbps;
+
+		/* Update FFC */
+		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+		if (hs_clk_mbps == MIPI_DSI_FREQ_MBPS_DEFAULT)
+			GS_DCS_BUF_ADD_CMD(dev, 0xC3, 0x00, 0x06, 0x20,
+						0x11, 0xFF, 0x00, 0x06, 0x20, 0x11,
+						0xFF, 0x00, 0x05, 0xBD, 0x1F, 0x06,
+						0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06,
+						0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06,
+						0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06,
+						0x4F, 0x19, 0x05, 0xBD, 0x1F, 0x06,
+						0x4F, 0x19);
+		else
+			GS_DCS_BUF_ADD_CMD(dev, 0xC3, 0x00, 0x06, 0x20,
+						0x10, 0xFF, 0x00, 0x06, 0x20, 0x10,
+						0xFF, 0x00, 0x05, 0xEA, 0x1D, 0x06,
+						0x1E, 0x16, 0x05, 0xEA, 0x1D, 0x06,
+						0x1E, 0x16, 0x05, 0xEA, 0x1D, 0x06,
+						0x1E, 0x16, 0x05, 0xEA, 0x1D, 0x06,
+						0x1E, 0x16, 0x05, 0xEA, 0x1D, 0x06,
+						0x1E, 0x16);
+	}
+
+	/* FFC on */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC3, 0xDD);
+
+	PANEL_ATRACE_END(__func__);
+}
+
 #define MAX_BR_HBM_IRC_OFF 4095
 static int tg4c_set_brightness(struct gs_panel *ctx, u16 br)
 {
 	struct device *dev = ctx->dev;
-	u16 brightness;
 
 	if (ctx->current_mode->gs_mode.is_lp_mode) {
 		if (gs_panel_has_func(ctx, set_binned_lp))
 			ctx->desc->gs_panel_func->set_binned_lp(ctx, br);
 		return 0;
-	}
-
-	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode) &&
-		br == ctx->desc->brightness_desc->brt_capability->hbm.level.max) {
-		br = MAX_BR_HBM_IRC_OFF;
-		dev_dbg(dev, "apply max DBV when reach hbm max with irc off\n");
 	}
 
 	if (ctx->timestamps.idle_exit_dimming_delay_ts &&
@@ -445,8 +622,17 @@ static int tg4c_set_brightness(struct gs_panel *ctx, u16 br)
 		ctx->timestamps.idle_exit_dimming_delay_ts = 0;
 	}
 
-	brightness = swab16(br);
-	return gs_dcs_set_brightness(ctx, brightness);
+	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode) && _is_max_hbm_level(br, ctx)) {
+		/* set brightness to hbm2 */
+		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x0F, 0xFF);
+		tg4c_update_acd(ctx, br);
+	} else {
+		tg4c_update_acd(ctx, br);
+		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
+						br >> 8, br & 0xff);
+	}
+
+	return 0;
 }
 
 static void tg4c_set_hbm_mode(struct gs_panel *ctx, enum gs_hbm_mode hbm_mode)
@@ -512,17 +698,44 @@ static const struct gs_display_underrun_param underrun_param = {
 #define TO_6BIT_SIGNED(v) ((v) & 0x3F)
 
 static const struct drm_dsc_config tg4c_dsc_cfg = {
+	/* Used DSC v1.2 */
+	.dsc_version_major = 1,
+	.dsc_version_minor = 2,
+	.line_buf_depth = 9,
+	.bits_per_component = 8,
+	.convert_rgb = true, /* confirm */
+	.slice_count = 2,
+	.slice_width = 540,
+	.slice_height = 24,
+	.simple_422 = false,
+	.pic_width = 1080,
+	.pic_height = 2424,
+	.rc_tgt_offset_high = 3,
+	.rc_tgt_offset_low = 3,
+	.bits_per_pixel = 128,
+	.rc_edge_factor = 6,
+	.rc_quant_incr_limit1 = 11,
+	.rc_quant_incr_limit0 = 11,
+	.initial_xmit_delay = 512,
+	.block_pred_enable = true,
 	.first_line_bpg_offset = 12,
+	.initial_offset = 6144,
+	.rc_buf_thresh = {
+		14, 28, 42, 56,
+		70, 84, 98, 105,
+		112, 119, 121, 123,
+		125, 126
+	},
 	.rc_range_params = {
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
+		{0, 4, TO_6BIT_SIGNED(2)},
+		{0, 4, TO_6BIT_SIGNED(0)},
+		{1, 5, TO_6BIT_SIGNED(0)},
+		{1, 6, TO_6BIT_SIGNED(-2)},
+		{3, 7, TO_6BIT_SIGNED(-4)},
+		{3, 7, TO_6BIT_SIGNED(-6)},
+		{3, 7, TO_6BIT_SIGNED(-8)},
+		{3, 8, TO_6BIT_SIGNED(-8)},
+		{3, 9, TO_6BIT_SIGNED(-8)},
 		{3, 10, TO_6BIT_SIGNED(-10)},
 		{5, 10, TO_6BIT_SIGNED(-10)},
 		{5, 11, TO_6BIT_SIGNED(-12)},
@@ -530,11 +743,22 @@ static const struct drm_dsc_config tg4c_dsc_cfg = {
 		{9, 12, TO_6BIT_SIGNED(-12)},
 		{12, 13, TO_6BIT_SIGNED(-12)},
 	},
-	/* Used DSC v1.2 */
-	.dsc_version_major = 1,
-	.dsc_version_minor = 2,
-	.slice_count = 2,
-	.slice_height = 24,
+	.rc_model_size = 8192,
+	.flatness_min_qp = 3,
+	.flatness_max_qp = 12,
+	.initial_scale_value = 32,
+	.scale_decrement_interval = 7,
+	.scale_increment_interval = 588,
+	.nfl_bpg_offset = 1069,
+	.slice_bpg_offset = 1085,
+	.final_offset = 4336,
+	.vbr_enable = false,
+	.slice_chunk_size = 540,
+	.native_422 = false,
+	.native_420 = false,
+	.second_line_bpg_offset = 0,
+	.nsl_bpg_offset = 0,
+	.second_line_offset_adj = 0,
 };
 #define TG4C_DSC {\
 		.enabled = true, \
@@ -641,17 +865,18 @@ static void tg4c_panel_init(struct gs_panel *ctx)
 
 static int tg4c_panel_probe(struct mipi_dsi_device *dsi)
 {
-	struct gs_panel *panel;
+	struct tg4c_panel *spanel;
 
-	panel = devm_kzalloc(&dsi->dev, sizeof(*panel), GFP_KERNEL);
-	if (!panel)
+	spanel = devm_kzalloc(&dsi->dev, sizeof(*spanel), GFP_KERNEL);
+	if (!spanel)
 		return -ENOMEM;
 
-	return gs_dsi_panel_common_init(dsi, panel);
+	spanel->is_hbm2_enabled = false;
+	return gs_dsi_panel_common_init(dsi, &spanel->base);
 }
 
 static const struct drm_panel_funcs tg4c_drm_funcs = {
-	.disable = gs_panel_disable,
+	.disable = tg4c_disable,
 	.unprepare = gs_panel_unprepare,
 	.prepare = gs_panel_prepare,
 	.enable = tg4c_enable,
@@ -679,6 +904,8 @@ static const struct gs_panel_funcs tg4c_gs_funcs = {
 	.update_te2 = tg4c_update_te2,
 	.read_id = tg4c_read_id,
 	.atomic_check = tg4c_atomic_check,
+	.pre_update_ffc = tg4c_pre_update_ffc,
+	.update_ffc = tg4c_update_ffc,
 };
 
 static const struct gs_brightness_configuration tg4c_btr_configs[] = {
@@ -728,7 +955,7 @@ static struct gs_panel_reg_ctrl_desc tg4c_reg_ctrl_desc = {
 	.reg_ctrl_enable = {
 		{PANEL_REG_ID_VDDI, 0},
 		{PANEL_REG_ID_VCI, 0},
-		{PANEL_REG_ID_VDDD, 10},
+		{PANEL_REG_ID_VDDD, 11},
 	},
 	.reg_ctrl_disable = {
 		{PANEL_REG_ID_VDDD, 0},
@@ -759,6 +986,7 @@ static struct gs_panel_desc gs_tg4c = {
 	.gs_panel_func = &tg4c_gs_funcs,
 	.reset_timing_ms = {1, 1, 20},
 	.refresh_on_lp = true,
+	.default_dsi_hs_clk_mbps = MIPI_DSI_FREQ_MBPS_DEFAULT,
 };
 
 static int tg4c_panel_config(struct gs_panel *ctx)
