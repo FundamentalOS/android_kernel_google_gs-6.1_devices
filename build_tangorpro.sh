@@ -18,5 +18,4 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=tangorpro \
-    --config=fast \
     //private/devices/google/tangorpro:gs201_tangorpro_dist "$@"
