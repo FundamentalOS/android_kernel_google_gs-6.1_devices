@@ -18,5 +18,4 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=felix \
-    --config=fast \
     //private/devices/google/felix:gs201_felix_dist "$@"
