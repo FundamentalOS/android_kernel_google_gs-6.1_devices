@@ -13,6 +13,7 @@
 #include "google-dts-ripcurrent/zuma-ripcurrent-gsa-gsc.dtsi"
 #include "zuma-tegu-wlan.dtsi"
 #include "google-dts-zumapro/zumapro-board-cp-s5300-sit.dtsi"
+#include "google-dts-zuma/gs101-cp-s5200-thermal-zone.dtsi"
 #include "google-dts-zuma/zuma-board-bluetooth.dtsi"
 #include "zuma-tegu-ese.dtsi"
 #include "zuma-tegu-nfc.dtsi"
