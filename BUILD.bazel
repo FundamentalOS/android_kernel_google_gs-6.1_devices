@@ -123,9 +123,6 @@ kernel_build(
     ],
     module_outs = [
         # keep sorted
-        "crypto/crct10dif_common.ko",
-        "crypto/crct10dif_generic.ko",
-        "drivers/block/null_blk/null_blk.ko",
         "drivers/gpu/drm/display/drm_display_helper.ko",
         "drivers/hwtracing/coresight/coresight.ko",
         "drivers/hwtracing/coresight/coresight-etm4x.ko",
@@ -138,12 +135,10 @@ kernel_build(
         "drivers/perf/arm_dsu_pmu.ko",
         "drivers/regulator/rt4801-regulator.ko",
         "drivers/regulator/tps65132-regulator.ko",
-        "drivers/scsi/scsi_debug.ko",
         "drivers/scsi/sg.ko",
         "drivers/spi/spidev.ko",
         "drivers/video/backlight/lp855x_bl.ko",
         "drivers/watchdog/softdog.ko",
-        "lib/crc-t10dif.ko",
         "net/mac80211/mac80211.ko",
         "net/wireless/cfg80211.ko",
     ],
