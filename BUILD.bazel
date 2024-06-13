@@ -8,16 +8,13 @@ load(
     "kernel_build",
     "kernel_build_config",
     "kernel_images",
+    "kernel_module",
     "kernel_module_group",
     "kernel_modules_install",
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
 load("//common:modules.bzl", "get_gki_modules_list")
-load(
-    "//private/devices/google/common/kleaf:device_build_configs.bzl",
-    "lto_dependant_kernel_module",
-)
 
 RAVIOLE_DTBOS = [
     "google/gs101-oriole.dtbo",
@@ -185,7 +182,7 @@ kernel_abi(
     module_grouping = False,
 )
 
-lto_dependant_kernel_module(
+kernel_module(
     name = "gs101_soc.raviole",
     srcs = [
         "//private/google-modules/soc/gs:gs_soc_sources",
@@ -312,6 +309,7 @@ lto_dependant_kernel_module(
         "drivers/thermal/samsung/gs_thermal.ko",
         "drivers/tty/serial/exynos_tty.ko",
         "drivers/ufs/ufs-exynos-gs.ko",
+        "drivers/ufs/ufs-pixel-fips140.ko",
         "drivers/usb/dwc3/dwc3-exynos-usb.ko",
         "drivers/usb/gadget/function/usb_f_dm.ko",
         "drivers/usb/gadget/function/usb_f_dm1.ko",
@@ -331,9 +329,6 @@ lto_dependant_kernel_module(
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
     kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
-    lto_outs = [
-        "drivers/ufs/ufs-pixel-fips140.ko",
-    ],
     makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
