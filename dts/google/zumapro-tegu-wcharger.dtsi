@@ -62,6 +62,7 @@
 	idt,irq_gpio = <&max77779_sgpio 4 GPIO_ACTIVE_LOW>; /* QI_INT_ODL */
 	idt,gpio_slct = <&s2mpg15_gpio 5 GPIO_ACTIVE_HIGH>; /* QI_BPP_EPP_SLCT */
 	idt,gpio_slct_value = <1>;
+	google,ll-bpp-vout-not-set;
 	google,q_value = <63>;
 	google,rf_value = <87>;
 	fod = [A5 23 83 2E A1 04 9B 0E 9A 10 A1 00 14 00 00 28];
