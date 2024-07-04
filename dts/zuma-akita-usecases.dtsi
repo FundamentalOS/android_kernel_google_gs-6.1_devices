@@ -21,4 +21,5 @@
 	max77759,ext-otg-only; /* use external OTG only */
 
 	max77759,wlc-otg-extbst-en; /* Only WLC+OTG to enable extbst mode */
+	max77759,wcin-inlim-headroom = <40000>;
 };
