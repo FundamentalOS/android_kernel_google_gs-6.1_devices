@@ -22,6 +22,10 @@
 	};
 };
 
+&hs_clock_rates {
+	hs-clock-rates = <1102 1000>;
+};
+
 &drmdsim0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
