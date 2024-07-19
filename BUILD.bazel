@@ -130,7 +130,6 @@ kernel_module_group(
 kernel_build(
     name = "zuma_akita",
     srcs = glob([
-        "akita*.fragment",
         "build.config.*",
         "dts/**",
     ]) + [
@@ -159,6 +158,7 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":akita_build_config",
     collect_unstripped_modules = True,
+    defconfig_fragments = ["akita_defconfig"],
     dtstree = "//private/devices/google/akita/dts:akita.dt",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",

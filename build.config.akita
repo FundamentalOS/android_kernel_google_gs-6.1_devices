@@ -4,7 +4,6 @@ DEVICE_DIR=private/devices/google/akita
 SOC_DIR=private/google-modules/soc/gs
 
 # These just need to be relative to the ROOT_DIR
-FRAGMENT_CONFIG=${DEVICE_DIR}/akita_gki.fragment
 . ${ROOT_DIR}/private/devices/google/zuma/build.config.zuma
 
 
