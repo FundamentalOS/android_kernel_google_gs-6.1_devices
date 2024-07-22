@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+package(
+    default_visibility = [
+        "//private/devices/google:__subpackages__",
+    ],
+)
+
+exports_files([
+    # keep sorted
+    "build.config.gs201",
+    "system_dlkm.props.gs201",
+    "vendor_dlkm.blocklist.gs201",
+    "vendor_dlkm.props.gs201",
+    "vendor_dlkm_modules.gs201",
+    "vendor_kernel_boot_modules.gs201",
+])
