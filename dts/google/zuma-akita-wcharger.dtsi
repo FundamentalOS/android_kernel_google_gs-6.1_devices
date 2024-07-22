@@ -51,7 +51,6 @@
 	#size-cells = <0>;
 
 	p9222@61 {
-		dev-name = "p9222";
 		compatible = "idt,p9222";
 		reg = <0x61>;
 		status = "ok";
