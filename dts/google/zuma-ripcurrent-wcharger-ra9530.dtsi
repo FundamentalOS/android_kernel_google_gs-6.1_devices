@@ -45,7 +45,6 @@
 	#size-cells = <0>;
 
 	p9530@3b {
-		dev-name = "ra9530";
 		compatible = "idt,ra9530";
 		reg = <0x3b>;
 		status = "ok";

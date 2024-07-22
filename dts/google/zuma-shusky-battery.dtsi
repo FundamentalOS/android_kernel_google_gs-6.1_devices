@@ -44,7 +44,7 @@
 				google,eeprom-pairing;
 
 				/* rest charging */
-				google,chg-rest-rate = <8>;
+				google,chg-rest-rate = <15>;
 				google,chg-rest-soc = <80>;
 				/* TRICKLE-DEFEND threshold */
 				google,bd-trickle-recharge-soc = <80>;
@@ -170,7 +170,7 @@
 
 		maxim,psy-type-unknown;
 		maxim,fg-data {
-			#include "google-dts-base/gs101-fake-battery-data.dtsi"
+			#include "google-dts-zuma/gs101-fake-battery-data.dtsi"
 		};
 	};
 

@@ -6,7 +6,7 @@
  *
  */
 
-#include "google-dts-base/zuma-fts-touch.dtsi"
+#include "google-dts-zuma/zuma-fts-touch.dtsi"
 
 &spi_20 {
 	status = "okay";
@@ -21,15 +21,9 @@
 	st,dchip_id = /bits/ 8 <0x36 0x40>;
 	st,max-coords = <1343 2991>;
 	st,panel_map = <&google_hk3 0>;
-
+	st,udfps-coords = <672 2261>;
 	st,sensor_inverted_x;
 	st,sensor_inverted_y;
-
-	/*goog,vrr-enabled;
-	goog,vrr-display-rate = /bits/ 32 <60 120>;
-	goog,vrr-touch-rate = /bits/ 32 <120 240>;
-	goog,vrr-up-delay = <0>;
-	goog,vrr-down-delay = <2>;*/
 
 	goog,v4l2-enabled;
 	goog,offload-enabled;

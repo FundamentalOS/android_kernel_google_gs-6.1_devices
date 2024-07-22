@@ -7,8 +7,8 @@ kernel_module(
     srcs = glob([
         "**/*.c",
         "**/*.h",
-        "Kbuild",
     ]) + [
+        "Kbuild",
         "//private/google-modules/display/common:headers",
         "//private/google-modules/display/samsung:headers",
         "//private/google-modules/display/samsung/include:headers",

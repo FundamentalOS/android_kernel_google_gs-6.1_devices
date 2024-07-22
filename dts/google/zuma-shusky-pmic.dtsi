@@ -26,7 +26,6 @@
 &s2mpg14mfd {
 	odpm_vbatt_en: odpm_vbatt_en {
 		compatible = "google,odpm_vbatt_en";
-		dev-name = "odpm_vbatt_en";
 		pinctrl-names = "odpm-vbatt-enable", "odpm-vbatt-disable";
 		pinctrl-0 = <&odpm_vbatt_enable>;
 		pinctrl-1 = <&odpm_vbatt_disable>;
