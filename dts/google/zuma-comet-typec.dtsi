@@ -13,10 +13,11 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
-#include "google-dts-base/max777x9-tcpc.dtsi"
+#include "google-dts-zuma/max777x9-tcpc.dtsi"
 };
 
 &max77759tcpc {
+	bcl-usb-voting;
 	pinctrl-0 = <&usb_pd_irq>;
 	pullup-supply = <&m_ldo19_reg>;
 	connector {
@@ -44,4 +45,4 @@
 	};
 };
 
-#include "google-dts-base/max777x9-usbc-cooling-dev.dtsi"
+#include "google-dts-zuma/max777x9-usbc-cooling-dev.dtsi"

@@ -52,12 +52,6 @@ enum ct3b_dbv_range {
 struct ct3b_panel {
 	/** @base: base panel struct */
 	struct gs_panel base;
-
-	/**
-	 * @auto_mode_vrefresh: indicates current minimum refresh rate while in auto mode,
-	 *			if 0 it means that auto mode is not enabled
-	 */
-	u32 auto_mode_vrefresh;
 	/** @force_changeable_te: force changeable TE (instead of fixed) during early exit */
 	bool force_changeable_te;
 	/** @force_changeable_te2: force changeable TE2 for monitoring refresh rate */
@@ -72,6 +66,11 @@ struct ct3b_panel {
 		u8 top_default[EDGE_COMPENSATION_SIZE];
 		u8 bottom_default[EDGE_COMPENSATION_SIZE];
 	}edge_comp;
+
+	/** @needs_display_on: if display_on command needs to send after flip done */
+	bool needs_display_on;
+	/** @needs_aod_idle: if AoD idle command needs to send after commit done */
+	bool needs_aod_idle;
 };
 
 #define to_spanel(ctx) container_of(ctx, struct ct3b_panel, base)
@@ -118,17 +117,36 @@ static DEFINE_GS_CMDSET(ct3b_off);
 static const struct gs_dsi_cmd ct3b_init_cmds[] = {
 	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00),
 	GS_DSI_CMD(0x6F, 0x06),
-	GS_DSI_CMD(0xB5, 0x7F, 0x00, 0x59, 0x67),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xB5, 0x7F, 0x00, 0x59, 0x67),
+	GS_DSI_REV_CMD(PANEL_REV_EVT1_1, 0xB5, 0x7F, 0x00, 0x5C, 0x67),
+	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_DVT1), 0xB5, 0x7F, 0x00, 0x60, 0x67),
 	GS_DSI_CMD(0x6F, 0x11),
-	GS_DSI_CMD(0xB5, 0x59, 0x59, 0x59, 0x59, 0x59),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xB5, 0x59, 0x59, 0x59,
+				0x59, 0x59),
+	GS_DSI_REV_CMD(PANEL_REV_EVT1_1, 0xB5, 0x5C, 0x5C, 0x5C,
+				0x5C, 0x5C),
+	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_DVT1), 0xB5, 0x60, 0x60, 0x60,
+				0x60, 0x60),
 	GS_DSI_CMD(0x6F, 0x2D),
-	GS_DSI_CMD(0xB5, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C,
-				0x2C, 0x2C, 0x2C, 0x2C, 0x25, 0x25, 0x20, 0x20,
-				0x16, 0x16, 0x08, 0x08, 0x04, 0x04, 0x04),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xB5, 0x2C, 0x2C, 0x2C,
+				0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x25, 0x25,
+				0x20, 0x20, 0x16, 0x16, 0x08, 0x08, 0x04, 0x04, 0x04),
+	GS_DSI_REV_CMD(PANEL_REV_EVT1_1, 0xB5, 0x29, 0x29, 0x29,
+				0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x22, 0x22,
+				0x1D, 0x1D, 0x13, 0x13, 0x05, 0x05, 0x01, 0x01, 0x01),
+	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_DVT1), 0xB5, 0x25, 0x25, 0x25, 0x25,
+				0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x1E, 0x1E, 0x19,
+				0x19, 0x0F, 0x0F, 0x01, 0x01, 0x01, 0x01, 0x01),
 	GS_DSI_CMD(0x6F, 0x44),
-	GS_DSI_CMD(0xB5, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C,
-				0x2C, 0x2C, 0x2C, 0x2C, 0x25, 0x25, 0x20, 0x20,
-				0x16, 0x16, 0x08, 0x08, 0x04, 0x04, 0x04),
+	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_EVT1_1), 0xB5, 0x2C, 0x2C, 0x2C,
+				0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x25, 0x25,
+				0x20, 0x20, 0x16, 0x16, 0x08, 0x08, 0x04, 0x04, 0x04),
+	GS_DSI_REV_CMD(PANEL_REV_EVT1_1, 0xB5, 0x29, 0x29, 0x29,
+				0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x22, 0x22,
+				0x1D, 0x1D, 0x13, 0x13, 0x05, 0x05, 0x01, 0x01, 0x01),
+	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_DVT1), 0xB5, 0x25, 0x25, 0x25, 0x25,
+				0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x1E, 0x1E, 0x19,
+				0x19, 0x0F, 0x0F, 0x01, 0x01, 0x01, 0x01, 0x01),
 	GS_DSI_CMD(0x6F, 0x1B),
 	GS_DSI_CMD(0xBA, 0x08),
 	GS_DSI_CMD(0x6F, 0x1C),
@@ -230,6 +248,69 @@ static const struct gs_dsi_cmd ct3b_init_cmds[] = {
 				0x28, 0x28, 0x28),
 	GS_DSI_CMD(0x6F, 0x03),
 	GS_DSI_CMD(0xC4, 0x44),
+	/* DBI */
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04),
+	GS_DSI_CMD(0xBB, 0xB3, 0x00, 0xC5),
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x08),
+	GS_DSI_CMD(0xC2, 0x33, 0x00, 0xEF, 0x03, 0x82, 0x00),
+	GS_DSI_CMD(0x6F, 0x06),
+	GS_DSI_CMD(0xC2, 0x79, 0xA5, 0xBF, 0xD2, 0xE1, 0xEF, 0xFA),
+	GS_DSI_CMD(0xC3, 0x00, 0x00, 0x03, 0x00, 0x03, 0x0B, 0x00, 0x0B, 0x18,
+				0x00, 0x18, 0x4B, 0x00, 0x4B, 0x9B, 0x10, 0x9B, 0xD8,
+				0x31, 0xDB, 0x88, 0x83, 0x88, 0x00, 0xF8, 0x00, 0xCF,
+				0xFF, 0xCF, 0xFF, 0xFF, 0xFF, 0xFF),
+	GS_DSI_CMD(0xC5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x10, 0x00),
+	GS_DSI_CMD(0xC6, 0x88, 0x00, 0x00, 0x88, 0x00, 0x00, 0x8F, 0xFF, 0x00),
+	GS_DSI_CMD(0x6F, 0x09),
+	GS_DSI_CMD(0xC6, 0x88, 0x00, 0x00, 0x88, 0x00, 0x00, 0x8F, 0xFF, 0x00),
+	GS_DSI_CMD(0x6F, 0x12),
+	GS_DSI_CMD(0xC6, 0x88, 0x00, 0x00, 0x88, 0x00, 0x00, 0x8F, 0xFF, 0x00),
+	GS_DSI_CMD(0xC7, 0x01),
+	GS_DSI_CMD(0xC8, 0x00, 0x00, 0x00, 0x01, 0x02, 0x05, 0x0A, 0x14, 0x28,
+				0x50),
+	GS_DSI_CMD(0xC9, 0x00, 0x02, 0x05, 0x0A, 0x14, 0x28, 0x50, 0xA0, 0xFF,
+				0xFF),
+	GS_DSI_CMD(0xCA, 0x00, 0x00, 0x01, 0x03, 0x06, 0x0C, 0x18, 0x30, 0x60,
+				0xC0),
+	GS_DSI_CMD(0xCB, 0x67, 0x00, 0x00, 0x45, 0x00, 0x00, 0x53, 0x00, 0x00,
+				0xB9, 0x00, 0x00, 0x79, 0x00, 0x00, 0xF7, 0x00, 0xFF),
+	GS_DSI_CMD(0xCC, 0x11, 0x00, 0x00, 0x11, 0x00, 0x00, 0x85, 0x00, 0x00,
+				0xB9, 0x00, 0x00, 0xAA, 0x00, 0x00, 0xFA, 0x0E, 0xFF),
+	GS_DSI_CMD(0xCE, 0x33, 0x00, 0x00, 0x54, 0x00, 0x00, 0xAB, 0x00, 0x00,
+				0x99, 0x00, 0x00, 0xA9, 0x00, 0x00, 0xFC, 0x0E, 0xFF),
+	GS_DSI_CMD(0xCF, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x33, 0x00, 0x00,
+				0x32, 0x00, 0x00, 0x23, 0x00, 0xA0, 0x22, 0xA0, 0x8F,
+				0x22, 0x00, 0x00, 0x22, 0x00, 0x00, 0x12, 0x00, 0xFF,
+				0x11, 0xFF, 0xFF, 0x11, 0xFF, 0x8F),
+	GS_DSI_CMD(0x6F, 0x4E),
+	GS_DSI_CMD(0xCF, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x33, 0x00, 0x00,
+				0x32, 0x00, 0x00, 0x23, 0x00, 0xA0, 0x22, 0xA0, 0x8F,
+				0x22, 0x00, 0x00, 0x22, 0x00, 0x00, 0x12, 0x00, 0xFF,
+				0x11, 0xFF, 0xFF, 0x11, 0xFF, 0x8F),
+	GS_DSI_CMD(0x6F, 0x75),
+	GS_DSI_CMD(0xCF, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x33, 0x00, 0x00,
+				0x32, 0x00, 0x00, 0x23, 0x00, 0xA0, 0x22, 0xA0, 0x8F,
+				0x22, 0x00, 0x00, 0x22, 0x00, 0x00, 0x12, 0x00, 0xFF,
+				0x11, 0xFF, 0xFF, 0x11, 0xFF, 0x8F),
+	GS_DSI_CMD(0xD0, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00,
+				0x04, 0x00, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00, 0x44,
+				0x00, 0x00),
+	GS_DSI_CMD(0xD1, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00,
+				0x44, 0x00, 0x00, 0x44, 0x00, 0x00, 0x44, 0x00, 0x00,
+				0x44, 0x00, 0x00, 0x44, 0x00, 0x00, 0x00, 0x11, 0x00,
+				0x00, 0x11, 0x00, 0x00, 0x11, 0x00, 0x00, 0x01, 0x00,
+				0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00,0x00),
+	GS_DSI_CMD(0xD2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00),
+
 	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x00, 0x00),
 	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x80),
 	GS_DSI_CMD(0x6F, 0x29),
@@ -270,6 +351,74 @@ static const struct gs_dsi_cmd ct3b_init_cmds[] = {
 	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_EVT1_1), 0x6F, 0x17),
 	GS_DSI_REV_CMD(PANEL_REV_GE(PANEL_REV_EVT1_1), 0xBD, 0x7E, 0x08, 0x1C),
 
+	/* ACD off */
+	GS_DSI_CMD(0x55, 0x00),
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00),
+	GS_DSI_CMD(0xB0, 0x0C),
+	GS_DSI_CMD(0x6F, 0x09),
+	GS_DSI_CMD(0xB0, 0x2A, 0x2B, 0x2A),
+	GS_DSI_CMD(0x6F, 0x0C),
+	GS_DSI_CMD(0xB0, 0x0F, 0x05, 0x32),
+	GS_DSI_CMD(0xB1, 0x35, 0x35, 0x35),
+	GS_DSI_CMD(0x6F, 0x03),
+	GS_DSI_CMD(0xB1, 0x00, 0x35),
+	GS_DSI_CMD(0x6F, 0x14),
+	GS_DSI_CMD(0xB1, 0x00, 0x35),
+	GS_DSI_CMD(0x6F, 0x16),
+	GS_DSI_CMD(0xB1, 0x00, 0x35),
+	GS_DSI_CMD(0x6F, 0x05),
+	GS_DSI_CMD(0xB1, 0x12, 0x34, 0x57, 0x89, 0x2C, 0x58, 0x84, 0xB0,
+				0xDC, 0x08, 0x34, 0x60),
+	GS_DSI_CMD(0x6F, 0x21),
+	GS_DSI_CMD(0xB1, 0x00, 0x00, 0x24, 0x68, 0xAC, 0xEF, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0xFF),
+	GS_DSI_CMD(0x6F, 0x18),
+	GS_DSI_CMD(0xB1, 0x04, 0x34, 0x08, 0x68, 0x04, 0x34),
+	GS_DSI_CMD(0x6F, 0x1E),
+	GS_DSI_CMD(0xB1, 0x11, 0x0A, 0xD8),
+
+	GS_DSI_CMD(0xBE, 0x5F, 0x4A, 0x49, 0x4F),
+	GS_DSI_CMD(0x6F, 0xC5),
+	GS_DSI_CMD(0xBA, 0x10),
+
+	/* Frame insertion default config */
+	GS_DSI_CMD(0x6F, 0x2D),
+	GS_DSI_CMD(0xBA, 0x01),
+	GS_DSI_CMD(0x6F, 0x31),
+	GS_DSI_CMD(0xBA, 0x01),
+	GS_DSI_CMD(0x6F, 0x35),
+	GS_DSI_CMD(0xBA, 0x01),
+	GS_DSI_CMD(0x6F, 0x3D),
+	GS_DSI_CMD(0xBA, 0x01),
+	GS_DSI_CMD(0x6F, 0x41),
+	GS_DSI_CMD(0xBA, 0x03),
+	GS_DSI_CMD(0x6F, 0x45),
+	GS_DSI_CMD(0xBA, 0x03),
+	GS_DSI_CMD(0x6F, 0x4D),
+	GS_DSI_CMD(0xBA, 0x01),
+	GS_DSI_CMD(0x6F, 0x51),
+	GS_DSI_CMD(0xBA, 0x0B),
+	GS_DSI_CMD(0x6F, 0x55),
+	GS_DSI_CMD(0xBA, 0x0B),
+
+	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x00),
+	GS_DSI_CMD(0xFF, 0x55, 0xAA, 0x52, 0x00, 0x00),
+	GS_DSI_CMD(0x35),
+	GS_DSI_CMD(0x53, 0x20),
+	GS_DSI_CMD(0x2A, 0x00, 0x00, 0x08, 0x67),
+	GS_DSI_CMD(0x2B, 0x00, 0x00, 0x08, 0x1B),
+	GS_DSI_CMD(0x26, 0x00),
+	GS_DSI_CMD(0x81, 0x01, 0x00),
+	GS_DSI_CMD(0x5A, 0x01),
+	GS_DSI_CMD(0x90, 0x03),
+	GS_DSI_CMD(0x91, 0x89, 0xA8, 0x00, 0x0C, 0xC2, 0x00, 0x03, 0x1B,
+				0x01, 0x7D, 0x00, 0x0E, 0x08, 0xBB, 0x04, 0x40,
+				0x10, 0xF0),
+	/* early-exit off */
+	GS_DSI_CMD(0x6F, 0x01),
+	GS_DSI_CMD(0x6D, 0x00),
+	GS_DSI_DELAY_CMD(120, MIPI_DCS_EXIT_SLEEP_MODE),
+
 	/* Demura */
 	GS_DSI_REV_CMD(PANEL_REV_DVT1, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04),
 	GS_DSI_REV_CMD(PANEL_REV_DVT1, 0x6F, 0x00),
@@ -290,55 +439,6 @@ static const struct gs_dsi_cmd ct3b_init_cmds[] = {
 	GS_DSI_REV_CMD(PANEL_REV_DVT1, 0xD2, 0x80),
 	GS_DSI_REV_CMD(PANEL_REV_DVT1, 0x6F, 0x48),
 	GS_DSI_REV_CMD(PANEL_REV_DVT1, 0xD2, 0xC0),
-
-	/* ACD off */
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x55, 0x00),
-	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB0, 0x0C),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x09),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB0, 0x2A, 0x2B, 0x2A),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x0C),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB0, 0x0F, 0x05, 0x32),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x35, 0x35, 0x35),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x03),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x00, 0x35),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x14),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x00, 0x35),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x16),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x00, 0x35),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x05),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x12, 0x34, 0x57, 0x89,
-				0x2C, 0x58, 0x84, 0xB0, 0xDC, 0x08, 0x34, 0x60),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x21),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x00, 0x00, 0x24, 0x68,
-				0xAC, 0xEF, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0xFF),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x18),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x04, 0x34, 0x08, 0x68,
-				0x04, 0x34),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0x6F, 0x1E),
-	GS_DSI_REV_CMD(PANEL_REV_LT(PANEL_REV_PVT), 0xB1, 0x11, 0x0A, 0xD8),
-
-	GS_DSI_CMD(0xBE, 0x5F, 0x4A, 0x49, 0x4F),
-	GS_DSI_CMD(0x6F, 0xC5),
-	GS_DSI_CMD(0xBA, 0x00),
-
-	GS_DSI_CMD(0xFF, 0xAA, 0x55, 0xA5, 0x00),
-	GS_DSI_CMD(0xFF, 0x55, 0xAA, 0x52, 0x00, 0x00),
-	GS_DSI_CMD(0x35),
-	GS_DSI_CMD(0x53, 0x20),
-	GS_DSI_CMD(0x2A, 0x00, 0x00, 0x08, 0x67),
-	GS_DSI_CMD(0x2B, 0x00, 0x00, 0x08, 0x1B),
-	GS_DSI_CMD(0x26, 0x00),
-	GS_DSI_CMD(0x81, 0x01, 0x00),
-	GS_DSI_CMD(0x5A, 0x01),
-	GS_DSI_CMD(0x90, 0x03),
-	GS_DSI_CMD(0x91, 0x89, 0xA8, 0x00, 0x0C, 0xC2, 0x00, 0x03, 0x1B,
-				0x01, 0x7D, 0x00, 0x0E, 0x08, 0xBB, 0x04, 0x40,
-				0x10, 0xF0),
-	/* early-exit off */
-	GS_DSI_CMD(0x6F, 0x01),
-	GS_DSI_CMD(0x6D, 0x00),
-	GS_DSI_DELAY_CMD(120, MIPI_DCS_EXIT_SLEEP_MODE),
 };
 static DEFINE_GS_CMDSET(ct3b_init);
 
@@ -352,6 +452,24 @@ static void ct3b_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 			GS_DCS_BUF_ADD_CMD(dev, 0x51, 0x0F, 0xFF);
 			/* ACD level.1 */
 			GS_DCS_BUF_ADD_CMD(dev, 0x55, 0x04);
+			/* Update the ELVSS before entry HBM2 */
+			if (ctx->panel_rev > PANEL_REV_EVT1_1) {
+				GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x06);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x7F, 0x00, 0x5C, 0x67);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x11);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x5C, 0x5C, 0x5C, 0x5C, 0x5C);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x2D);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29,
+							0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x22,
+							0x22, 0x1D, 0x1D, 0x13, 0x13, 0x05, 0x05,
+							0x01, 0x01, 0x01);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x44);
+				GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x29, 0x29, 0x29, 0x29, 0x29, 0x29,
+							0x29, 0x29, 0x29, 0x29, 0x29, 0x29, 0x22,
+							0x22, 0x1D, 0x1D, 0x13, 0x13, 0x05, 0x05,
+							0x01, 0x01, 0x01);
+			}
 		}
 
 		GS_DCS_BUF_ADD_CMD(dev, 0x5F, 0x01);
@@ -377,6 +495,24 @@ static void ct3b_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 		GS_DCS_BUF_ADD_CMD(dev, 0x5F, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0x26, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+		/* restore the ELVSS after exit HBM2 */
+		if (ctx->panel_rev > PANEL_REV_EVT1_1) {
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x06);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x7F, 0x00, 0x60, 0x67);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x11);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x60, 0x60, 0x60, 0x60, 0x60);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x2D);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25,
+						0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x1E,
+						0x1E, 0x19, 0x19, 0x0F, 0x0F, 0x01, 0x01,
+						0x01, 0x01, 0x01);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x44);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB5, 0x25, 0x25, 0x25, 0x25, 0x25, 0x25,
+						0x25, 0x25, 0x25, 0x25, 0x25, 0x25, 0x1E,
+						0x1E, 0x19, 0x19, 0x0F, 0x0F, 0x01, 0x01,
+						0x01, 0x01, 0x01);
+		}
+
 		if (ctx->panel_rev < PANEL_REV_DVT1) {
 			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
 			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC0, 0x30);
@@ -392,12 +528,13 @@ static void ct3b_update_irc(struct gs_panel *ctx, const enum gs_hbm_mode hbm_mod
 static u8 ct3b_get_te2_option(struct gs_panel *ctx)
 {
 	struct ct3b_panel *spanel = to_spanel(ctx);
+	struct gs_panel_status *sw_status = &ctx->sw_status;
 
 	if (!ctx || !ctx->current_mode || spanel->force_changeable_te2)
 		return TEX_OPT_CHANGEABLE;
 
 	if (ctx->current_mode->gs_mode.is_lp_mode ||
-	    (test_bit(FEAT_EARLY_EXIT, ctx->sw_status.feat) && spanel->auto_mode_vrefresh < 30))
+	    (test_bit(FEAT_EARLY_EXIT, sw_status->feat) && sw_status->idle_vrefresh < 30))
 		return TEX_OPT_FIXED;
 
 	return TEX_OPT_CHANGEABLE;
@@ -458,22 +595,29 @@ static u32 ct3b_get_min_idle_vrefresh(struct gs_panel *ctx,
 	return min_idle_vrefresh;
 }
 
-static void ct3b_set_panel_feat_auto_fi(struct gs_panel *ctx)
+static void ct3b_set_panel_feat_manual_mode_fi(struct gs_panel *ctx)
 {
 	struct device *dev = ctx->dev;
 	bool enabled;
-	u8 val;
 
-	enabled = test_bit(FEAT_FI_AUTO, ctx->sw_status.feat);
-	val = enabled ? 0x51 : 0x01;
+	enabled = test_bit(FEAT_FRAME_MANUAL_FI, ctx->sw_status.feat);
 
+	GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
 	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x9C);
-	GS_DCS_BUF_ADD_CMD(dev, 0xBA, val);
+	GS_DCS_BUF_ADD_CMD(dev, 0xBA, enabled ? 0x21 : 0x11);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x9E);
+	GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x01);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0xA0);
+	GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x01);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0xA2);
+	GS_DCS_BUF_ADD_CMD(dev, 0xBA, enabled ? 0xA1 : 0x01);
 	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0xA4);
 	GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x00, 0x01);
+	GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6D, 0x04);
 
-	dev_dbg(ctx->dev, "%s: auto fi %s\n", __func__, enabled ? "enabled" : "disabled");
+	dev_dbg(ctx->dev, "%s: manual mode fi %s\n", __func__, enabled ? "enabled" : "disabled");
 }
 
 static void ct3b_set_panel_feat_frequency(struct gs_panel *ctx, unsigned long *feat, u32 vrefresh,
@@ -481,7 +625,6 @@ static void ct3b_set_panel_feat_frequency(struct gs_panel *ctx, unsigned long *f
 {
 	struct device *dev = ctx->dev;
 	u8 val;
-	const bool is_ns_mode = test_bit(FEAT_OP_NS, feat);
 
 	/*
 	 * Description: this sequence possibly overrides some configs early-exit
@@ -491,109 +634,73 @@ static void ct3b_set_panel_feat_frequency(struct gs_panel *ctx, unsigned long *f
 		/* frame insertion on */
 		GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
 		/* target frequency */
-		if (is_ns_mode && ctx->panel_rev >= PANEL_REV_DVT1) {
-			if (idle_vrefresh == 30) {
-				val = 0x05;
-			} else if (idle_vrefresh == 10) {
-				val = 0x06;
-			} else {
-				if (idle_vrefresh != 1)
-					dev_warn(ctx->dev, "%s: unsupported target freq %d (ns)\n",
-						 __func__, idle_vrefresh);
-				/* 1Hz */
-				val = 0x07;
-			}
+		if (idle_vrefresh == 60) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x00;
+			else
+				val = 0x01;
+		} else if (idle_vrefresh == 30) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x01;
+			else
+				val = 0x02;
+		} else if (idle_vrefresh == 10) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x02;
+			else
+				val = 0x03;
 		} else {
-			if (idle_vrefresh == 60) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x00;
-				else
-					val = 0x01;
-
-			} else if (idle_vrefresh == 30) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x01;
-				else
-					val = 0x02;
-			} else if (idle_vrefresh == 10) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x02;
-				else
-					val = 0x03;
-			} else {
-				if (idle_vrefresh != 1)
-					dev_warn(ctx->dev, "%s: unsupported target freq %d (ns)\n",
-						 __func__, idle_vrefresh);
-				/* 1Hz */
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x03;
-				else
-					val = 0x04;
-			}
+			if (idle_vrefresh != 1)
+				dev_warn(ctx->dev, "%s: unsupported target freq %d (ns)\n",
+					 __func__, idle_vrefresh);
+			/* 1Hz */
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x03;
+			else
+				val = 0x04;
 		}
 		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
 	} else { /* manual */
-		if (is_ns_mode && ctx->panel_rev >= PANEL_REV_DVT1) {
-			if (vrefresh == 1) {
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, 0x07);
-			} else if (vrefresh == 10) {
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, 0x06);
-			} else if (vrefresh == 30) {
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, 0x05);
-			} else {
-				if (vrefresh != 60)
-					dev_warn(ctx->dev,
-						 "%s: unsupported manual freq %d (hs)\n",
-						 __func__, vrefresh);
-				/* 60Hz */
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x01);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x26, 0x00);
-			}
+		if (vrefresh == 1) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x03;
+			else
+				val = 0x04;
+
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
+		} else if (vrefresh == 10) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x02;
+			else
+				val = 0x03;
+
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
+		} else if (vrefresh == 30) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x01;
+			else
+				val = 0x02;
+
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
+		} else if (vrefresh == 60) {
+			if (ctx->panel_rev < PANEL_REV_EVT1_1)
+				val = 0x00;
+			else
+				val = 0x01;
+
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
 		} else {
-			if (vrefresh == 1) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x03;
-				else
-					val = 0x04;
-
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
-			} else if (vrefresh == 10) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x02;
-				else
-					val = 0x03;
-
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
-			} else if (vrefresh == 30) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x01;
-				else
-					val = 0x02;
-
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
-			} else if (vrefresh == 60) {
-				if (ctx->panel_rev < PANEL_REV_EVT1_1)
-					val = 0x00;
-				else
-					val = 0x01;
-
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x30);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x6D, val);
-			} else {
-				if (vrefresh != 120)
-					dev_warn(ctx->dev,
-						 "%s: unsupported manual freq %d (hs)\n",
-						 __func__, vrefresh);
-				/* 120Hz */
-				GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
-				GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x26, 0x00);
-			}
+			if (vrefresh != 120)
+				dev_warn(ctx->dev,
+					 "%s: unsupported manual freq %d (hs)\n",
+					 __func__, vrefresh);
+			/* 120Hz */
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x26, 0x00);
 		}
 	}
 }
@@ -607,73 +714,59 @@ static void ct3b_set_panel_feat_frequency(struct gs_panel *ctx, unsigned long *f
  *
  * Configure panel features based on the context.
  */
-static void ct3b_set_panel_feat(struct gs_panel *ctx,
-	const struct gs_panel_mode *pmode, u32 idle_vrefresh, bool enforce)
+static void ct3b_set_panel_feat(struct gs_panel *ctx, const struct gs_panel_mode *pmode,
+			       bool enforce)
 {
 	struct device *dev = ctx->dev;
-	unsigned long *feat = ctx->sw_status.feat;
+	struct gs_panel_status *sw_status = &ctx->sw_status;
+	struct gs_panel_status *hw_status = &ctx->hw_status;
+	unsigned long *feat = sw_status->feat;
+	u32 idle_vrefresh = sw_status->idle_vrefresh;
 	u32 vrefresh = drm_mode_vrefresh(&pmode->mode);
 	u32 te_freq = gs_drm_mode_te_freq(&pmode->mode);
 	bool is_vrr = gs_is_vrr_mode(pmode);
 	DECLARE_BITMAP(changed_feat, FEAT_MAX);
 
 #ifndef PANEL_FACTORY_BUILD
-	if (is_vrr) {
-		if (pmode->mode.flags & DRM_MODE_FLAG_NS)
-			set_bit(FEAT_OP_NS, feat);
-		else
-			clear_bit(FEAT_OP_NS, feat);
-	}
-	if (ctx->panel_rev >= PANEL_REV_DVT1 || !test_bit(FEAT_OP_NS, feat)) {
-		vrefresh = 1;
+	if (!test_bit(FEAT_FRAME_AUTO, feat)) {
+		vrefresh = idle_vrefresh ?: 1;
 		idle_vrefresh = 0;
-		set_bit(FEAT_EARLY_EXIT, feat);
-		clear_bit(FEAT_FRAME_AUTO, feat);
-	} else {
-		clear_bit(FEAT_EARLY_EXIT, feat);
 	}
+	set_bit(FEAT_EARLY_EXIT, feat);
 #endif
 
 	if (enforce) {
 		bitmap_fill(changed_feat, FEAT_MAX);
 	} else {
-		bitmap_xor(changed_feat, feat, ctx->hw_status.feat, FEAT_MAX);
-		if (bitmap_empty(changed_feat, FEAT_MAX) && vrefresh == ctx->hw_status.vrefresh &&
-			idle_vrefresh == ctx->hw_status.idle_vrefresh &&
-			te_freq == ctx->hw_status.te_freq) {
+		bitmap_xor(changed_feat, feat, hw_status->feat, FEAT_MAX);
+		if (bitmap_empty(changed_feat, FEAT_MAX) && vrefresh == hw_status->vrefresh &&
+			idle_vrefresh == hw_status->idle_vrefresh &&
+			te_freq == hw_status->te.rate_hz) {
 			dev_dbg(dev, "%s: no changes, skip update\n", __func__);
 			return;
 		}
 	}
 
-	dev_dbg(dev,
-		"op=%d ee=%d fi=%d fps=%u idle_fps=%u te=%u vrr=%d\n",
+	dev_dbg(dev, "op=%u ee=%u vrr=%u fi=%u@a,%u@m rr=%u-%u:%u\n",
 		test_bit(FEAT_OP_NS, feat),test_bit(FEAT_EARLY_EXIT, feat),
-		test_bit(FEAT_FRAME_AUTO, feat),
-		vrefresh, idle_vrefresh, te_freq, is_vrr);
+		is_vrr, test_bit(FEAT_FRAME_MANUAL_FI, feat), test_bit(FEAT_FRAME_AUTO, feat),
+		idle_vrefresh ?: vrefresh, drm_mode_vrefresh(&pmode->mode), te_freq);
 
 #ifndef PANEL_FACTORY_BUILD
 	/* TE setting */
-	if (ctx->panel_rev >= PANEL_REV_DVT1 || !test_bit(FEAT_OP_NS, feat)) {
+	sw_status->te.rate_hz = te_freq;
+	if (te_freq == 60) {
 		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x47, 0x4A, 0x49, 0x4F);
 
-		if (te_freq == 60 && !test_bit(FEAT_OP_NS, feat)) {
-			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
-			GS_DCS_BUF_ADD_CMD(dev, 0x35, 0x01);
-			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x1C);
-			GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x01, 0x01, 0x01, 0x01, 0x77, 0x77,
-					0x77, 0x77, 0x77, 0x77, 0x77, 0x77);
-		} else {
-			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
-			GS_DCS_BUF_ADD_CMD(dev, 0x35, 0x00);
-			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x1C);
-			GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
-					0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-		}
+		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+		GS_DCS_BUF_ADD_CMD(dev, 0x35, 0x01);
+		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x1C);
+		GS_DCS_BUF_ADD_CMD(dev, 0xBA, 0x01, 0x01, 0x01, 0x01, 0x77, 0x77, 0x77,
+				0x77, 0x77, 0x77, 0x77, 0x77);
 	} else {
 		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-		GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x5F, 0x4A, 0x49, 0x4F);
+		GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x47, 0x4A, 0x49, 0x4F);
 		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
 		GS_DCS_BUF_ADD_CMD(dev, 0x35, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x1C);
@@ -691,27 +784,29 @@ static void ct3b_set_panel_feat(struct gs_panel *ctx,
 		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x01);
 		GS_DCS_BUF_ADD_CMD(dev, 0x6D, 0x01);
 		GS_DCS_BUF_ADD_CMD(dev, 0x5A, 0x00);
+		hw_status->te.option = TEX_OPT_FIXED;
 	} else {
 		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x01);
 		GS_DCS_BUF_ADD_CMD(dev, 0x6D, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0x5A, 0x01);
+		hw_status->te.option = TEX_OPT_CHANGEABLE;
 	}
 
 	/*
-	 * Auto FI: enable or disable
+	 * Manual FI: enable or disable manual mode FI
 	 */
-	if (test_bit(FEAT_FI_AUTO, changed_feat))
-		ct3b_set_panel_feat_auto_fi(ctx);
+	if (test_bit(FEAT_FRAME_MANUAL_FI, changed_feat))
+		ct3b_set_panel_feat_manual_mode_fi(ctx);
 
 	/*
 	 * Frequency setting: FI, frequency, idle frequency
 	 */
 	ct3b_set_panel_feat_frequency(ctx, feat, vrefresh, idle_vrefresh, is_vrr);
 
-	ctx->hw_status.vrefresh = vrefresh;
-	ctx->hw_status.idle_vrefresh = idle_vrefresh;
-	ctx->hw_status.te_freq = te_freq;
-	bitmap_copy(ctx->hw_status.feat, feat, FEAT_MAX);
+	hw_status->vrefresh = vrefresh;
+	hw_status->idle_vrefresh = idle_vrefresh;
+	hw_status->te.rate_hz = te_freq;
+	bitmap_copy(hw_status->feat, feat, FEAT_MAX);
 }
 
 /**
@@ -725,21 +820,19 @@ static void ct3b_set_panel_feat(struct gs_panel *ctx,
 static void ct3b_update_panel_feat(struct gs_panel *ctx, bool enforce)
 {
 	const struct gs_panel_mode *pmode = ctx->current_mode;
-	struct ct3b_panel *spanel = to_spanel(ctx);
-	u32 idle_vrefresh = spanel->auto_mode_vrefresh;
 
-	ct3b_set_panel_feat(ctx, pmode, idle_vrefresh, enforce);
+	ct3b_set_panel_feat(ctx, pmode, enforce);
 }
 
 static void ct3b_update_refresh_mode(struct gs_panel *ctx, const struct gs_panel_mode *pmode,
 				    const u32 idle_vrefresh)
 {
-	struct ct3b_panel *spanel = to_spanel(ctx);
+	struct gs_panel_status *sw_status = &ctx->sw_status;
 
 	dev_info(ctx->dev, "%s: mode: %s set idle_vrefresh: %u\n", __func__,
 		pmode->mode.name, idle_vrefresh);
 
-	spanel->auto_mode_vrefresh = idle_vrefresh;
+	sw_status->idle_vrefresh = idle_vrefresh;
 	/*
 	 * Note: when mode is explicitly set, panel performs early exit to get out
 	 * of idle at next vsync, and will not back to idle until not seeing new
@@ -748,7 +841,7 @@ static void ct3b_update_refresh_mode(struct gs_panel *ctx, const struct gs_panel
 	 * new frame commit will correct it if the guess is wrong.
 	 */
 	ctx->idle_data.panel_idle_vrefresh = idle_vrefresh;
-	ct3b_set_panel_feat(ctx, pmode, idle_vrefresh, false);
+	ct3b_set_panel_feat(ctx, pmode, false);
 	notify_panel_mode_changed(ctx);
 
 	dev_dbg(ctx->dev, "%s: display state is notified\n", __func__);
@@ -762,16 +855,14 @@ static void ct3b_change_frequency(struct gs_panel *ctx, const struct gs_panel_mo
 	if (!ctx)
 		return;
 
-	if (vrefresh > ctx->op_hz) {
-		dev_err(ctx->dev, "invalid freq setting: op_hz=%u, vrefresh=%u\n",
-				ctx->op_hz, vrefresh);
-		return;
-	}
-
 	if (pmode->idle_mode == GIDLE_MODE_ON_INACTIVITY)
 		idle_vrefresh = ct3b_get_min_idle_vrefresh(ctx, pmode);
 
+	if (test_bit(FEAT_FRAME_AUTO, ctx->sw_status.feat))
+		idle_vrefresh = ctx->sw_status.idle_vrefresh;
+
 	ct3b_update_refresh_mode(ctx, pmode, idle_vrefresh);
+	ctx->sw_status.te.rate_hz = gs_drm_mode_te_freq(&pmode->mode);
 
 	dev_dbg(ctx->dev, "%s: change to %uHz\n", __func__, vrefresh);
 }
@@ -819,6 +910,7 @@ static bool ct3b_set_self_refresh(struct gs_panel *ctx, bool enable)
 {
 	const struct gs_panel_mode *pmode = ctx->current_mode;
 	struct ct3b_panel *spanel = to_spanel(ctx);
+	struct device *dev = ctx->dev;
 	u32 idle_vrefresh;
 
 	dev_dbg(ctx->dev, "%s: %d\n", __func__, enable);
@@ -831,6 +923,19 @@ static bool ct3b_set_self_refresh(struct gs_panel *ctx, bool enable)
 		/* set 1Hz while self refresh is active, otherwise clear it */
 		ctx->idle_data.panel_idle_vrefresh = enable ? 1 : 0;
 		notify_panel_mode_changed(ctx);
+
+		/* 1Hz */
+		if (spanel->needs_aod_idle && ctx->panel_rev >= PANEL_REV_EVT1_1) {
+			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
+			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x47, 0x4A, 0x49, 0x4F);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x18);
+			GS_DCS_BUF_ADD_CMD(dev, 0xBB, 0x01, 0x1D);
+			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x2F, 0x30);
+
+			spanel->needs_aod_idle = false;
+		}
+
 		return false;
 	}
 
@@ -842,7 +947,7 @@ static bool ct3b_set_self_refresh(struct gs_panel *ctx, bool enable)
 		 * or switch to manual mode if idle should be disabled (idle_vrefresh=0)
 		 */
 		if ((pmode->idle_mode == GIDLE_MODE_ON_INACTIVITY) &&
-			(spanel->auto_mode_vrefresh != idle_vrefresh)) {
+			(ctx->sw_status.idle_vrefresh != idle_vrefresh)) {
 			ct3b_update_refresh_mode(ctx, pmode, idle_vrefresh);
 			return true;
 		}
@@ -896,9 +1001,77 @@ static void ct3b_set_dimming_on(struct gs_panel *ctx,
 	dev_dbg(dev, "%s dimming_on=%d\n", __func__, dimming_on);
 }
 
+#ifndef PANEL_FACTORY_BUILD
+static void ct3b_update_refresh_ctrl_feat(struct gs_panel *ctx, const struct gs_panel_mode *pmode)
+{
+	const u32 ctrl = ctx->refresh_ctrl;
+	unsigned long *feat = ctx->sw_status.feat;
+	u32 min_vrefresh = ctx->sw_status.idle_vrefresh;
+	u32 vrefresh;
+	bool lp_mode;
+
+	if (!pmode)
+		return;
+
+	vrefresh = drm_mode_vrefresh(&pmode->mode);
+	lp_mode =  pmode->gs_mode.is_lp_mode;
+
+	if (ctrl & GS_PANEL_REFRESH_CTRL_MIN_REFRESH_RATE_MASK) {
+		min_vrefresh = (ctrl & GS_PANEL_REFRESH_CTRL_MIN_REFRESH_RATE_MASK) >>
+				GS_PANEL_REFRESH_CTRL_MIN_REFRESH_RATE_OFFSET;
+
+		if (min_vrefresh > vrefresh) {
+			dev_warn(ctx->dev, "%s: min RR %uHz requested, but valid range is 1-%uHz\n",
+				 __func__, min_vrefresh, vrefresh);
+			min_vrefresh = vrefresh;
+		}
+		if (ctx->sw_status.idle_vrefresh != min_vrefresh) {
+			if (!lp_mode) {
+				ctx->sw_status.idle_vrefresh = min_vrefresh;
+			} else {
+				dev_warn(ctx->dev, "%s: setting minRR during AOD not supported\n",
+				 __func__);
+			}
+		}
+	}
+
+	if ((ctrl & GS_PANEL_REFRESH_CTRL_FI_AUTO) && (min_vrefresh <= 1)) {
+		set_bit(FEAT_FRAME_MANUAL_FI, feat);
+	} else {
+		clear_bit(FEAT_FRAME_MANUAL_FI, feat);
+	}
+
+	if (lp_mode) {
+		dev_warn(ctx->dev, "%s: new refresh_ctrl settings will apply during AOD exit\n",
+			 __func__);
+		return;
+	}
+
+	ct3b_set_panel_feat(ctx, pmode, false);
+}
+
+static void ct3b_refresh_ctrl(struct gs_panel *ctx)
+{
+	const u32 ctrl = ctx->refresh_ctrl;
+	struct device *dev = ctx->dev;
+
+	PANEL_ATRACE_BEGIN(__func__);
+
+	ct3b_update_refresh_ctrl_feat(ctx, ctx->current_mode);
+
+	if (ctrl & GS_PANEL_REFRESH_CTRL_FI_FRAME_COUNT_MASK) {
+		dev_dbg(dev, "%s: manually inserting frame\n", __func__);
+		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x2C, 0x00);
+	}
+
+	PANEL_ATRACE_END(__func__);
+}
+#endif
+
 static void ct3b_set_lp_mode(struct gs_panel *ctx, const struct gs_panel_mode *pmode)
 {
 	struct device *dev = ctx->dev;
+	struct ct3b_panel *spanel = to_spanel(ctx);
 
 	dev_dbg(ctx->dev, "%s\n", __func__);
 
@@ -913,26 +1086,16 @@ static void ct3b_set_lp_mode(struct gs_panel *ctx, const struct gs_panel_mode *p
 
 	/* enter AOD */
 	GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
-	if (ctx->panel_rev >= PANEL_REV_EVT1_1) {
-		GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
-		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
-		GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x20);
-
-		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_ENTER_IDLE_MODE);
-
-		/* skip 1Hz */
-		GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
-		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
-		GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x47, 0x4A, 0x49, 0x4F);
-		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x18);
-		GS_DCS_BUF_ADD_CMD(dev, 0xBB, 0x01, 0x1D);
-		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x2F, 0x30);
-	} else {
-		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, MIPI_DCS_ENTER_IDLE_MODE);
-	}
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x20);
+	GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_ENTER_IDLE_MODE);
 
 	ctx->hw_status.vrefresh = 30;
-	ctx->hw_status.te_freq = 30;
+	ctx->hw_status.te.rate_hz = 30;
+	ctx->sw_status.te.rate_hz = 30;
+	ctx->sw_status.te.option = TEX_OPT_FIXED;
+	spanel->needs_aod_idle = true;
 
 	PANEL_ATRACE_END(__func__);
 
@@ -942,9 +1105,7 @@ static void ct3b_set_lp_mode(struct gs_panel *ctx, const struct gs_panel_mode *p
 static void ct3b_set_nolp_mode(struct gs_panel *ctx,
 				  const struct gs_panel_mode *pmode)
 {
-	struct ct3b_panel *spanel = to_spanel(ctx);
 	struct device *dev = ctx->dev;
-	u32 idle_vrefresh = spanel->auto_mode_vrefresh;
 
 	if (!gs_is_panel_active(ctx))
 		return;
@@ -960,11 +1121,10 @@ static void ct3b_set_nolp_mode(struct gs_panel *ctx,
 
 	/* exit AOD */
 	GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_EXIT_IDLE_MODE);
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x2B);
 	if (ctx->panel_rev >= PANEL_REV_EVT1_1) {
-		GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
-		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
-		GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x2B);
-
 		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
 		GS_DCS_BUF_ADD_CMD(dev, 0xBE, 0x5F, 0x4A, 0x49, 0x4F);
 	}
@@ -972,58 +1132,13 @@ static void ct3b_set_nolp_mode(struct gs_panel *ctx,
 	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, MIPI_DCS_WRITE_CONTROL_DISPLAY,
 					ctx->dimming_on ? 0x28 : 0x20);
 
-	ct3b_set_panel_feat(ctx, pmode, idle_vrefresh, true);
+	ct3b_update_refresh_ctrl_feat(ctx, pmode);
+	ct3b_set_panel_feat(ctx, pmode, true);
 	ct3b_change_frequency(ctx, pmode);
 
 	PANEL_ATRACE_END(__func__);
 
 	dev_info(dev, "exit LP mode\n");
-}
-
-static int ct3b_set_op_hz(struct gs_panel *ctx, unsigned int hz)
-{
-	const unsigned int vrefresh = drm_mode_vrefresh(&ctx->current_mode->mode);
-
-	if (gs_is_vrr_mode(ctx->current_mode)) {
-		dev_warn(ctx->dev, "%s: should be set via mode switch\n", __func__);
-		return -EINVAL;
-	}
-
-	if ((vrefresh > hz) || ((hz != 60) && (hz != 120))) {
-		dev_err(ctx->dev, "invalid op_hz=%u for vrefresh=%u\n",
-			hz, vrefresh);
-		return -EINVAL;
-	}
-
-	PANEL_ATRACE_BEGIN(__func__);
-
-	ctx->op_hz = hz;
-	if (hz == 60)
-		set_bit(FEAT_OP_NS, ctx->sw_status.feat);
-	else
-		clear_bit(FEAT_OP_NS, ctx->sw_status.feat);
-
-	if (gs_is_panel_active(ctx))
-		ct3b_update_panel_feat(ctx, false);
-
-	dev_info(ctx->dev, "%s op_hz at %d\n",
-		gs_is_panel_active(ctx) ? "set" : "cache", hz);
-
-	if (hz == 120) {
-		/*
-		 * We may transfer the frame for the first TE after switching from
-		 * NS to HS mode. The DDIC read speed will change from 60Hz to 120Hz,
-		 * but the DPU write speed will remain the same. In this case,
-		 * underruns would happen. Waiting for an extra vblank here so that
-		 * the frame can be postponed to the next TE to avoid the noises.
-		 */
-		dev_dbg(ctx->dev, "wait one vblank after NS to HS\n");
-		ct3b_wait_one_vblank(ctx);
-	}
-
-	PANEL_ATRACE_END(__func__);
-
-	return 0;
 }
 
 static void ct3b_dimming_frame_setting(struct gs_panel *ctx, u8 dimming_frame)
@@ -1043,7 +1158,7 @@ static void ct3b_dimming_frame_setting(struct gs_panel *ctx, u8 dimming_frame)
 static int ct3b_enable(struct drm_panel *panel)
 {
 	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
-	struct device *dev = ctx->dev;
+	struct ct3b_panel *spanel = to_spanel(ctx);
 	const struct gs_panel_mode *pmode = ctx->current_mode;
 
 	if (!pmode) {
@@ -1065,34 +1180,11 @@ static int ct3b_enable(struct drm_panel *panel)
 	if (pmode->gs_mode.is_lp_mode)
 		ct3b_set_lp_mode(ctx, pmode);
 
-	GS_DCS_WRITE_CMD(dev, MIPI_DCS_SET_DISPLAY_ON);
+	spanel->needs_display_on = true;
 
 	PANEL_ATRACE_END(__func__);
 
 	return 0;
-}
-
-static void ct3b_refresh_ctrl(struct gs_panel *ctx)
-{
-	const u32 ctrl = ctx->refresh_ctrl;
-	struct device *dev = ctx->dev;
-
-	PANEL_ATRACE_BEGIN(__func__);
-
-	if (ctrl & GS_PANEL_REFRESH_CTRL_FI_AUTO) {
-		set_bit(FEAT_FI_AUTO, ctx->sw_status.feat);
-		ct3b_update_panel_feat(ctx, false);
-	} else {
-		clear_bit(FEAT_FI_AUTO, ctx->sw_status.feat);
-		ct3b_update_panel_feat(ctx, false);
-
-		if (ctrl & GS_PANEL_REFRESH_CTRL_FI_FRAME_COUNT_MASK) {
-			dev_dbg(dev, "%s: manually inserting frame\n", __func__);
-			GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0x2C, 0x00);
-		}
-	}
-
-	PANEL_ATRACE_END(__func__);
 }
 
 static int ct3b_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *state)
@@ -1101,10 +1193,11 @@ static int ct3b_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *stat
 	struct drm_connector_state *new_conn_state =
 					drm_atomic_get_new_connector_state(state, conn);
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
-	struct ct3b_panel *spanel = to_spanel(ctx);
+	const struct gs_panel_mode *pmode;
+	bool was_lp_mode, is_lp_mode = false;
 
-	if (!ctx->current_mode || drm_mode_vrefresh(&ctx->current_mode->mode) == 120 ||
-	    !new_conn_state || !new_conn_state->crtc)
+
+	if (!ctx->current_mode || !new_conn_state || !new_conn_state->crtc)
 		return 0;
 
 	new_crtc_state = drm_atomic_get_new_crtc_state(state, new_conn_state->crtc);
@@ -1112,10 +1205,25 @@ static int ct3b_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *stat
 	if (!old_crtc_state || !new_crtc_state || !new_crtc_state->active)
 		return 0;
 
-	if ((spanel->auto_mode_vrefresh && old_crtc_state->self_refresh_active) ||
+	was_lp_mode = ctx->current_mode->gs_mode.is_lp_mode;
+	pmode = gs_panel_get_mode(ctx, &new_crtc_state->mode);
+	if (pmode)
+		is_lp_mode = pmode->gs_mode.is_lp_mode;
+
+	if (drm_mode_vrefresh(&ctx->current_mode->mode) == 120 && !is_lp_mode)
+		return 0;
+
+	/* don't skip update when switching between AoD and normal mode */
+	if (pmode) {
+		if (was_lp_mode != is_lp_mode)
+			new_crtc_state->color_mgmt_changed = true;
+	} else {
+		dev_err(ctx->dev, "%s: no new mode\n", __func__);
+	}
+
+	if ((ctx->sw_status.idle_vrefresh && old_crtc_state->self_refresh_active) ||
 	    !drm_atomic_crtc_effectively_active(old_crtc_state) ||
-	    (ctx->current_mode->gs_mode.is_lp_mode &&
-		drm_mode_vrefresh(&new_crtc_state->mode) == 60)) {
+	    (was_lp_mode && drm_mode_vrefresh(&new_crtc_state->mode) == 60)) {
 		struct drm_display_mode *mode = &new_crtc_state->adjusted_mode;
 
 		mode->clock = mode->htotal * mode->vtotal * 120 / 1000;
@@ -1154,6 +1262,7 @@ static int ct3b_disable(struct drm_panel *panel)
 		return 0;
 	}
 
+	spanel->needs_display_on = false;
 	ret = gs_panel_disable(panel);
 	if (ret)
 		return ret;
@@ -1161,7 +1270,7 @@ static int ct3b_disable(struct drm_panel *panel)
 	/* panel register state gets reset after disabling hardware */
 	bitmap_clear(ctx->hw_status.feat, 0, FEAT_MAX);
 	ctx->hw_status.vrefresh = 60;
-	ctx->hw_status.te_freq = 60;
+	ctx->hw_status.te.rate_hz = 60;
 	ctx->hw_status.idle_vrefresh = 0;
 	spanel->dbv_range = DBV_INIT;
 
@@ -1219,24 +1328,37 @@ static void ct3b_update_idle_state(struct gs_panel *ctx)
 
 static void ct3b_commit_done(struct gs_panel *ctx)
 {
+	struct ct3b_panel *spanel = to_spanel(ctx);
+
 	if (ctx->current_mode->gs_mode.is_lp_mode)
 		return;
 
 	ct3b_update_idle_state(ctx);
+
+	if (!gs_is_panel_active(ctx) || !spanel->needs_display_on)
+		return;
+
+	PANEL_ATRACE_BEGIN("ct3b_wait_flip_done");
+	gs_panel_wait_for_flip_done(ctx, 100);
+	PANEL_ATRACE_END("ct3b_wait_flip_done");
+
+	GS_DCS_WRITE_CMD(ctx->dev, MIPI_DCS_SET_DISPLAY_ON);
+	spanel->needs_display_on = false;
+	dev_info(ctx->dev, "%s: DISPLAY_ON\n", __func__);
 }
 
 static void ct3b_update_ecc_setting(struct gs_panel *ctx)
 {
 	struct ct3b_panel *spanel = to_spanel(ctx);
 	struct device *dev = ctx->dev;
-	const u8 left_2nits[] = { 0xBD, 0xF9, 0xF0, 0xF9, 0xFB, 0xF9, 0xFC, 0xFE,
-							0xFD, 0xFF, 0xFF, 0xFF, 0xFF };
-	const u8 right_2nits[] = { 0xBD, 0xF2, 0xEA, 0xF5, 0xF8, 0xF5, 0xFB, 0xFD,
-							0xFC, 0xFE, 0xFF, 0xFF, 0xFF };
-	const u8 top_2nits[] = {0xBD, 0xF2, 0xE4, 0xED, 0xF7, 0xF3, 0xFA, 0xFE,
-							0xFE, 0xFE, 0xFF, 0xFF, 0xFF};
-	const u8 bottom_2nits[] = {0xBD, 0xF2, 0xE9, 0xEB, 0xF7, 0xF5, 0xFB, 0xFC,
-							0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	const u8 left_2nits[] = { 0xBD, 0xF7, 0xED, 0xF7, 0xF9, 0xF7, 0xFA, 0xFC,
+							0xFB, 0xFD, 0xFD, 0xFD, 0xFD };
+	const u8 right_2nits[] = { 0xBD, 0xEB, 0xE4, 0xEF, 0xF2, 0xEF, 0xF5, 0xF9,
+							0xF8, 0xFC, 0xFD, 0xFD, 0xFD };
+	const u8 top_2nits[] = { 0xBD, 0xEF, 0xE1, 0xEA, 0xF4, 0xF1, 0xF8, 0xFC,
+							0xFC, 0xFC, 0xFD, 0xFD, 0xFD};
+	const u8 bottom_2nits[] = { 0xBD, 0xED, 0xE4, 0xE8, 0xF2, 0xF0, 0xF6, 0xF7,
+							0xFA, 0xFA, 0xFC, 0xFC, 0xFC};
 	const u8 *left = spanel->edge_comp.left_default;
 	const u8 *right = spanel->edge_comp.right_default;
 	const u8 *top = spanel->edge_comp.top_default;
@@ -1616,7 +1738,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 #ifdef PANEL_FACTORY_BUILD
 	.num_modes = 5,
 #else
-	.num_modes = 3,
+	.num_modes = 4,
 #endif
 	.modes = {
 /* MRR modes */
@@ -1727,6 +1849,24 @@ static const struct gs_panel_mode_array ct3b_modes = {
 			},
 			.idle_mode = GIDLE_MODE_UNSUPPORTED,
 		},
+		{
+			.mode = {
+				.name = "2152x2076@60:60",
+				DRM_MODE_TIMING(60, 2152, 80, 30, 38, 2076, 6, 4, 14),
+				.flags = DRM_MODE_FLAG_TE_FREQ_X1 | DRM_MODE_FLAG_BTS_OP_RATE,
+				.type = DRM_MODE_TYPE_VRR,
+				.width_mm = WIDTH_MM,
+				.height_mm = HEIGHT_MM,
+			},
+			.gs_mode = {
+				.mode_flags = MIPI_DSI_CLOCK_NON_CONTINUOUS,
+				.vblank_usec = 120,
+				.bpc = 8,
+				.dsc = CT3B_DSC,
+				.underrun_param = &underrun_param,
+			},
+			.idle_mode = GIDLE_MODE_UNSUPPORTED,
+		},
 #endif
 	},/* modes */
 };
@@ -1808,15 +1948,19 @@ static void ct3b_panel_init(struct gs_panel *ctx)
 #ifdef PANEL_FACTORY_BUILD
 	ctx->idle_data.panel_idle_enabled = false;
 	set_bit(FEAT_FRAME_AUTO, ctx->sw_status.feat);
-	set_bit(FEAT_FI_AUTO, ctx->sw_status.feat);
+	set_bit(FEAT_FRAME_MANUAL_FI, ctx->sw_status.feat);
 #else
-	clear_bit(FEAT_FI_AUTO, ctx->sw_status.feat);
+	clear_bit(FEAT_FRAME_MANUAL_FI, ctx->sw_status.feat);
 	clear_bit(FEAT_FRAME_AUTO, ctx->sw_status.feat);
 #endif
 
 	/* re-init panel to decouple bootloader settings */
-	if (pmode)
-		ct3b_set_panel_feat(ctx, pmode, 0, true);
+	if (pmode) {
+		dev_info(ctx->dev, "%s: set mode: %s\n", __func__, pmode->mode.name);
+		ctx->sw_status.idle_vrefresh = 0;
+		ct3b_set_panel_feat(ctx, pmode, true);
+		ct3b_change_frequency(ctx, pmode);
+	}
 
 	ct3b_dimming_frame_setting(ctx, CT3B_DIMMING_FRAME);
 }
@@ -1839,9 +1983,10 @@ static int ct3b_panel_probe(struct mipi_dsi_device *dsi)
 		return -ENOMEM;
 	}
 
-	spanel->base.op_hz = 120;
 	ctx->hw_status.vrefresh = 60;
-	ctx->hw_status.te_freq = 60;
+	ctx->hw_status.te.rate_hz = 60;
+	/* always use fixed TE */
+	ctx->hw_status.te.option = TEX_OPT_FIXED;
 	spanel->dbv_range = DBV_INIT;
 	clear_bit(FEAT_ZA, ctx->hw_status.feat);
 
@@ -1968,8 +2113,9 @@ static const struct gs_panel_funcs ct3b_gs_funcs = {
 	.commit_done = ct3b_commit_done,
 	.set_self_refresh = ct3b_set_self_refresh,
 	.set_dimming = ct3b_set_dimming_on,
+#ifndef PANEL_FACTORY_BUILD
 	.refresh_ctrl = ct3b_refresh_ctrl,
-	.set_op_hz = ct3b_set_op_hz,
+#endif
 	.is_mode_seamless = ct3b_is_mode_seamless,
 	.mode_set = ct3b_mode_set,
 	.panel_init = ct3b_panel_init,
@@ -2012,6 +2158,7 @@ struct gs_panel_desc gs_ct3b = {
 	.panel_func = &ct3b_drm_funcs,
 	.gs_panel_func = &ct3b_gs_funcs,
 	.reset_timing_ms = { 1, 1, 20 },
+	.refresh_on_lp = true,
 };
 
 static const struct of_device_id gs_panel_of_match[] = {

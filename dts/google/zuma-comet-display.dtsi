@@ -89,8 +89,31 @@
 	};
 };
 
+&drmdecon0 {
+	status = "okay";
+	connector = <0x1 0x2 0x10>;
+	bts_scen_name = "dpu_qurgent_default";
+	bts_scen_min_panel_width = <2152>;
+	bts_scen_min_panel_height = <2076>;
+	bts_scen_min_fps = <120>;
+	bts_scen_min_rt = <1930198>;
+	bts_scen_max_rt = <3494400>;
+	bts_scen_min_peak = <0>;
+	bts_scen_max_peak = <5553600>;
+	bts_scen_skip_with_video;
+};
+
 &drmdecon1 {
 	status = "okay";
+	connector = <0x1 0x2 0x10>;
+	bts_scen_name = "dpu_qurgent_default";
+	bts_scen_min_panel_width = <1080>;
+	bts_scen_min_panel_height = <2424>;
+	bts_scen_min_fps = <120>;
+	bts_scen_min_rt = <5004799>;
+	bts_scen_max_rt = <5105906>;
+	bts_scen_min_peak = <4609478>;
+	bts_scen_max_peak = <4702599>;
 };
 
 &drmdp {
@@ -126,9 +149,9 @@
 };
 
 &s_ldo29_reg {
-	regulator-boot-on;
-	regulator-min-microvolt = <1800000>;
-	regulator-max-microvolt = <1800000>;
+	regulator-always-on;
+	regulator-min-microvolt = <1850000>;
+	regulator-max-microvolt = <1850000>;
 	schematic-name = "L29S_OUTER_DISP_VDDI";
 	subsys-name = "Display";
 };

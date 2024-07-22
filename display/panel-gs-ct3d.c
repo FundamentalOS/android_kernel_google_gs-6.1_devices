@@ -25,11 +25,24 @@
 
 #define CT3D_DDIC_ID_LEN 8
 #define CT3D_DIMMING_FRAME 32
+#define CT3D_GRAY_REFRESH_LEN 2
+#define CT3D_GRAY_GAMMA_LEN 3
+#define CT3D_GRAY_RGB_DATA_LEN 2
+#define CT3D_GRAY_RGB_LEN 3
+#define CT3D_BEH_LEN 10
+#define CT3D_READ_BEH_RETRY_COUNT 3
 
 #define WIDTH_MM 64
 #define HEIGHT_MM 145
 
+#define MIPI_DSI_FREQ_MBPS_DEFAULT 865
+#define MIPI_DSI_FREQ_MBPS_ALTERNATIVE 756
+
 #define PROJECT "CT3D"
+
+static const u8 gray_refresh_cmd[] = { 0x00, 0x10 };
+static const u8 gray_lvl_cmd[] = { 0x00, 0x02, 0x04 };
+static const u8 gray_rgb_cmd[] = { 0xB0, 0xB3, 0xB6 };
 
 /**
  * struct ct3d_panel - panel specific runtime info
@@ -40,6 +53,12 @@
 struct ct3d_panel {
 	/** @base: base panel struct */
 	struct gs_panel base;
+	/** @is_hbm2_enabled: indicates panel is running in HBM mode 2 */
+	bool is_hbm2_enabled;
+	/** @is_gamma_data_read: indicates panel has read the gray 3 RGB data */
+	bool is_gamma_data_read;
+	/** @g3_2nits_rgb_values: store the RGB data [rr][rgb][data]*/
+	u8 g3_2nits_rgb_values[CT3D_GRAY_REFRESH_LEN][CT3D_GRAY_RGB_LEN][CT3D_GRAY_RGB_DATA_LEN];
 };
 
 #define to_spanel(ctx) container_of(ctx, struct ct3d_panel, base)
@@ -132,6 +151,28 @@ static const struct gs_dsi_cmd ct3d_init_cmds[] = {
 	GS_DSI_CMD(0x6F, 0x05),
 	GS_DSI_CMD(0xC5, 0x15, 0x15, 0x15, 0xDD),
 
+	/* FFC Off */
+	GS_DSI_CMD(0xC3, 0x00),
+	/* FFC setting (MIPI: 865Mbps) */
+	GS_DSI_CMD(0xC3, 0xDD, 0x06, 0x20, 0x0E, 0xFF,
+				0x00, 0x06, 0x20, 0x0E, 0xFF, 0x00,
+				0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+				0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+				0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+				0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+				0x04, 0x79, 0x0E, 0x06, 0x12, 0x13),
+
+	/* CMD2, Page3 */
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x03),
+	/* Extend AOD TE width to 1.9ms */
+	GS_DSI_CMD(0x6F, 0x22),
+	GS_DSI_CMD(0xB3, 0x70, 0x7F),
+
+	/* CMD2, Page4 */
+	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04),
+	/* Extend DBI flash data update cycle time */
+	GS_DSI_CMD(0xBB, 0xB3, 0x01, 0xBC),
+
 	/* CMD2, Page7 */
 	GS_DSI_CMD(0xF0, 0x55, 0xAA, 0x52, 0x08, 0x07),
 	/* Round algorithm OFF */
@@ -191,7 +232,7 @@ static const struct gs_dsi_cmd ct3d_init_cmds[] = {
 	GS_DSI_CMD(0x91, 0x89, 0xA8, 0x00, 0x18, 0xD2, 0x00, 0x02, 0x25, 0x02,
 				0x35, 0x00, 0x07, 0x04, 0x86, 0x04, 0x3D, 0x10, 0xF0),
 	GS_DSI_CMD(0x2F, 0x02),
-	GS_DSI_DELAY_CMD(60, MIPI_DCS_EXIT_SLEEP_MODE)
+	GS_DSI_DELAY_CMD(70, MIPI_DCS_EXIT_SLEEP_MODE)
 };
 static DEFINE_GS_CMDSET(ct3d_init);
 
@@ -229,29 +270,46 @@ static void ct3d_update_irc(struct gs_panel *ctx,
 				const int vrefresh)
 {
 	struct device *dev = ctx->dev;
+	struct ct3d_panel *spanel = to_spanel(ctx);
 	const u16 level = gs_panel_get_brightness(ctx);
-
-	if (!GS_IS_HBM_ON(hbm_mode)) {
-		dev_dbg(dev, "hbm is off, skip update irc\n");
-		return;
-	}
 
 	if (GS_IS_HBM_ON_IRC_OFF(hbm_mode)) {
 		/* sync from bigSurf panel_rev >= PANEL_REV_EVT */
-		if (level == ctx->desc->brightness_desc->brt_capability->hbm.level.max)
+		if (level == ctx->desc->brightness_desc->brt_capability->hbm.level.max) {
+			/* set brightness to hbm2 */
 			GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x0F, 0xFF);
+			spanel->is_hbm2_enabled = true;
+			/* set ACD Level 3 */
+			GS_DCS_BUF_ADD_CMD(dev, 0x55, 0x04);
+			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0C);
+			GS_DCS_BUF_ADD_CMD(dev, 0xB0, 0x0E, 0x2C, 0x32);
+		} else {
+			if (spanel->is_hbm2_enabled) {
+				/* set ACD off */
+				GS_DCS_BUF_ADD_CMD(dev, 0x55, 0x00);
+			}
+			spanel->is_hbm2_enabled = false;
+		}
+
+		dev_info(ctx->dev, "%s: is HBM2 enabled: %d\n",
+					__func__, spanel->is_hbm2_enabled);
 
 		GS_DCS_BUF_ADD_CMD(dev, 0x5F, 0x01);
 		if (vrefresh == 120) {
 			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
 			GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_GAMMA_CURVE, 0x02);
-			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			if (ctx->panel_rev < PANEL_REV_PVT) {
+				GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+				GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x40);
+			}
 		} else {
 			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x02);
 			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+			GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x40);
 		}
-		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
-		GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x40);
 	} else {
 		const u8 val1 = level >> 8;
 		const u8 val2 = level & 0xff;
@@ -260,13 +318,17 @@ static void ct3d_update_irc(struct gs_panel *ctx,
 		if (vrefresh == 120) {
 			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x00);
 			GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_GAMMA_CURVE, 0x00);
-			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			if (ctx->panel_rev < PANEL_REV_PVT) {
+				GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+				GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+				GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x10);
+			}
 		} else {
 			GS_DCS_BUF_ADD_CMD(dev, 0x2F, 0x02);
 			GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+			GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
+			GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x10);
 		}
-		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x03);
-		GS_DCS_BUF_ADD_CMD(dev, 0xC0, 0x10);
 		/* sync from bigSurf panel_rev >= PANEL_REV_EVT */
 		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, val1, val2);
 	}
@@ -360,10 +422,135 @@ static void ct3d_dimming_frame_setting(struct gs_panel *ctx, u8 dimming_frame)
 	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xB2, dimming_frame, dimming_frame);
 }
 
+static void ct3d_read_gray3_rgb_value(struct gs_panel *ctx)
+{
+	struct device *dev = ctx->dev;
+	struct ct3d_panel *spanel = to_spanel(ctx);
+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+	u8 buf[CT3D_GRAY_RGB_DATA_LEN] = {0};
+	int32_t ret;
+
+	if (spanel->is_gamma_data_read)
+		return;
+
+	/* turn on hclk */
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x20);
+
+	/* read the 2nits G3 RGB value @120Hz and 60Hz */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x02);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xCC, 0x10);
+
+	for (int rr = 0; rr < CT3D_GRAY_REFRESH_LEN; rr++) {
+		GS_DCS_WRITE_CMD(dev, 0xBF, gray_refresh_cmd[rr]);
+
+		for (int color = 0; color < CT3D_GRAY_RGB_LEN; color++) {
+			GS_DCS_WRITE_CMD(dev, 0x6F, gray_lvl_cmd[CT3D_GRAY_GAMMA_LEN - 1]);
+			ret = mipi_dsi_dcs_read(dsi, gray_rgb_cmd[color],
+						buf, CT3D_GRAY_RGB_DATA_LEN);
+
+			if (ret != CT3D_GRAY_RGB_DATA_LEN) {
+				dev_warn(ctx->dev, "Unable to read Gray3 RGB values (%d)\n", ret);
+				goto done;
+			}
+
+			for (int k = 0; k < CT3D_GRAY_RGB_DATA_LEN; k++)
+				spanel->g3_2nits_rgb_values[rr][color][k] = buf[k];
+		}
+	}
+
+	for (int i = 0; i < CT3D_GRAY_REFRESH_LEN; i++) {
+		for (int j = 0; j < CT3D_GRAY_RGB_LEN; j++) {
+			for (int k = 0; k < CT3D_GRAY_RGB_DATA_LEN; k++) {
+				dev_dbg(ctx->dev, "g3_2nits_rgb_values %x\n",
+					spanel->g3_2nits_rgb_values[i][j][k]);
+			}
+		}
+	}
+
+	spanel->is_gamma_data_read = true;
+
+done:
+	/* turn off hclk */
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xF5, 0x2B);
+	dev_dbg(ctx->dev, "%s done.\n", __func__);
+}
+
+static void ct3d_write_gray3_rgb_value(struct gs_panel *ctx)
+{
+	struct device *dev = ctx->dev;
+	struct ct3d_panel *spanel = to_spanel(ctx);
+
+	/* turn on hclk */
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD(dev, 0xF5, 0x20);
+
+	/* over write 2nits G3 RGB value to G0 and G1 */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x02);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xCC, 0x10);
+
+	for (int rr = 0; rr < CT3D_GRAY_REFRESH_LEN; rr++) {
+		GS_DCS_WRITE_CMD(dev, 0xBF, gray_refresh_cmd[rr]);
+
+		for (int lvl = 0; lvl < (CT3D_GRAY_GAMMA_LEN - 1); lvl++) {
+			for (int color = 0; color < CT3D_GRAY_RGB_LEN; color++) {
+				GS_DCS_WRITE_CMD(dev, 0x6F, gray_lvl_cmd[lvl]);
+				GS_DCS_WRITE_CMD(dev, gray_rgb_cmd[color],
+					spanel->g3_2nits_rgb_values[rr][color][0],
+					spanel->g3_2nits_rgb_values[rr][color][1]);
+			}
+		}
+	}
+
+	/* turn off hclk */
+	GS_DCS_BUF_ADD_CMD(dev, 0xFF, 0xAA, 0x55, 0xA5, 0x81);
+	GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0E);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xF5, 0x2B);
+
+	dev_dbg(ctx->dev, "%s done.\n", __func__);
+}
+
+static int ct3d_read_beh(struct gs_panel *ctx)
+{
+	struct device *dev = ctx->dev;
+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
+	u8 buf[CT3D_BEH_LEN] = {0};
+	int ret;
+
+	GS_DCS_WRITE_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04);
+
+	ret = mipi_dsi_dcs_read(dsi, 0xBE, buf, CT3D_BEH_LEN);
+	if (ret != CT3D_BEH_LEN) {
+		dev_warn(dev, "Unable to read BEh values (ret = %d)\n", ret);
+		return -EIO;
+	}
+
+	if (buf[0] != 0 || buf[1] != 2 || buf[2] != 0 || buf[5] != 0 || buf[7] != 0
+		|| buf[8] != 6 || buf[9] != 3)
+		return -EAGAIN;
+
+	return 0;
+}
+
+static void ct3d_change_spi_speed(struct gs_panel *ctx, int speed)
+{
+	struct device *dev = ctx->dev;
+
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x04);
+	GS_DCS_BUF_ADD_CMD(dev, 0xC2, (speed == 23)? 0x14 : 0x12);
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x08);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC2, (speed == 23)? 0x00 : 0x33);
+}
+
 static int ct3d_enable(struct drm_panel *panel)
 {
 	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
 	struct device *dev = ctx->dev;
+	struct ct3d_panel *spanel = to_spanel(ctx);
 	const struct gs_panel_mode *pmode = ctx->current_mode;
 
 	if (!pmode) {
@@ -376,12 +563,56 @@ static int ct3d_enable(struct drm_panel *panel)
 	gs_panel_reset_helper(ctx);
 	gs_panel_send_cmdset(ctx, &ct3d_init_cmdset);
 	ct3d_change_frequency(ctx, pmode);
+	ct3d_read_gray3_rgb_value(ctx);
+
+	if (ct3d_read_beh(ctx)) {
+		int retry;
+		int ret = 1;
+
+		dev_warn(dev, "Reading BEh failed at first try\n");
+
+		ct3d_change_spi_speed(ctx, 23);
+
+		for (retry = 0; retry < CT3D_READ_BEH_RETRY_COUNT && ret; retry++) {
+			GS_DCS_WRITE_DELAY_CMD(dev, 120, MIPI_DCS_ENTER_SLEEP_MODE);
+			GS_DCS_WRITE_DELAY_CMD(dev, 120, MIPI_DCS_EXIT_SLEEP_MODE);
+			ret = ct3d_read_beh(ctx);
+		}
+
+		if (retry == CT3D_READ_BEH_RETRY_COUNT)
+			dev_warn(dev, "Failed to read BEh %d times\n", retry);
+		else
+			dev_info(dev, "Success to read BEh after retry %d time(s)\n", retry);
+
+		ct3d_change_spi_speed(ctx, 34);
+	}
+
 	ct3d_dimming_frame_setting(ctx, CT3D_DIMMING_FRAME);
 
 	if (pmode->gs_mode.is_lp_mode)
 		gs_panel_set_lp_mode_helper(ctx, pmode);
 
 	GS_DCS_WRITE_CMD(dev, MIPI_DCS_SET_DISPLAY_ON);
+
+	if(spanel->is_gamma_data_read)
+		ct3d_write_gray3_rgb_value(ctx);
+
+	ctx->dsi_hs_clk_mbps = MIPI_DSI_FREQ_MBPS_DEFAULT;
+
+	return 0;
+}
+
+static int ct3d_disable(struct drm_panel *panel)
+{
+	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
+	struct ct3d_panel *spanel = to_spanel(ctx);
+	int ret;
+
+	spanel->is_hbm2_enabled = false;
+
+	ret = gs_panel_disable(panel);
+	if (ret)
+		return ret;
 
 	return 0;
 }
@@ -429,9 +660,60 @@ static int ct3d_atomic_check(struct gs_panel *ctx, struct drm_atomic_state *stat
 	return 0;
 }
 
+static void ct3d_pre_update_ffc(struct gs_panel *ctx)
+{
+	struct device *dev = ctx->dev;
+
+	dev_dbg(ctx->dev, "%s\n", __func__);
+
+	/* FFC off */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC3, 0x00);
+}
+
+static void ct3d_update_ffc(struct gs_panel *ctx, unsigned int hs_clk_mbps)
+{
+	struct device *dev = ctx->dev;
+
+	dev_dbg(ctx->dev, "%s: hs_clk_mbps: current=%d, target=%d\n",
+		__func__, ctx->dsi_hs_clk_mbps, hs_clk_mbps);
+
+	if (hs_clk_mbps != MIPI_DSI_FREQ_MBPS_DEFAULT &&
+	    hs_clk_mbps != MIPI_DSI_FREQ_MBPS_ALTERNATIVE) {
+		dev_warn(ctx->dev, "invalid hs_clk_mbps=%d for FFC\n", hs_clk_mbps);
+	} else if (ctx->dsi_hs_clk_mbps != hs_clk_mbps) {
+		dev_info(ctx->dev, "%s: updating for hs_clk_mbps=%d\n", __func__, hs_clk_mbps);
+		ctx->dsi_hs_clk_mbps = hs_clk_mbps;
+
+		/* Update FFC */
+		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+		if (hs_clk_mbps == MIPI_DSI_FREQ_MBPS_DEFAULT)
+			GS_DCS_BUF_ADD_CMD(dev, 0xC3, 0xDD, 0x06, 0x20, 0x0E, 0xFF,
+						0x00, 0x06, 0x20, 0x0E, 0xFF, 0x00,
+						0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+						0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+						0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+						0x04, 0x79, 0x0E, 0x06, 0x12, 0x13,
+						0x04, 0x79, 0x0E, 0x06, 0x12, 0x13);
+		else /* MIPI_DSI_FREQ_MBPS_ALTERNATIVE */
+			GS_DCS_BUF_ADD_CMD(dev, 0xC3, 0xDD, 0x06, 0x20, 0x0C, 0xFF,
+						0x00, 0x06, 0x20, 0x0C, 0xFF, 0x00,
+						0x04, 0x63, 0x0C, 0x05, 0xD9, 0x10,
+						0x04, 0x63, 0x0C, 0x05, 0xD9, 0x10,
+						0x04, 0x63, 0x0C, 0x05, 0xD9, 0x10,
+						0x04, 0x63, 0x0C, 0x05, 0xD9, 0x10,
+						0x04, 0x63, 0x0C, 0x05, 0xD9, 0x10);
+	}
+
+	/* FFC on */
+	GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x01);
+	GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xC3, 0xDD);
+}
+
 static int ct3d_set_brightness(struct gs_panel *ctx, u16 br)
 {
-	u16 brightness;
+	struct device *dev = ctx->dev;
+	struct ct3d_panel *spanel = to_spanel(ctx);
 
 	if (ctx->current_mode->gs_mode.is_lp_mode) {
 		if (gs_panel_has_func(ctx, set_binned_lp))
@@ -439,9 +721,32 @@ static int ct3d_set_brightness(struct gs_panel *ctx, u16 br)
 		return 0;
 	}
 
-	brightness = swab16(br);
+	if (GS_IS_HBM_ON_IRC_OFF(ctx->hbm_mode)
+			&& br == ctx->desc->brightness_desc->brt_capability->hbm.level.max) {
 
-	return gs_dcs_set_brightness(ctx, brightness);
+		/* set brightness to hbm2 */
+		GS_DCS_BUF_ADD_CMD(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS, 0x0F, 0xFF);
+		spanel->is_hbm2_enabled = true;
+
+		/* set ACD Level 3 */
+		GS_DCS_BUF_ADD_CMD(dev, 0x55, 0x04);
+		GS_DCS_BUF_ADD_CMD(dev, 0xF0, 0x55, 0xAA, 0x52, 0x08, 0x00);
+		GS_DCS_BUF_ADD_CMD(dev, 0x6F, 0x0C);
+		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, 0xB0, 0x0E, 0x2C, 0x32);
+		dev_info(ctx->dev, "%s: is HBM2 enabled : %d\n",
+				__func__, spanel->is_hbm2_enabled);
+	} else {
+
+		if (spanel->is_hbm2_enabled) {
+			/* set ACD off */
+			GS_DCS_BUF_ADD_CMD(dev, 0x55, 0x00);
+			dev_info(ctx->dev, "%s: is HBM2 enabled: off\n", __func__);
+		}
+		spanel->is_hbm2_enabled = false;
+		GS_DCS_BUF_ADD_CMD_AND_FLUSH(dev, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
+						br >> 8, br & 0xff);
+	}
+	return 0;
 }
 
 static void ct3d_set_hbm_mode(struct gs_panel *ctx,
@@ -510,7 +815,7 @@ done:
 }
 
 static const struct gs_display_underrun_param underrun_param = {
-	.te_idle_us = 200,
+	.te_idle_us = 350,
 	.te_var = 1,
 };
 
@@ -655,11 +960,13 @@ static int ct3d_panel_probe(struct mipi_dsi_device *dsi)
 	if (!spanel)
 		return -ENOMEM;
 
+	spanel->is_hbm2_enabled = false;
+	spanel->is_gamma_data_read = false;
 	return gs_dsi_panel_common_init(dsi, &spanel->base);
 }
 
 static const struct drm_panel_funcs ct3d_drm_funcs = {
-	.disable = gs_panel_disable,
+	.disable = ct3d_disable,
 	.unprepare = gs_panel_unprepare,
 	.prepare = gs_panel_prepare,
 	.enable = ct3d_enable,
@@ -686,6 +993,8 @@ static const struct gs_panel_funcs ct3d_gs_funcs = {
 	.update_te2 = ct3d_update_te2,
 	.read_id = ct3d_read_id,
 	.atomic_check = ct3d_atomic_check,
+	.pre_update_ffc = ct3d_pre_update_ffc,
+	.update_ffc = ct3d_update_ffc,
 };
 
 static const struct gs_brightness_configuration ct3d_btr_configs[] = {
@@ -759,9 +1068,9 @@ struct gs_panel_desc google_ct3d = {
 	.reg_ctrl_desc = &ct3d_reg_ctrl_desc,
 	.panel_func = &ct3d_drm_funcs,
 	.gs_panel_func = &ct3d_gs_funcs,
+	.default_dsi_hs_clk_mbps = MIPI_DSI_FREQ_MBPS_DEFAULT,
 	.reset_timing_ms = {1, 1, 20},
-	//TODO(gilliu) : implement the refresh_on_lp feature on gs_panel.
-	//.refresh_on_lp = true,
+	.refresh_on_lp = true,
 };
 
 static int ct3d_panel_config(struct gs_panel *ctx)
