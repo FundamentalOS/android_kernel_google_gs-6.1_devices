@@ -2672,8 +2672,8 @@ static int _name##_set(void *data, u64 val)                                     
 {                                                                                               \
 	struct pogo_transport *pogo_transport  = data;                                          \
 	pogo_transport->_name = val;                                                          \
-	logbuffer_log(pogo_transport->log, "%s: %lu", __func__,                                 \
-		      pogo_transport->_name);                                                   \
+	logbuffer_log(pogo_transport->log, "%s: %llu", __func__,                                \
+		      (u64)pogo_transport->_name);                                              \
 	return 0;                                                                               \
 }                                                                                               \
 static int _name##_get(void *data, u64 *val)                                                    \

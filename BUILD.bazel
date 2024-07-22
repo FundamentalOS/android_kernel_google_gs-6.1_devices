@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//aosp:modules.bzl", "get_gki_modules_list")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load("//build/bazel_common_rules/exec:exec.bzl", "exec")
 load("//build/kernel/kleaf:hermetic_tools.bzl", "hermetic_genrule")
@@ -9,17 +8,15 @@ load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
     "kernel_build",
+    "kernel_build_config",
     "kernel_images",
+    "kernel_module",
     "kernel_module_group",
     "kernel_modules_install",
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
-load(
-    "//private/devices/google/common:device_build_configs.bzl",
-    "device_build_configs",
-    "lto_dependant_kernel_module",
-)
+load("//common:modules.bzl", "get_gki_modules_list")
 
 _SOC_REVS = [
     "a0",
@@ -71,6 +68,7 @@ kernel_module_group(
         "//private/google-modules/aoc/usb:aoc.usb",
         "//private/google-modules/nfc",
         "//private/google-modules/touch/common:touch.common",
+        "//private/google-modules/touch/common/usi:touch.common.usi",
         "//private/google-modules/touch/novatek/nt36xxx",
         "//private/google-modules/trusty",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
@@ -78,12 +76,6 @@ kernel_module_group(
         "//private/google-modules/wlan/dhd43752p:synadhd",
         "//private/google-modules/bluetooth/synaptics:bluetooth.synaptics",
     ],
-)
-
-device_build_configs(
-    name = "build.config.tangorpro",
-    base_build_config = ":build.config.tangorpro",
-    device_name = "tangorpro",
 )
 
 kernel_build(
@@ -94,7 +86,8 @@ kernel_build(
         "tangorpro*.fragment",
     ]) + [
         # keep sorted
-        "//private/devices/google/common:debug_build_configs",
+        "//common:kernel_aarch64_sources",
+        "//private/devices/google/gs201:build.config.gs201",
         "//private/devices/google/pantah:pantah_gki.fragment",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
@@ -104,38 +97,29 @@ kernel_build(
         "//private/google-modules/power/reset:reset.kconfig",
         "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
         "//private/google-modules/radio/samsung/s5400:cpif.kconfig",
-        "//private/google-modules/soc/gs:build.config.gs201",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
         "//private/google-modules/touch/common:touch.common.kconfig",
         "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
         "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
-    ] + select({
-        "//private/devices/google/common:gki_aosp": ["//aosp:kernel_aarch64_sources"],
-        "//private/devices/google/common:gki_aosp_staging": ["//aosp-staging:kernel_aarch64_sources"],
-    }),
+    ],
     outs = [
         "google-base/gs201-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _TANGORPRO_DTBOS,
-    base_kernel = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_download_or_build",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_download_or_build",
-    }),
-    build_config = ":device_build_config",
+    base_kernel = "//common:kernel_aarch64_download_or_build",
+    build_config = ":tangorpro_build_config",
     collect_unstripped_modules = True,
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
-    kconfig_ext = "//private/google-modules/soc/gs:Kconfig.ext",
-    kmi_symbol_list = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:android/abi_gki_aarch64_pixel",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:android/abi_gki_aarch64_pixel",
-    }),
+    kconfig_ext = "Kconfig.ext",
+    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    make_goals = [
+        "modules",
+        "dtbs",
+    ],
     module_outs = [
         # keep sorted
-        "crypto/crct10dif_common.ko",
-        "crypto/crct10dif_generic.ko",
-        "drivers/block/null_blk/null_blk.ko",
         "drivers/gpu/drm/display/drm_display_helper.ko",
         "drivers/hwtracing/coresight/coresight.ko",
         "drivers/hwtracing/coresight/coresight-etm4x.ko",
@@ -148,12 +132,10 @@ kernel_build(
         "drivers/perf/arm_dsu_pmu.ko",
         "drivers/regulator/rt4801-regulator.ko",
         "drivers/regulator/tps65132-regulator.ko",
-        "drivers/scsi/scsi_debug.ko",
         "drivers/scsi/sg.ko",
         "drivers/spi/spidev.ko",
         "drivers/video/backlight/lp855x_bl.ko",
         "drivers/watchdog/softdog.ko",
-        "lib/crc-t10dif.ko",
         "net/mac80211/mac80211.ko",
         "net/wireless/cfg80211.ko",
     ],
@@ -172,7 +154,7 @@ kernel_abi(
     module_grouping = False,
 )
 
-lto_dependant_kernel_module(
+kernel_module(
     name = "gs201_soc.tangorpro",
     srcs = [
         "//private/google-modules/soc/gs:gs_soc_sources",
@@ -187,10 +169,7 @@ lto_dependant_kernel_module(
         "drivers/clk/gs/clk_exynos_gs.ko",
         "drivers/clocksource/exynos_mct.ko",
         "drivers/cpufreq/exynos-acme.ko",
-        "drivers/devfreq-whi/google/arm-memlat-mon.ko",
         "drivers/devfreq-whi/google/exynos_devfreq.ko",
-        "drivers/devfreq-whi/google/governor_memlat.ko",
-        "drivers/devfreq-whi/google/memlat-devfreq.ko",
         "drivers/dma-buf/heaps/samsung/samsung_dma_heap.ko",
         "drivers/dma/pl330.ko",
         "drivers/dma/samsung-dma.ko",
@@ -218,6 +197,9 @@ lto_dependant_kernel_module(
         "drivers/misc/sscoredump/sscoredump.ko",
         "drivers/pci/controller/dwc-whi/pcie-exynos-gs.ko",
         "drivers/pci/controller/dwc-whi/pcie-exynos-gs201-rc-cal.ko",
+        "drivers/performance/gs_perf_mon/gs_perf_mon.ko",
+        "drivers/performance/lat_governors/gs_governor_memlat.ko",
+        "drivers/performance/lat_governors/gs_governor_utils.ko",
         "drivers/phy/samsung/phy-exynos-mipi.ko",
         "drivers/phy/samsung/phy-exynos-mipi-dsim.ko",
         "drivers/phy/samsung/phy-exynos-usbdrd-super.ko",
@@ -299,6 +281,7 @@ lto_dependant_kernel_module(
         "drivers/thermal/samsung/gs_thermal.ko",
         "drivers/tty/serial/exynos_tty.ko",
         "drivers/ufs/ufs-exynos-gs.ko",
+        "drivers/ufs/ufs-pixel-fips140.ko",
         "drivers/usb/dwc3/dwc3-exynos-usb.ko",
         "drivers/usb/gadget/function/usb_f_dm.ko",
         "drivers/usb/gadget/function/usb_f_dm1.ko",
@@ -317,9 +300,6 @@ lto_dependant_kernel_module(
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
     kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
-    lto_outs = [
-        "drivers/ufs/ufs-pixel-fips140.ko",
-    ],
     makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
@@ -354,14 +334,14 @@ hermetic_genrule(
     name = "vendor_kernel_boot_modules.tangorpro-cat",
     srcs = [
         "vendor_kernel_boot_modules.tangorpro",
-        "//private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201",
+        "//private/devices/google/gs201:vendor_kernel_boot_modules.gs201",
     ],
     outs = [
         "vendor_kernel_boot_modules.concat",
     ],
     cmd = """
         cat $(location vendor_kernel_boot_modules.tangorpro) \\
-            $(location //private/google-modules/soc/gs:vendor_kernel_boot_modules.gs201) \\
+            $(location //private/devices/google/gs201:vendor_kernel_boot_modules.gs201) \\
             > $@
     """,
 )
@@ -377,10 +357,7 @@ write_file(
 
 kernel_images(
     name = "gs201_tangorpro_images",
-    base_kernel_images = select({
-        "//private/devices/google/common:gki_aosp": "//aosp:kernel_aarch64_images_download_or_build",
-        "//private/devices/google/common:gki_aosp_staging": "//aosp-staging:kernel_aarch64_images_download_or_build",
-    }),
+    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
     boot_image_outs = ["dtb.img"],
     build_boot = False,
     build_dtbo = True,
@@ -395,17 +372,16 @@ kernel_images(
     # Keep the following in sync with build.config.tangorpro:
     modules_list = ":vendor_kernel_boot_modules.tangorpro-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = "//private/google-modules/soc/gs:system_dlkm.props.gs201",
+    system_dlkm_props = "//private/devices/google/gs201:system_dlkm.props.gs201",
     vendor_dlkm_etc_files = ["//private/devices/google/tangorpro:insmod_cfgs"],
-    vendor_dlkm_modules_blocklist = "//private/google-modules/soc/gs:vendor_dlkm.blocklist.gs201",
+    vendor_dlkm_modules_blocklist = "//private/devices/google/gs201:vendor_dlkm.blocklist.gs201",
     # No MODULES_BLOCKLIST
-    vendor_dlkm_modules_list = "//private/google-modules/soc/gs:vendor_dlkm_modules.gs201",
-    vendor_dlkm_props = "//private/google-modules/soc/gs:vendor_dlkm.props.gs201",
+    vendor_dlkm_modules_list = "//private/devices/google/gs201:vendor_dlkm_modules.gs201",
+    vendor_dlkm_props = "//private/devices/google/gs201:vendor_dlkm.props.gs201",
     deps = [
         # Keep the following in sync with vendor_dlkm.props:
         # selinux_fc
-        "//prebuilts/boot-artifacts/selinux:file_contexts",
-        "//prebuilts/boot-artifacts/selinux:system_file_contexts",
+        "//private/devices/google/common:sepolicy",
     ],
 )
 
@@ -424,25 +400,20 @@ _gs201_tangorpro_dist_targets = [
     # UAPI headers of external modules, while build.sh-style mixed builds
     # always uses kernel-uapi-headers.tar.gz from GKI_DIST_DIR.
     # To use GKI's kernel-uapi-headers.tar.gz in DIST_DIR, use
-    #     //aosp:kernel_aarch64_uapi_headers
+    #     //common:kernel_aarch64_uapi_headers
     # instead.
     ":gs201_tangorpro_merged_uapi_headers",
     ":gs201_tangorpro_modules_install",
     ":gs201_tangorpro_unstripped_modules_archive",
     ":insmod_cfgs",
+    "//common:android/abi_gki_aarch64_pixel",
+    "//common:kernel_aarch64_download_or_build",
+    "//common:kernel_aarch64_headers_download_or_build",
     "//private/devices/google/pantah:gki_aarch64_boot",
     "//private/devices/google/pantah:gs201_pantah_extracted_system_dlkm",
 ] + select({
-    "//private/devices/google/common:gki_aosp": [
-        "//aosp:android/abi_gki_aarch64_pixel",
-        "//aosp:kernel_aarch64_download_or_build",
-        "//aosp:kernel_aarch64_headers_download_or_build",
-    ],
-    "//private/devices/google/common:gki_aosp_staging": [
-        "//aosp-staging:android/abi_gki_aarch64_pixel",
-        "//aosp-staging:kernel_aarch64_download_or_build",
-        "//aosp-staging:kernel_aarch64_headers_download_or_build",
-    ],
+    "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
+    "//private/devices/google/common:disable_download_fips140": [],
 })
 
 copy_to_dist_dir(
@@ -460,4 +431,13 @@ exec(
         echo {gki_kernel_dir}: $(git -C $BUILD_WORKSPACE_DIRECTORY/{gki_kernel_dir} rev-parse HEAD)
         $(rootpath :gs201_tangorpro_dist_copy_to_dist_dir) $@
     """.format(gki_kernel_dir = "//aosp"),
+)
+
+kernel_build_config(
+    name = "tangorpro_build_config",
+    srcs = [
+        # do not sort
+        "//common:set_kernel_dir_build_config",
+        "build.config.tangorpro",
+    ],
 )
