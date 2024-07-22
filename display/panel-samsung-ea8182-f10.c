@@ -132,7 +132,7 @@ static const struct exynos_binned_lp ea8182_f10_binned_lp[] = {
 
 
 static const struct exynos_dsi_cmd ea8182_f10_init_cmds[] = {
-	EXYNOS_DSI_CMD_SEQ(0x35, 0x00), /* TE on */
+	EXYNOS_DSI_CMD_SEQ(0x35), /* TE on */
 
 	/* TE2 Setting */
 	EXYNOS_DSI_CMD0(unlock_cmd_f0),
