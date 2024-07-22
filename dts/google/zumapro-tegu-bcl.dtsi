@@ -6,7 +6,7 @@
  *		https://www.google.com
  */
 
-#include "google-dts-base/zumapro-board-bcl.dtsi"
+#include "google-dts-zumapro/zumapro-board-bcl.dtsi"
 
 &pinctrl_11 {
 	bcl_rffe_modem: bcl-rffe-modem {
@@ -20,6 +20,7 @@
 };
 
 &google_mitigation {
+	google,ifpmic = <M77779>;
 	google,charger = <&max77779_chg>;
 	google,pmic = <&max77779_pmic>;
 	google,power-supply = <&max77779_fg>;
@@ -27,18 +28,24 @@
 	batoilo_upper = <8000>;
 	batoilo2_lower = <3800>;
 	batoilo2_upper = <10000>;
-	batoilo_wlc_trig_lvl = <2200>;
+	batoilo_usb_trig_lvl = <4800>;
+	batoilo2_usb_trig_lvl = <7800>;
+	batoilo_wlc_trig_lvl = <2400>;
 	batoilo2_wlc_trig_lvl = <5200>;
-	batoilo_trig_lvl = <5000>;
+	batoilo_trig_lvl = <5200>;
 	batoilo2_trig_lvl = <8000>;
 	batoilo_bat_open_to = <0x8>;    /* 36ms */
 	batoilo2_bat_open_to = <0x3>;   /* 12ms */
 	batoilo_rel = <0x3>;   /* 10ms */
 	batoilo2_rel = <0x3>;   /* 10ms */
-	batoilo_det = <0x0>;   /* 0ms */
-	batoilo2_det = <0x0>;   /* 0ms */
-	uvlo1_rel = <0x2>;   /* 10ms */
-	uvlo2_rel = <0x2>;   /* 10ms */
+	batoilo_det = <0x1A>;   /* 34ms DEBOUNCE to VDROOP */
+	batoilo2_det = <0x1>;   /* 30us DEBOUNCE to VDROOP */
+	batoilo_int_det = <0x2>;   /* 5ms */
+	batoilo2_int_det = <0x1>;   /* 30us */
+	batoilo_int_rel = <0x2>;   /* 1ms */
+	batoilo2_int_rel = <0x3>;   /* 10ms */
+	uvlo1_rel = <0x1>;   /* 1ms */
+	uvlo2_rel = <0x1>;   /* 1ms */
 	uvlo1_det = <0x1>;   /* 30us */
 	uvlo2_det = <0x1>;   /* 30us */
 	evt_cnt_enable = <0x1>;

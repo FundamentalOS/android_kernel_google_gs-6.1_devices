@@ -10,7 +10,6 @@ p9222: p9222@61 {
 	compatible = "idt,p9222";
 	reg = <0x61>;
 
-	dev-name = "p9222";
 
 	/* Support p9412 GPIO */
 	idt,has_p9412_gpio;
@@ -20,6 +19,11 @@ p9222: p9222@61 {
 	google,power_mitigate_threshold = <90>;
 	google,has-sw-ramp;
 	google,epp_dcicl_default_ma = <750000>;
+	google,bpp_iop_vout_mv = <5500>;
+	google,bpp_ask_mod_fet = /bits/ 8 <0xC0>;
+	google,bpp_freq109_icl_ma = <400000>;
+	google,bpp_freq109_vout_mv = <5000>;
+
 
 	pinctrl-names = "default";
 

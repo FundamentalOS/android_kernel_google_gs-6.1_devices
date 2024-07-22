@@ -2,9 +2,9 @@
 
 # DPM overlays
 zuma_tegu_overlays += \
-	google-dts-base/zuma-dpm-eng.dtbo \
-	google-dts-base/zuma-dpm-userdebug.dtbo \
-	google-dts-base/zuma-dpm-user.dtbo
+	google-dts-zuma/zuma-dpm-eng.dtbo \
+	google-dts-zuma/zuma-dpm-userdebug.dtbo \
+	google-dts-zuma/zuma-dpm-user.dtbo
 
 DTC_FLAGS_zuma-dpm-eng += -a 4096
 DTC_FLAGS_zuma-dpm-user += -a 4096
@@ -25,16 +25,16 @@ zumapro_tegu_overlays := \
 
 # zumapro dtb
 zumapro_tegu_dtbs := \
-	google-dts-base/zumapro-a0-foplp.dtb \
-	google-dts-base/zumapro-a0-ipop.dtb  \
-	google-dts-base/zumapro-a1-foplp.dtb \
-	google-dts-base/zumapro-a1-ipop.dtb
+	google-dts-zumapro/zumapro-a0-foplp.dtb \
+	google-dts-zumapro/zumapro-a0-ipop.dtb  \
+	google-dts-zumapro/zumapro-a1-foplp.dtb \
+	google-dts-zumapro/zumapro-a1-ipop.dtb
 
 # DPM overlays
 zumapro_tegu_overlays += \
-        google-dts-base/zumapro-dpm-eng.dtbo \
-        google-dts-base/zumapro-dpm-userdebug.dtbo \
-        google-dts-base/zumapro-dpm-user.dtbo
+        google-dts-zumapro/zumapro-dpm-eng.dtbo \
+        google-dts-zumapro/zumapro-dpm-userdebug.dtbo \
+        google-dts-zumapro/zumapro-dpm-user.dtbo
 
 DTC_FLAGS_zumapro-dpm-eng += -a 4096
 DTC_FLAGS_zumapro-dpm-user += -a 4096
