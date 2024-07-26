@@ -5,9 +5,9 @@
  * Copyright 2023 Google LLC
  */
 
+#include <arm64/exynos/exynos-pinctrl.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/gpio/gpio.h>
-#include <dt-bindings/pinctrl/samsung.h>
 //#include <dt-bindings/sound/google-aoc.h>
 
 /* DP audio */
