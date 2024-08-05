@@ -83,12 +83,10 @@ kernel_build(
     srcs = glob([
         "build.config.*",
         "dts/**",
-        "tangorpro*.fragment",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
         "//private/devices/google/gs201:build.config.gs201",
-        "//private/devices/google/pantah:pantah_gki.fragment",
         "//private/google-modules/bms/misc:bms-misc.kconfig",
         "//private/google-modules/display/common:common.kconfig",
         "//private/google-modules/display/samsung:display.samsung.kconfig",
@@ -111,6 +109,7 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":tangorpro_build_config",
     collect_unstripped_modules = True,
+    defconfig_fragments = ["tangorpro_defconfig"],
     dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
