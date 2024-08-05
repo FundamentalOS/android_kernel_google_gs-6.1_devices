@@ -86,7 +86,6 @@ kernel_build(
     srcs = glob([
         "build.config.*",
         "dts/**",
-        "felix*.fragment",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
@@ -115,6 +114,7 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":felix_build_config",
     collect_unstripped_modules = True,
+    defconfig_fragments = ["felix_defconfig"],
     dtstree = "//private/devices/google/felix/dts:felix.dt",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",

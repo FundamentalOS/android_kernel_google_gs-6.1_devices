@@ -4,7 +4,6 @@ DEVICE_DIR=private/devices/google/felix
 SOC_DIR=private/google-modules/soc/gs
 
 # These just need to be relative to the ROOT_DIR
-FRAGMENT_CONFIG=${DEVICE_DIR}/felix_gki.fragment
 . ${ROOT_DIR}/private/devices/google/gs201/build.config.gs201
 
 DTC_INCLUDE=${ROOT_DIR}/${SOC_DIR}/include/dtc
