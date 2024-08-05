@@ -153,7 +153,6 @@ kernel_build(
     srcs = glob([
         "build.config.*",
         "dts/**",
-        "pantah*.fragment",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
@@ -181,6 +180,7 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":pantah_build_config",
     collect_unstripped_modules = True,
+    defconfig_fragments = ["pantah_defconfig"],
     dtstree = "//private/devices/google/pantah/dts:pantah.dt",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
@@ -509,7 +509,3 @@ copy_to_dist_dir(
     flat = True,
     log = "info",
 )
-
-exports_files([
-    "pantah_gki.fragment",
-])
