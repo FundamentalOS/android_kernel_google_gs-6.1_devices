@@ -123,7 +123,6 @@ kernel_build(
     srcs = glob([
         "build.config.*",
         "dts/**",
-        "raviole*.fragment",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
@@ -150,6 +149,7 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":raviole_build_config",
     collect_unstripped_modules = True,
+    defconfig_fragments = ["raviole_defconfig"],
     dtstree = "//private/devices/google/raviole/dts:raviole.dt",
     implicit_outs = RAVIOLE_DTBOS,
     kconfig_ext = "Kconfig.ext",
