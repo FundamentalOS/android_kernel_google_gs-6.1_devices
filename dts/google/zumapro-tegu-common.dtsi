@@ -6,6 +6,7 @@
  */
 
 #include "google-dts-zumapro/zumapro-common.dtsi"
+#include "google-dts-zuma/gs101-faceauth-dma-heap.dtsi"
 
 #include "zuma-tegu-battery-common.dtsi"
 #include "zuma-tegu-camera-pmic.dtsi"
