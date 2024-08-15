@@ -9,6 +9,7 @@ load(
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
+    "kernel_dtstree",
     "kernel_images",
     "kernel_module",
     "kernel_module_group",
@@ -17,12 +18,6 @@ load(
     "merged_kernel_uapi_headers",
 )
 load("//common:modules.bzl", "get_gki_modules_list")
-
-_SOC_REVS = [
-    "a0",
-    "b0",
-    "b0_v2-ipop",
-]
 
 _TANGORPRO_DTBOS = [
     # Sync with build.config.tangorpro
@@ -78,11 +73,18 @@ kernel_module_group(
     ],
 )
 
+kernel_dtstree(
+    name = "dtstree",
+    srcs = glob(["dts/**"]) + [
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    makefile = "dts/Makefile",
+)
+
 kernel_build(
     name = "gs201_tangorpro",
     srcs = glob([
         "build.config.*",
-        "dts/**",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
@@ -103,14 +105,15 @@ kernel_build(
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ],
     outs = [
-        "google-base/gs201-{}.dtb".format(soc_rev)
-        for soc_rev in _SOC_REVS
+        "gs201/gs201-a0.dtb",
+        "gs201/gs201-b0.dtb",
+        "gs201/gs201-b0_v2-ipop.dtb",
     ] + _TANGORPRO_DTBOS,
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":tangorpro_build_config",
     collect_unstripped_modules = True,
     defconfig_fragments = ["tangorpro_defconfig"],
-    dtstree = "//private/devices/google/tangorpro/dts:tangorpro.dt",
+    dtstree = ":dtstree",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = [

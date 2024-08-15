@@ -10,9 +10,9 @@ tangorpro_overlays := \
         gs201-tangorpro-mp.dtbo
 
 tangorpro_dtbs := \
-        google-base/gs201-a0.dtb \
-        google-base/gs201-b0.dtb \
-        google-base/gs201-b0_v2-ipop.dtb \
+        gs201/gs201-a0.dtb \
+        gs201/gs201-b0.dtb \
+        gs201/gs201-b0_v2-ipop.dtb \
 
 #
 # Usage:
