@@ -1,6 +1,6 @@
 felix_dtbs := \
-        google-base/gs201-a0.dtb \
-        google-base/gs201-b0.dtb
+        gs201/gs201-a0.dtb \
+        gs201/gs201-b0.dtb
 
 felix_overlays := \
         gs201-felix-dev1_0.dtbo \

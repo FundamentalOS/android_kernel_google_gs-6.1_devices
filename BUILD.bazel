@@ -9,6 +9,7 @@ load(
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
+    "kernel_dtstree",
     "kernel_images",
     "kernel_module",
     "kernel_module_group",
@@ -17,11 +18,6 @@ load(
     "merged_kernel_uapi_headers",
 )
 load("//common:modules.bzl", "get_gki_modules_list")
-
-_SOC_REVS = [
-    "a0",
-    "b0",
-]
 
 _FELIX_DTBOS = [
     # Sync with build.config.felix
@@ -81,11 +77,18 @@ kernel_module_group(
     ],
 )
 
+kernel_dtstree(
+    name = "dtstree",
+    srcs = glob(["dts/**"]) + [
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    makefile = "dts/Makefile",
+)
+
 kernel_build(
     name = "gs201_felix",
     srcs = glob([
         "build.config.*",
-        "dts/**",
     ]) + [
         # keep sorted
         "//common:kernel_aarch64_sources",
@@ -108,14 +111,14 @@ kernel_build(
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ],
     outs = [
-        "google-base/gs201-{}.dtb".format(soc_rev)
-        for soc_rev in _SOC_REVS
+        "gs201/gs201-a0.dtb",
+        "gs201/gs201-b0.dtb",
     ] + _FELIX_DTBOS,
     base_kernel = "//common:kernel_aarch64_download_or_build",
     build_config = ":felix_build_config",
     collect_unstripped_modules = True,
     defconfig_fragments = ["felix_defconfig"],
-    dtstree = "//private/devices/google/felix/dts:felix.dt",
+    dtstree = ":dtstree",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = [
