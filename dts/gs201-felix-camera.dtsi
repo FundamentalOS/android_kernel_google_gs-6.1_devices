@@ -230,10 +230,11 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-names = "default","on_i2c","off_i2c","recovery";
 	pinctrl-0 = <&hsi2c8_bus &flash_en>;
 	pinctrl-1 = <&hsi2c8_bus>;
 	pinctrl-2 = <&hsi2c8_bus>;
+	pinctrl-3 = <>;
 };
 
 &hsi2c_14 {
