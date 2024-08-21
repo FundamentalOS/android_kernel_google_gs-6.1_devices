@@ -1,0 +1,16 @@
+# List of modules loaded during first stage init from vendor_boot
+# Sort order defined by
+# LC_ALL=C sort
+bcm47765.ko
+cp_thermal_zone.ko
+cpif.ko
+cpif_page.ko
+panel-samsung-s6e3fc3_6a.ko
+shm_ipc.ko
+snd-soc-cs35l41-i2c.ko
+snd-soc-cs35l41-spi.ko
+snd-soc-cs35l41.ko
+st33spi.ko
+st54spi.ko
+touch_bus_negotiator.ko
+touch_offload.ko
