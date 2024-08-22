@@ -193,6 +193,7 @@ copy_to_dist_dir(
         ":vendor_dlkm_props",
         "//common:android/abi_gki_aarch64_pixel",
         "//common:kernel_aarch64",
+        "//common:kernel_aarch64_gki_boot_image",
         "//common:kernel_aarch64_headers",
         "//common:kernel_aarch64_modules",
         "//private/devices/google/common:sepolicy/vendor_dlkm_file_contexts",
