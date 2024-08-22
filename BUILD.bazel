@@ -162,6 +162,7 @@ kernel_images(
     kernel_build = ":kernel",
     kernel_modules_install = ":kernel_modules_install",
     modules_list = ":vendor_ramdisk_modules_list",
+    ramdisk_compression = "lz4",
     vendor_dlkm_archive = True,
     vendor_dlkm_modules_blocklist = ":vendor_dlkm_modules_blocklist",
     vendor_dlkm_modules_list = ":vendor_dlkm_modules_list",
