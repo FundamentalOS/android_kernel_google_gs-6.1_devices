@@ -4,7 +4,6 @@ DEVICE_DIR=private/devices/google/shusky
 SOC_DIR=private/google-modules/soc/gs
 
 # These just need to be relative to the ROOT_DIR
-FRAGMENT_CONFIG=${DEVICE_DIR}/shusky_gki.fragment
 . ${ROOT_DIR}/private/devices/google/zuma/build.config.zuma
 
 DTC_INCLUDE="${ROOT_DIR}/${SOC_DIR}/include/dtc \

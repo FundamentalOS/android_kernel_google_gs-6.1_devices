@@ -8,6 +8,10 @@
 
 #include <linux/kconfig.h>
 
+&farawimg {
+        size = <0xAC00000>; /* 172MB */
+};
+
 &faceauth_tpu {
 	size = <0x00C00000>; /* 12MB */
 };

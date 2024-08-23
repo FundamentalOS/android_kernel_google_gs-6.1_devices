@@ -193,3 +193,8 @@
 &ch21 {
 	rail-name = "LDO21S";
 };
+
+/* Replace L9S_GNSS_CORE with S6S_LLDO2 */
+&ch20 {
+	rail-name = "BUCK6S";
+};
