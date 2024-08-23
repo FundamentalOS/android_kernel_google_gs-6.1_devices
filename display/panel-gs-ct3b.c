@@ -58,14 +58,14 @@ struct ct3b_panel {
 	bool force_changeable_te2;
 	/** @dbv_range: indicates current dbv range  */
 	enum ct3b_dbv_range dbv_range;
-	/** @edge_compensation: compensation default value **/
+	/** @edge_comp: compensation default value **/
 	struct edge_compensation {
 		bool is_support;
 		u8 left_default[EDGE_COMPENSATION_SIZE];
 		u8 right_default[EDGE_COMPENSATION_SIZE];
 		u8 top_default[EDGE_COMPENSATION_SIZE];
 		u8 bottom_default[EDGE_COMPENSATION_SIZE];
-	}edge_comp;
+	} edge_comp;
 
 	/** @needs_display_on: if display_on command needs to send after flip done */
 	bool needs_display_on;
@@ -709,7 +709,6 @@ static void ct3b_set_panel_feat_frequency(struct gs_panel *ctx, unsigned long *f
  * ct3b_set_panel_feat - configure panel features
  * @ctx: gs_panel struct
  * @pmode: gs_panel_mode struct, target panel mode
- * @idle_vrefresh: target vrefresh rate in auto mode, 0 if disabling auto mode
  * @enforce: force to write all of registers even if no feature state changes
  *
  * Configure panel features based on the context.
@@ -1990,20 +1989,35 @@ static int ct3b_panel_probe(struct mipi_dsi_device *dsi)
 	spanel->dbv_range = DBV_INIT;
 	clear_bit(FEAT_ZA, ctx->hw_status.feat);
 
+	ret = gs_dsi_panel_common_init(dsi, ctx);
+	if (ret)
+		return ret;
+
 	ctx->thermal->tz = thermal_zone_device_register("inner_brightness",
 				0, 0, spanel, &spanel_tzd_ops, NULL, 0, 0);
-	if (IS_ERR(ctx->thermal->tz))
-		dev_err(ctx->dev, "failed to register inner"
+	if (IS_ERR(ctx->thermal->tz)) {
+		dev_warn(ctx->dev, "failed to register inner"
 			" display thermal zone: %ld", PTR_ERR(ctx->thermal->tz));
+		return 0;
+	}
 
 	ret = thermal_zone_device_enable(ctx->thermal->tz);
 	if (ret) {
-		dev_err(ctx->dev, "failed to enable inner"
-					" display thermal zone ret=%d", ret);
+		dev_warn(ctx->dev, "failed to enable inner"
+			" display thermal zone ret=%d", ret);
 		thermal_zone_device_unregister(ctx->thermal->tz);
 	}
 
-	return gs_dsi_panel_common_init(dsi, ctx);
+	return 0;
+}
+
+static void ct3b_panel_remove(struct mipi_dsi_device *dsi)
+{
+	const struct gs_panel *ctx = mipi_dsi_get_drvdata(dsi);
+
+	if (ctx->thermal && ctx->thermal->tz)
+		thermal_zone_device_unregister(ctx->thermal->tz);
+	gs_dsi_panel_common_remove(dsi);
 }
 
 static const struct drm_panel_funcs ct3b_drm_funcs = {
@@ -2088,7 +2102,7 @@ static const struct gs_brightness_configuration ct3b_btr_configs[] = {
 
 static struct gs_panel_brightness_desc ct3b_brightness_desc = {
 	.max_luminance = 10000000,
-	.max_avg_luminance = 1200000,
+	.max_avg_luminance = 10000000,
 	.min_luminance = 5,
 };
 
@@ -2169,7 +2183,7 @@ MODULE_DEVICE_TABLE(of, gs_panel_of_match);
 
 static struct mipi_dsi_driver gs_panel_driver = {
 	.probe = ct3b_panel_probe,
-	.remove = gs_dsi_panel_common_remove,
+	.remove = ct3b_panel_remove,
 	.driver = {
 		.name = "panel-gs-ct3b",
 		.of_match_table = gs_panel_of_match,
