@@ -82,6 +82,7 @@
 		google,light_load;      /* Calibration light load */
 		google,ll-bpp-vout-not-set;
 		google,bpp-cep-on-dl;
+		google,wcin_inlim_en = <&max77759_gpio 0 GPIO_ACTIVE_HIGH>;
 
 		google,alignment_scalar_low_current = <200>;
 		google,alignment_scalar_high_current = <100>;
