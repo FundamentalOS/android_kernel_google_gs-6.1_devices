@@ -71,7 +71,7 @@ kernel_build(
         "gs101/{}".format(dtb)
         for dtb in GS101_DTBS
     ] + RAVIOLE_DTBOS,
-    base_kernel = "//common:kernel_aarch64_download_or_build",
+    base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
     defconfig_fragments = [":defconfig_fragments"],
@@ -154,7 +154,7 @@ create_file(
 
 kernel_images(
     name = "kernel_images",
-    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
+    base_kernel_images = "//common:kernel_aarch64_images",
     build_dtbo = True,
     build_initramfs = True,
     build_vendor_dlkm = True,
