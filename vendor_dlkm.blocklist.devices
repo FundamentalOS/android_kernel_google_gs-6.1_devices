@@ -1,0 +1,23 @@
+# blocklist from felix
+blocklist bcmdhd4389
+blocklist cs40l26_i2c
+blocklist ftm5
+
+# blocklist from tangorpro
+blocklist cs40l26_i2c
+
+# blocklist from pantah
+blocklist bcmdhd4389
+blocklist cs40l26_i2c
+blocklist ftm5
+blocklist goodix_brl_touch
+blocklist sec_touch
+blocklist syna_touch
+
+# blocklist from everyone but felix
+blocklist fst2
+
+# blocklist from everyone but tangorpro
+blocklist goog_usi_stylus
+blocklist nvt_touch
+blocklist synadhd

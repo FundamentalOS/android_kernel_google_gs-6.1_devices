@@ -23,3 +23,11 @@ GS201_MODULE_OUTS = [
     "net/mac80211/mac80211.ko",
     "net/wireless/cfg80211.ko",
 ]
+
+GS201_DEVICE_MODULE_OUTS = [
+    # keep sorted
+    "drivers/leds/leds-pwm.ko",
+    "drivers/regulator/rt4801-regulator.ko",
+    "drivers/regulator/tps65132-regulator.ko",
+    "drivers/video/backlight/lp855x_bl.ko",
+]
