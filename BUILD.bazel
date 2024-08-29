@@ -9,6 +9,7 @@ load(
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
+    "kernel_dtstree",
     "kernel_images",
     "kernel_module",
     "kernel_module_group",
@@ -26,6 +27,14 @@ kernel_build_config(
         "//common:set_kernel_dir_build_config",
         "build.config.akita",
     ],
+)
+
+kernel_dtstree(
+    name = "dtstree",
+    srcs = glob(["dts/**"]) + [
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    makefile = "dts/Makefile",
 )
 
 filegroup(
@@ -60,29 +69,28 @@ _SOC_REVS = [
 ]
 
 _AKITA_DTBOS = [
-    # Sync with build.config.akita
-    "google/zuma-akita-dev1.dtbo",
-    "google/zuma-akita-dev1-gnss.dtbo",
-    "google/zuma-akita-proto1-A0-broadcom-gnss.dtbo",
-    "google/zuma-akita-proto1-B1-broadcom-gnss.dtbo",
-    "google/zuma-akita-proto1-A0-samsung-gnss.dtbo",
-    "google/zuma-akita-proto1-B1-samsung-gnss.dtbo",
-    "google/zuma-akita-proto1_1-broadcom-gnss.dtbo",
-    "google/zuma-akita-proto1_1-samsung-gnss.dtbo",
-    "google/zuma-akita-proto1_1-broadcom-gnss-wingboard.dtbo",
-    "google/zuma-akita-proto1_1-samsung-gnss-wingboard.dtbo",
-    "google/zuma-akita-proto1_1-broadcom-gnss-sky.dtbo",
-    "google/zuma-akita-proto1_1-samsung-gnss-sky.dtbo",
-    "google/zuma-akita-evt1-broadcom-gnss.dtbo",
-    "google/zuma-akita-evt1-samsung-gnss.dtbo",
-    "google/zuma-akita-evt1_1.dtbo",
-    "google/zuma-akita-dvt1.dtbo",
-    "google/zuma-akita-dvt1-2nd-fab.dtbo",
-    "google/zuma-akita-pvt1.dtbo",
-    "google/zuma-akita-mp.dtbo",
-    "google/google-dts-base/zuma-dpm-eng.dtbo",
-    "google/google-dts-base/zuma-dpm-user.dtbo",
-    "google/google-dts-base/zuma-dpm-userdebug.dtbo",
+    "zuma-akita-dev1.dtbo",
+    "zuma-akita-dev1-gnss.dtbo",
+    "zuma-akita-proto1-A0-broadcom-gnss.dtbo",
+    "zuma-akita-proto1-B1-broadcom-gnss.dtbo",
+    "zuma-akita-proto1-A0-samsung-gnss.dtbo",
+    "zuma-akita-proto1-B1-samsung-gnss.dtbo",
+    "zuma-akita-proto1_1-broadcom-gnss.dtbo",
+    "zuma-akita-proto1_1-samsung-gnss.dtbo",
+    "zuma-akita-proto1_1-broadcom-gnss-wingboard.dtbo",
+    "zuma-akita-proto1_1-samsung-gnss-wingboard.dtbo",
+    "zuma-akita-proto1_1-broadcom-gnss-sky.dtbo",
+    "zuma-akita-proto1_1-samsung-gnss-sky.dtbo",
+    "zuma-akita-evt1-broadcom-gnss.dtbo",
+    "zuma-akita-evt1-samsung-gnss.dtbo",
+    "zuma-akita-evt1_1.dtbo",
+    "zuma-akita-dvt1.dtbo",
+    "zuma-akita-dvt1-2nd-fab.dtbo",
+    "zuma-akita-pvt1.dtbo",
+    "zuma-akita-mp.dtbo",
+    "zuma/zuma-dpm-eng.dtbo",
+    "zuma/zuma-dpm-user.dtbo",
+    "zuma/zuma-dpm-userdebug.dtbo",
 ]
 
 kernel_module_group(
@@ -152,7 +160,7 @@ kernel_build(
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ],
     outs = [
-        "google/google-dts-base/zuma-{}.dtb".format(soc_rev)
+        "zuma/zuma-{}.dtb".format(soc_rev)
         for soc_rev in _SOC_REVS
     ] + _AKITA_DTBOS,
     base_kernel = "//common:kernel_aarch64_download_or_build",
@@ -162,7 +170,7 @@ kernel_build(
         "//private/devices/google/zuma:zuma_defconfig",
         "akita_defconfig",
     ],
-    dtstree = "//private/devices/google/akita/dts:akita.dt",
+    dtstree = ":dtstree",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = _PIXEL_MAKE_GOALS,
