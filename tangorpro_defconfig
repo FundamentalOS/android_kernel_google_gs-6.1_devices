@@ -7,13 +7,8 @@ CONFIG_USB_FEW_INIT_RETRIES=y
 CONFIG_LEDS_PWM=m
 
 # private/google-modules/touch/common/Kconfig
+CONFIG_TOUCHSCREEN_HEATMAP=m
 CONFIG_TOUCHSCREEN_TBN=m
 CONFIG_TOUCHSCREEN_OFFLOAD=m
 CONFIG_GOOG_TOUCH_INTERFACE=m
 CONFIG_GOOG_USI_STYLUS=m
-
-# private/google-modules/touch/fts/ftm5/Kconfig
-CONFIG_TOUCHSCREEN_FTS=m
-
-# private/google-modules/touch/sec/Kconfig
-CONFIG_TOUCHSCREEN_SEC_TS=m
