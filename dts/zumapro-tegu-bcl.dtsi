@@ -6,7 +6,7 @@
  *		https://www.google.com
  */
 
-#include "google-dts-zumapro/zumapro-board-bcl.dtsi"
+#include "zumapro/zumapro-board-bcl.dtsi"
 
 &pinctrl_11 {
 	bcl_rffe_modem: bcl-rffe-modem {

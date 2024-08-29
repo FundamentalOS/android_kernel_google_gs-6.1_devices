@@ -9,6 +9,7 @@ load(
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
+    "kernel_dtstree",
     "kernel_images",
     "kernel_module",
     "kernel_module_group",
@@ -26,6 +27,14 @@ kernel_build_config(
         "//common:set_kernel_dir_build_config",
         "build.config.tegu",
     ],
+)
+
+kernel_dtstree(
+    name = "dtstree",
+    srcs = glob(["dts/**"]) + [
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    makefile = "dts/Makefile",
 )
 
 filegroup(
@@ -61,22 +70,22 @@ ZUMAPRO_SOC_REVS = [
 
 # zumapro dtbo
 _ZUMAPRO_TEGU_DTBOS = [
-    "google/zumapro-tegu-dev1.dtbo",
-    "google/zumapro-tegu-proto1_0.dtbo",
-    "google/zumapro-tegu-proto1_0-wingboard.dtbo",
-    "google/zumapro-tegu-proto1_1.dtbo",
-    "google/zumapro-tegu-proto1_1-wingboard.dtbo",
-    "google/zumapro-tegu-evt1.dtbo",
-    "google/zumapro-tegu-evt1_1.dtbo",
-    "google/zumapro-tegu-dvt1.dtbo",
-    "google/zumapro-tegu-pvt1.dtbo",
-    "google/zumapro-tegu-mp.dtbo",
+    "zumapro-tegu-dev1.dtbo",
+    "zumapro-tegu-proto1_0.dtbo",
+    "zumapro-tegu-proto1_0-wingboard.dtbo",
+    "zumapro-tegu-proto1_1.dtbo",
+    "zumapro-tegu-proto1_1-wingboard.dtbo",
+    "zumapro-tegu-evt1.dtbo",
+    "zumapro-tegu-evt1_1.dtbo",
+    "zumapro-tegu-dvt1.dtbo",
+    "zumapro-tegu-pvt1.dtbo",
+    "zumapro-tegu-mp.dtbo",
 ]
 
 _ZUMAPRO_TEGU_DPM_DTBOS = [
-    "google/google-dts-zumapro/zumapro-dpm-eng.dtbo",
-    "google/google-dts-zumapro/zumapro-dpm-userdebug.dtbo",
-    "google/google-dts-zumapro/zumapro-dpm-user.dtbo",
+    "zumapro/zumapro-dpm-eng.dtbo",
+    "zumapro/zumapro-dpm-userdebug.dtbo",
+    "zumapro/zumapro-dpm-user.dtbo",
 ]
 
 kernel_module_group(
@@ -150,7 +159,7 @@ kernel_build(
         "//private/google-modules/trusty:trusty.kconfig",
         "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
     ],
-    outs = ["google/google-dts-zumapro/zumapro-{}.dtb".format(soc_rev) for soc_rev in ZUMAPRO_SOC_REVS] +
+    outs = ["zumapro/zumapro-{}.dtb".format(soc_rev) for soc_rev in ZUMAPRO_SOC_REVS] +
            _ZUMAPRO_TEGU_DTBOS + _ZUMAPRO_TEGU_DPM_DTBOS,
     # TODO(b/221278445): Use real GKI
     base_kernel = "//common:kernel_aarch64_download_or_build",
@@ -160,7 +169,7 @@ kernel_build(
         "//private/devices/google/zumapro:zumapro_defconfig",
         "tegu_defconfig",
     ],
-    dtstree = "//private/devices/google/tegu/dts:tegu.dt",
+    dtstree = ":dtstree",
     kconfig_ext = "Kconfig.ext",
     kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = _PIXEL_MAKE_GOALS,
