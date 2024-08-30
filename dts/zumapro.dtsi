@@ -33,7 +33,6 @@
 #include "zumapro-usb.dtsi"
 #include "zumapro-pcie.dtsi"
 #include "google-dts-zuma/gs101-dma-heap.dtsi"
-#include "google-dts-zuma/gs101-faceauth-dma-heap.dtsi"
 #include "zumapro-bts.dtsi"
 #include "google-dts-zuma/zuma-isp.dtsi"
 #include "google-dts-zuma/zuma-aoc.dtsi"
