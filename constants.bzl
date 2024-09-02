@@ -14,11 +14,6 @@ GS201_DTBS = [
 GS201_MODULE_OUTS = [
     # keep sorted
     "drivers/gpu/drm/display/drm_display_helper.ko",
-    "drivers/hwtracing/coresight/coresight.ko",
-    "drivers/hwtracing/coresight/coresight-etm4x.ko",
-    "drivers/hwtracing/coresight/coresight-funnel.ko",
-    "drivers/hwtracing/coresight/coresight-replicator.ko",
-    "drivers/hwtracing/coresight/coresight-tmc.ko",
     "drivers/i2c/i2c-dev.ko",
     "drivers/misc/eeprom/at24.ko",
     "drivers/perf/arm_dsu_pmu.ko",
