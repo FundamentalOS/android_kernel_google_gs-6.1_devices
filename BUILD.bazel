@@ -164,11 +164,7 @@ create_file(
 
 create_file(
     name = "vendor_dlkm_modules_list",
-    srcs = [
-        # TODO: b/362689009 - Remove GKI modules from vendor_dlkm
-        ":system_dlkm_modules_list",
-        "//private/devices/google/gs201:vendor_dlkm_modules_list",
-    ],
+    srcs = ["//private/devices/google/gs201:vendor_dlkm_modules_list"],
     out = "vendor_dlkm.modules",
 )
 
@@ -206,8 +202,6 @@ kernel_images(
     build_system_dlkm = True,
     build_vendor_dlkm = True,
     build_vendor_kernel_boot = True,
-    # TODO: b/362689009 - Not needed after removing GKI modules from vendor_dlkm
-    dedup_dlkm_modules = True,
     dtbo_srcs = [":kernel/" + dtbo for dtbo in PANTAH_DTBOS],
     kernel_build = ":kernel",
     kernel_modules_install = ":kernel_modules_install",
