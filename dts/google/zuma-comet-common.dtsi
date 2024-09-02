@@ -23,4 +23,3 @@
 #include "zuma-comet-pmic.dtsi"
 #include "zuma-comet-thermal.dtsi"
 #include "zuma-comet-usb.dtsi"
-#include "google-dts-zuma/gs101-faceauth-dma-heap.dtsi"
