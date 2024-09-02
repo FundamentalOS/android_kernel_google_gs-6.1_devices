@@ -68,6 +68,7 @@ kernel_module_group(
         "//private/devices/google/felix/touch/fst2",
         "//private/devices/google/felix/touch/ftm5",
         "//private/google-modules/nfc",
+        "//private/google-modules/sensors/hall_sensor",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/trusty",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
