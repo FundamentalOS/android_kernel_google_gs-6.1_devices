@@ -21,16 +21,6 @@ akita_overlays := \
 	zuma-akita-pvt1.dtbo \
 	zuma-akita-mp.dtbo
 
-# DPM overlays
-akita_overlays += \
-	zuma/zuma-dpm-eng.dtbo \
-	zuma/zuma-dpm-userdebug.dtbo \
-	zuma/zuma-dpm-user.dtbo
-
-DTC_FLAGS_zuma-dpm-eng += -a 4096
-DTC_FLAGS_zuma-dpm-user += -a 4096
-DTC_FLAGS_zuma-dpm-userdebug += -a 4096
-
 akita_dtbs := \
 	zuma/zuma-a0-foplp.dtb \
 	zuma/zuma-a0-ipop.dtb \

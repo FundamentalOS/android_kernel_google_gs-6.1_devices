@@ -24,7 +24,4 @@ AKITA_DTBOS = [
     "zuma-akita-dvt1-2nd-fab.dtbo",
     "zuma-akita-pvt1.dtbo",
     "zuma-akita-mp.dtbo",
-    "zuma/zuma-dpm-eng.dtbo",
-    "zuma/zuma-dpm-user.dtbo",
-    "zuma/zuma-dpm-userdebug.dtbo",
 ]
