@@ -133,7 +133,6 @@ extra/private/google-modules/soc/gs/drivers/block/zram/zram_gs.ko
 extra/private/google-modules/soc/gs/drivers/block/zram/zcomp_cpu.ko
 extra/private/google-modules/soc/gs/drivers/block/zram/zcomp_eh.ko
 extra/private/google-modules/amplifiers/audiometrics/audiometrics.ko
-extra/private/google-modules/amplifiers/snd_soc_wm_adsp/snd-soc-wm-adsp.ko
 extra/private/google-modules/aoc/mailbox-wc.ko
 extra/private/google-modules/aoc/aoc_core.ko
 extra/private/google-modules/aoc/aoc_char_dev.ko
