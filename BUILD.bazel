@@ -98,6 +98,7 @@ kernel_module_group(
         "//private/devices/google/akita/display:drm_panel.google",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs40l26",
+        "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
         "//private/google-modules/amplifiers/tas256x",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
         "//private/google-modules/gps/broadcom/bcm47765",
