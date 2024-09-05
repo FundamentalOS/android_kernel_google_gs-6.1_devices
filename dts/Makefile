@@ -25,16 +25,19 @@ gs201_overlays := \
 	gs201-panther-dvt1.dtbo \
 	gs201-panther-pvt1.dtbo \
 	gs201-panther-mp.dtbo \
-	gs201-lynx-dev1_0.dtbo \
-	gs201-lynx-proto1_0.dtbo \
-	gs201-lynx-proto1_1.dtbo \
-	gs201-lynx-evt1_0.dtbo \
-	gs201-lynx-evt1_0-wingboard.dtbo \
-	gs201-lynx-evt1_1.dtbo \
-	gs201-lynx-dvt1_0.dtbo \
-	gs201-lynx-dvt1_0-gain1.dtbo \
-	gs201-lynx-pvt1_0.dtbo \
-	gs201-lynx-mp1_0.dtbo
+
+# TODO: b/358264236 - Remove lynx dtbos.
+gs201_overlays += \
+	lynx/gs201-lynx-dev1_0.dtbo \
+	lynx/gs201-lynx-proto1_0.dtbo \
+	lynx/gs201-lynx-proto1_1.dtbo \
+	lynx/gs201-lynx-evt1_0.dtbo \
+	lynx/gs201-lynx-evt1_0-wingboard.dtbo \
+	lynx/gs201-lynx-evt1_1.dtbo \
+	lynx/gs201-lynx-dvt1_0.dtbo \
+	lynx/gs201-lynx-dvt1_0-gain1.dtbo \
+	lynx/gs201-lynx-pvt1_0.dtbo \
+	lynx/gs201-lynx-mp1_0.dtbo
 
 gs201_dtbs := \
 	gs201/gs201-a0.dtb \
