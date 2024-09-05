@@ -94,7 +94,8 @@ kernel_module_group(
         "//private/devices/google/gs201:kernel_ext_modules",
     ] + [
         # keep sorted
-        "//private/devices/google/pantah/display:drm_panel.google",
+        # TODO: b/358264236 - Remove lynx panel.
+        "//private/devices/google/lynx/display:drm_panel.google",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs35l45",
         "//private/google-modules/amplifiers/cs40l26",
