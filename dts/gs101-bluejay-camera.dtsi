@@ -100,10 +100,11 @@
 	status = "okay";
 	clock-frequency = <370000>;
 
-	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-names = "default","on_i2c","off_i2c","recovery";
 	pinctrl-0 = <&hsi2c7_bus &spi14_cs2>;
 	pinctrl-1 = <&hsi2c7_bus>;
 	pinctrl-2 = <&hsi2c7_bus>;
+	pinctrl-3 = <>;
 };
 
 &s_ldo15_reg {
@@ -121,7 +122,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "sensor-imx363";
@@ -225,7 +226,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "sensor-imx386";
@@ -307,7 +308,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "sensor-imx355";
@@ -389,7 +390,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "eeprom-lc898129";
@@ -441,7 +442,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "eeprom-m24c64x";
@@ -479,7 +480,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "eeprom-m24c64s";
@@ -517,7 +518,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "act-lc898129";
@@ -562,8 +563,6 @@
 					<1000
 					 1000
 					 1000>;
-				/* Thread priority */
-				transaction-thread-priority = <99>;
 			};
 
 			/* Ois lc898129 for imx363 */
@@ -571,7 +570,7 @@
 				compatible = "google,lwis-i2c-device";
 
 				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
+				transaction-thread-priority = <99>;
 
 				/* Device node name */
 				node-name = "ois-lc898129";
@@ -616,15 +615,10 @@
 					<1000
 					 1000
 					 1000>;
-				/* Thread priority */
-				transaction-thread-priority = <99>;
 			};
 
 			flash0: flash@0 {
 				compatible = "google,lwis-i2c-device";
-
-				/* Adjust thread priority for I2C */
-				thread-priority = <1>;
 
 				/* Device node name */
 				node-name = "flash-lm3644";
