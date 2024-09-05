@@ -94,7 +94,8 @@ kernel_module_group(
         "//private/devices/google/gs101:kernel_ext_modules",
     ] + [
         # keep sorted
-        "//private/devices/google/raviole/display:drm_panel.google",
+        # TODO: b/358264236 - Remove bluejay panel.
+        "//private/devices/google/bluejay/display:drm_panel.google",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs40l25",
         "//private/google-modules/amplifiers/cs40l26",
