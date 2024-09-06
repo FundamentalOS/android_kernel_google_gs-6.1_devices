@@ -16,12 +16,10 @@ CONFIG_CH_EXTENSION=m
 CONFIG_CP_THERMAL=m
 
 # private/google-modules/touch/common/Kconfig
+CONFIG_TOUCHSCREEN_HEATMAP=m
 CONFIG_TOUCHSCREEN_TBN=m
 CONFIG_TOUCHSCREEN_OFFLOAD=m
 CONFIG_GOOG_TOUCH_INTERFACE=m
 
-# private/google-modules/touch/fts/ftm5/Kconfig
+# private/google-modules/touch/fts/ftm5_legacy/Kconfig
 CONFIG_TOUCHSCREEN_FTS=m
-
-# private/google-modules/touch/sec/Kconfig
-CONFIG_TOUCHSCREEN_SEC_TS=m
