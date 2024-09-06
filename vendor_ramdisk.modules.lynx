@@ -10,10 +10,6 @@ extra/private/devices/google/lynx/display/panel-samsung-s6e3fc3-l10.ko
 extra/private/devices/google/lynx/display/panel-samsung-s6e3fc5.ko
 extra/private/google-modules/amplifiers/cs35l41/snd-soc-cs35l41.ko
 extra/private/google-modules/amplifiers/cs35l41/snd-soc-cs35l41-spi.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45-spi.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45-wm-adsp.ko
-extra/private/google-modules/amplifiers/cs35l45/cs35l45-cs-dsp.ko
 extra/private/google-modules/amplifiers/snd_soc_wm_adsp/snd-soc-wm-adsp.ko
 extra/private/google-modules/gps/broadcom/bcm47765/bcm47765.ko
 extra/private/google-modules/nfc/st21nfc.ko
