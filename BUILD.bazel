@@ -60,8 +60,6 @@ filegroup(
         "//private/devices/google/zuma:kernel_sources",
         "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
         "//private/google-modules/touch/common:touch.common.kconfig",
-        "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
-        "//private/google-modules/touch/sec:sec.kconfig",
     ],
 )
 
