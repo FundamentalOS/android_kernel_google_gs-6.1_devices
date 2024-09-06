@@ -96,9 +96,7 @@ kernel_module_group(
         # keep sorted
         "//private/devices/google/bluejay/display:drm_panel.google",
         "//private/google-modules/amplifiers/cs35l41",
-        "//private/google-modules/amplifiers/cs40l25",
         "//private/google-modules/amplifiers/cs40l26",
-        "//private/google-modules/amplifiers/drv2624",
         "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
         "//private/google-modules/gps/broadcom/bcm47765",
@@ -106,8 +104,6 @@ kernel_module_group(
         "//private/google-modules/radio/samsung/s5300:cpif.dit",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/touch/fts/ftm5_legacy:ftm5",
-        "//private/google-modules/touch/sec",
-        "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/wlan/bcm4389:bcmdhd4389",
     ],
 )
