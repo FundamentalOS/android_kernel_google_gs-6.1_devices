@@ -2,5 +2,5 @@
 #
 # Copyright (C) 2022 Google LLC
 
-build:tangorpro --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/tangorpro:gs201_tangorpro
+build:tangorpro --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/tangorpro:kernel
 build:tangorpro --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/tangorpro:gs201_soc.tangorpro
