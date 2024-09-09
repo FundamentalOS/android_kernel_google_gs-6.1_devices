@@ -10,7 +10,7 @@
  *
  */
 
-#include "google-dts-zuma/zuma-bts.dtsi"
+#include "zuma/zuma-bts.dtsi"
 
 / {
 	exynos-bts {

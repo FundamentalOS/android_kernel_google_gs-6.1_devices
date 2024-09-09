@@ -4,7 +4,7 @@
  *
  * Copyright 2023 Google LLC.
  */
-#include "google-dts-zuma/zuma-usb.dtsi"
+#include "zuma/zuma-usb.dtsi"
 
 &usbdrd_phy0 {
 	phy_eusb_version = <0x701>;
