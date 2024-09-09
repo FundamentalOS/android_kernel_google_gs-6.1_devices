@@ -5,7 +5,7 @@
  * Copyright 2022 Google LLC
  */
 
-#include "google-dts-base/zuma-board.dtsi"
+#include "zuma/zuma-board.dtsi"
 
 #include "zuma-akita-camera-pmic.dtsi"
 #include "zuma-akita-usb.dtsi"

@@ -5,7 +5,7 @@
  * Copyright 2023 Google LLC
  *
  */
-#include "google-dts-base/zuma-typec.dtsi"
+#include "zuma/zuma-typec.dtsi"
 
 &max77759tcpc {
 	ovp-present;
