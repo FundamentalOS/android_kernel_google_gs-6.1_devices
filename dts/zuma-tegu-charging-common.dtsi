@@ -5,7 +5,7 @@
  * Copyright 2023 Google LLC
  *
  */
-#include "google-dts-zuma/zuma-charging.dtsi"
+#include "zuma/zuma-charging.dtsi"
 
 &google_charger {
 	google,thermal-mitigation =
