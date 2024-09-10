@@ -7,7 +7,7 @@
  *
  */
 
-#include "zuma/zuma-drm-dpu.dtsi"
+#include "google-dts-zuma/zuma-drm-dpu.dtsi"
 
 &drmdsim0 {
 	#address-cells = <1>;
