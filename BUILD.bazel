@@ -1,268 +1,511 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
+load("//build/kernel/kleaf:hermetic_tools.bzl", "hermetic_genrule")
 load(
     "//build/kernel/kleaf:kernel.bzl",
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
-    "kernel_dtstree",
     "kernel_images",
+    "kernel_module",
     "kernel_module_group",
     "kernel_modules_install",
     "kernel_unstripped_modules_archive",
     "merged_kernel_uapi_headers",
 )
-load("//private/devices/google/common/kleaf:create_file.bzl", "create_file")
-load("//private/devices/google/gs201:constants.bzl", "GS201_DTBS", "GS201_MODULE_OUTS")
-load(":constants.bzl", "PANTAH_DTBOS")
+load("//common:modules.bzl", "get_gki_modules_list")
+load("//private/devices/google/common/kleaf:device.bzl", "extracted_system_dlkm")
 
 kernel_build_config(
-    name = "build_config",
+    name = "pantah_build_config",
     srcs = [
         # do not sort
-        "//private/devices/google/gs201:build_config",
-    ],
-)
-
-kernel_dtstree(
-    name = "dtstree",
-    srcs = glob(["dts/**"]) + [
-        "//private/google-modules/soc/gs:gs.dt-bindings",
-    ],
-    makefile = "dts/Makefile",
-)
-
-create_file(
-    name = "kconfig_ext",
-    srcs = [
-        # do not sort
-        "//private/devices/google/gs201:kconfig_ext",
-        "Kconfig.ext.pantah",
-    ],
-    out = "Kconfig.ext",
-)
-
-filegroup(
-    name = "defconfig_fragments",
-    srcs = [
-        # do not sort
-        "//private/devices/google/gs201:defconfig_fragments",
-        "pantah_defconfig",
+        "//common:set_kernel_dir_build_config",
+        "build.config.pantah",
     ],
 )
 
 filegroup(
-    name = "kernel_sources",
-    srcs = [
-        # keep sorted
-        "//private/devices/google/gs201:kernel_sources",
-        "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
-        "//private/google-modules/touch/common:touch.common.kconfig",
-        "//private/google-modules/touch/sec:sec.kconfig",
+    name = "gki_aarch64_boot_lz4",
+    srcs = ["//common:kernel_aarch64_gki_artifacts_download_or_build"],
+)
+
+hermetic_genrule(
+    name = "gki_aarch64_boot",
+    srcs = [":gki_aarch64_boot_lz4"],
+    outs = ["boot.img"],
+    cmd = """
+        for f in $(locations :gki_aarch64_boot_lz4); do
+            if [[ "$${f##*/}" == "boot-lz4.img" ]]; then
+                cp -L $$f $(location boot.img)
+                break
+            fi
+        done
+    """,
+    visibility = [
+        "//private/devices/google:__subpackages__",
     ],
 )
 
-kernel_build(
-    name = "kernel",
-    srcs = [":kernel_sources"],
-    outs = [
-        "gs201/{}".format(dtb)
-        for dtb in GS201_DTBS
-    ] + PANTAH_DTBOS,
-    base_kernel = "//common:kernel_aarch64",
-    build_config = ":build_config",
-    collect_unstripped_modules = True,
-    defconfig_fragments = [":defconfig_fragments"],
-    dtstree = ":dtstree",
-    kconfig_ext = ":kconfig_ext",
-    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
-    make_goals = [
-        "modules",
-        "dtbs",
-    ],
-    module_outs = GS201_MODULE_OUTS,
-    strip_modules = True,
-)
+_PIXEL_MAKE_GOALS = [
+    "modules",
+    "dtbs",
+]
+
+_GS201_SOC_REVS = [
+    "a0",
+    "b0",
+    "b0_v2-ipop",
+]
+
+# gs201 dtbo
+_GS201_PANTAH_DTBOS = [
+    "google/gs201-ravenclaw-dev1_0.dtbo",
+    "google/gs201-ravenclaw-dev1_1.dtbo",
+    "google/gs201-cheetah-proto1.dtbo",
+    "google/gs201-cheetah-proto1_1.dtbo",
+    "google/gs201-cheetah-proto1_1-wingboard.dtbo",
+    "google/gs201-cheetah-evt1.dtbo",
+    "google/gs201-cheetah-evt1-wingboard.dtbo",
+    "google/gs201-cheetah-evt1-nfc.dtbo",
+    "google/gs201-cheetah-evt1_1.dtbo",
+    "google/gs201-cheetah-evt1_1-wingboard.dtbo",
+    "google/gs201-cheetah-dvt1.dtbo",
+    "google/gs201-cheetah-pvt1.dtbo",
+    "google/gs201-cheetah-mp.dtbo",
+    "google/gs201-panther-proto1.dtbo",
+    "google/gs201-panther-proto1_1.dtbo",
+    "google/gs201-panther-proto1_1-wingboard.dtbo",
+    "google/gs201-panther-evt1.dtbo",
+    "google/gs201-panther-evt1-wingboard.dtbo",
+    "google/gs201-panther-evt1_1.dtbo",
+    "google/gs201-panther-evt1_1-wingboard.dtbo",
+    "google/gs201-panther-dvt1.dtbo",
+    "google/gs201-panther-pvt1.dtbo",
+    "google/gs201-panther-mp.dtbo",
+    # TODO: move lynx dtb files to it's own device folder
+    "google/gs201-lynx-dev1_0.dtbo",
+    "google/gs201-lynx-proto1_0.dtbo",
+    "google/gs201-lynx-proto1_1.dtbo",
+    "google/gs201-lynx-evt1_0.dtbo",
+    "google/gs201-lynx-evt1_1.dtbo",
+    "google/gs201-lynx-evt1_0-wingboard.dtbo",
+    "google/gs201-lynx-dvt1_0.dtbo",
+    "google/gs201-lynx-dvt1_0-gain1.dtbo",
+    "google/gs201-lynx-pvt1_0.dtbo",
+    "google/gs201-lynx-mp1_0.dtbo",
+    # TODO: if we're going to support cloudripper, create a device folder for it
+    "google/gs201-cloudripper-dev.dtbo",
+]
 
 kernel_module_group(
-    name = "kernel_ext_modules",
+    name = "pantah_ext_modules",
     srcs = [
-        # FIXME: SoC modules need to be loaded first or the device will crash.
-        #        Module dependencies should not rely on the order. This needs be fixed.
-        "//private/devices/google/gs201:kernel_ext_modules",
-    ] + [
         # keep sorted
-        # TODO: b/358264236 - Remove lynx panel.
-        "//private/devices/google/lynx/display:drm_panel.google",
+        "//private/devices/google/pantah:gs201_soc.pantah",
+        "//private/devices/google/pantah/display:drm_panel.google",
+        "//private/google-modules/amplifiers/audiometrics",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs35l45",
         "//private/google-modules/amplifiers/cs40l26",
+        "//private/google-modules/amplifiers/drv2624",
         "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
+        "//private/google-modules/aoc",
+        "//private/google-modules/aoc/alsa",
+        "//private/google-modules/aoc/usb:aoc.usb",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
         "//private/google-modules/bluetooth/qcom:bluetooth.qcom",
+        "//private/google-modules/bms",
+        "//private/google-modules/bms/misc:bms-misc",
+        "//private/google-modules/display/common/gs_drm",
+        "//private/google-modules/display/common/gs_panel",
+        "//private/google-modules/display/samsung:display.samsung",
+        "//private/google-modules/edgetpu/janeiro/drivers/edgetpu:edgetpu.janeiro",
         "//private/google-modules/gps/broadcom/bcm47765",
+        "//private/google-modules/gpu/mali_kbase",
+        "//private/google-modules/gpu/mali_pixel",
+        "//private/google-modules/gxp/gs201:gxp",
+        "//private/google-modules/lwis",
+        "//private/google-modules/misc/sscoredump",
         "//private/google-modules/nfc",
+        "//private/google-modules/power/mitigation:bcl",
+        "//private/google-modules/power/reset",
         "//private/google-modules/radio/samsung/s5300:cpif",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/touch/focaltech/ft3658",
         "//private/google-modules/touch/goodix",
         "//private/google-modules/touch/sec",
         "//private/google-modules/touch/synaptics/syna_c10:syna_touch",
+        "//private/google-modules/trusty",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
+        "//private/google-modules/video/gchips:video.gchips",
         "//private/google-modules/wlan/bcm4389:bcmdhd4389",
         "//private/google-modules/wlan/wcn6740/cnss2",
         "//private/google-modules/wlan/wcn6740/wlan/qcacld-3.0",
     ],
 )
 
-kernel_modules_install(
-    name = "kernel_modules_install",
-    kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+kernel_build(
+    name = "gs201_pantah",
+    srcs = glob([
+        "build.config.*",
+        "dts/**",
+    ]) + [
+        # keep sorted
+        "//common:kernel_aarch64_sources",
+        "//private/devices/google/gs201:build.config.gs201",
+        "//private/google-modules/bms/misc:bms-misc.kconfig",
+        "//private/google-modules/display/common:common.kconfig",
+        "//private/google-modules/display/samsung:display.samsung.kconfig",
+        "//private/google-modules/fingerprint/qcom/qfs4008:qbt_handler.kconfig",
+        "//private/google-modules/power/mitigation:bcl.kconfig",
+        "//private/google-modules/power/reset:reset.kconfig",
+        "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
+        "//private/google-modules/radio/samsung/s5400:cpif.kconfig",
+        "//private/google-modules/soc/gs:gs_soc.kconfig",
+        "//private/google-modules/touch/common:touch.common.kconfig",
+        "//private/google-modules/touch/fts/ftm5:ftm5.kconfig",
+        "//private/google-modules/touch/sec:sec.kconfig",
+        "//private/google-modules/trusty:trusty.kconfig",
+        "//private/google-modules/wlan/wlan_ptracker:wlan_ptracker.kconfig",
+    ],
+    outs = [
+        "google/gs201-{}.dtb".format(soc_rev)
+        for soc_rev in _GS201_SOC_REVS
+    ] + _GS201_PANTAH_DTBOS,
+    # TODO(b/221278445): Use real GKI
+    base_kernel = "//common:kernel_aarch64_download_or_build",
+    build_config = ":pantah_build_config",
+    collect_unstripped_modules = True,
+    defconfig_fragments = ["pantah_defconfig"],
+    dtstree = "//private/devices/google/pantah/dts:pantah.dt",
+    kconfig_ext = "Kconfig.ext",
+    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
+    make_goals = _PIXEL_MAKE_GOALS,
+    module_outs = [
+        # keep sorted
+        "drivers/gpu/drm/display/drm_display_helper.ko",
+        "drivers/hwtracing/coresight/coresight.ko",
+        "drivers/hwtracing/coresight/coresight-etm4x.ko",
+        "drivers/hwtracing/coresight/coresight-funnel.ko",
+        "drivers/hwtracing/coresight/coresight-replicator.ko",
+        "drivers/hwtracing/coresight/coresight-tmc.ko",
+        "drivers/i2c/i2c-dev.ko",
+        "drivers/misc/eeprom/at24.ko",
+        "drivers/perf/arm_dsu_pmu.ko",
+        "drivers/scsi/sg.ko",
+        "drivers/spi/spidev.ko",
+        "drivers/watchdog/softdog.ko",
+        "net/mac80211/mac80211.ko",
+        "net/wireless/cfg80211.ko",
+    ],
+    strip_modules = True,
 )
 
-kernel_unstripped_modules_archive(
-    name = "kernel_unstripped_modules_archive",
-    kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+kernel_abi(
+    name = "gs201_pantah_abi",
+    kernel_build = ":gs201_pantah",
+    kernel_modules = [":pantah_ext_modules"],
+    kmi_symbol_list_add_only = True,
+    module_grouping = False,
+)
+
+kernel_module(
+    name = "gs201_soc.pantah",
+    srcs = [
+        "//private/google-modules/soc/gs:gs_soc_sources",
+        "//private/google-modules/trusty:headers",
+    ],
+    outs = [
+        # keep sorted
+        "drivers/block/zram/zcomp_cpu.ko",
+        "drivers/block/zram/zcomp_eh.ko",
+        "drivers/block/zram/zram_gs.ko",
+        "drivers/bts/bts.ko",
+        "drivers/clk/gs/clk_exynos_gs.ko",
+        "drivers/clocksource/exynos_mct.ko",
+        "drivers/cpufreq/exynos-acme.ko",
+        "drivers/devfreq-whi/google/exynos_devfreq.ko",
+        "drivers/dma-buf/heaps/samsung/samsung_dma_heap.ko",
+        "drivers/dma/pl330.ko",
+        "drivers/dma/samsung-dma.ko",
+        "drivers/gpu/exynos/g2d/g2d.ko",
+        "drivers/i2c/busses/i2c-acpm.ko",
+        "drivers/i2c/busses/i2c-exynos5.ko",
+        "drivers/iio/power/odpm-whi.ko",
+        "drivers/input/fingerprint/goodixfp.ko",
+        "drivers/input/keyboard/s2mpg12-key.ko",
+        "drivers/input/keycombo.ko",
+        "drivers/input/keydebug.ko",
+        "drivers/input/misc/vl53l1/stmvl53l1.ko",
+        "drivers/iommu/exynos-pcie-iommu.ko",
+        "drivers/iommu/samsung-iommu-group.ko",
+        "drivers/iommu/samsung-secure-iova.ko",
+        "drivers/iommu/samsung_iommu.ko",
+        "drivers/media/platform/exynos/mfc/exynos_mfc.ko",
+        "drivers/media/platform/exynos/smfc/smfc.ko",
+        "drivers/mfd/s2mpg12-mfd.ko",
+        "drivers/mfd/s2mpg13-mfd.ko",
+        "drivers/mfd/s2mpg1x-gpio.ko",
+        "drivers/mfd/slg51000-core.ko",
+        "drivers/mfd/slg51002-core.ko",
+        "drivers/misc/sbb-mux/sbb-mux.ko",
+        "drivers/misc/sscoredump/sscoredump.ko",
+        "drivers/pci/controller/dwc-whi/pcie-exynos-gs.ko",
+        "drivers/pci/controller/dwc-whi/pcie-exynos-gs201-rc-cal.ko",
+        "drivers/performance/gs_perf_mon/gs_perf_mon.ko",
+        "drivers/performance/lat_governors/gs_governor_memlat.ko",
+        "drivers/performance/lat_governors/gs_governor_utils.ko",
+        "drivers/phy/samsung/phy-exynos-mipi.ko",
+        "drivers/phy/samsung/phy-exynos-mipi-dsim.ko",
+        "drivers/phy/samsung/phy-exynos-usbdrd-super.ko",
+        "drivers/pinctrl/gs/pinctrl-exynos-gs.ko",
+        "drivers/pinctrl/pinctrl-slg51000.ko",
+        "drivers/pinctrl/pinctrl-slg51002.ko",
+        "drivers/power/reset/debug-reboot.ko",
+        "drivers/regulator/pmic_class.ko",
+        "drivers/regulator/s2mpg12-powermeter.ko",
+        "drivers/regulator/s2mpg12-regulator.ko",
+        "drivers/regulator/s2mpg13-powermeter.ko",
+        "drivers/regulator/s2mpg13-regulator.ko",
+        "drivers/regulator/slg51000-regulator.ko",
+        "drivers/regulator/slg51002-regulator.ko",
+        "drivers/rtc/rtc-s2mpg12.ko",
+        "drivers/soc/google/acpm/acpm_flexpmu_dbg.ko",
+        "drivers/soc/google/acpm/acpm_mbox_test.ko",
+        "drivers/soc/google/acpm/gs_acpm.ko",
+        "drivers/soc/google/acpm/power_stats.ko",
+        "drivers/soc/google/bcm_dbg.ko",
+        "drivers/soc/google/cal-if/cmupmucal.ko",
+        "drivers/soc/google/dbgcore-dump.ko",
+        "drivers/soc/google/debug/debug-snapshot-debug-kinfo.ko",
+        "drivers/soc/google/debug/dss.ko",
+        "drivers/soc/google/debug/ehld.ko",
+        "drivers/soc/google/debug/etm2dram.ko",
+        "drivers/soc/google/debug/exynos-adv-tracer.ko",
+        "drivers/soc/google/debug/exynos-adv-tracer-s2d.ko",
+        "drivers/soc/google/debug/exynos-coresight.ko",
+        "drivers/soc/google/debug/exynos-coresight-etm.ko",
+        "drivers/soc/google/debug/exynos-debug-test.ko",
+        "drivers/soc/google/debug/exynos-ecc-handler.ko",
+        "drivers/soc/google/debug/itmon.ko",
+        "drivers/soc/google/debug/pixel-boot-metrics.ko",
+        "drivers/soc/google/debug/pixel-debug-test.ko",
+        "drivers/soc/google/debug/pixel-suspend-diag.ko",
+        "drivers/soc/google/debug/sjtag-driver.ko",
+        "drivers/soc/google/ect_parser.ko",
+        "drivers/soc/google/eh/eh.ko",
+        "drivers/soc/google/exynos-bcm_dbg-dump.ko",
+        "drivers/soc/google/exynos-cpuhp.ko",
+        "drivers/soc/google/exynos-cpupm.ko",
+        "drivers/soc/google/exynos-dm.ko",
+        "drivers/soc/google/exynos-pd.ko",
+        "drivers/soc/google/exynos-pd-dbg.ko",
+        "drivers/soc/google/exynos-pd_el3.ko",
+        "drivers/soc/google/exynos-pd_hsi0.ko",
+        "drivers/soc/google/exynos-pm.ko",
+        "drivers/soc/google/exynos-pmu-if.ko",
+        "drivers/soc/google/exynos-seclog.ko",
+        "drivers/soc/google/exynos_pm_qos.ko",
+        "drivers/soc/google/gs-chipid.ko",
+        "drivers/soc/google/gsa/gsa.ko",
+        "drivers/soc/google/gsa/gsa_gsc.ko",
+        "drivers/soc/google/hardlockup-debug.ko",
+        "drivers/soc/google/hardlockup-watchdog.ko",
+        "drivers/soc/google/kernel-top.ko",
+        "drivers/soc/google/pixel_stat/mm/pixel_stat_mm.ko",
+        "drivers/soc/google/pixel_stat/pixel_stat_sysfs.ko",
+        "drivers/soc/google/pkvm-s2mpu/pkvm-s2mpu/pkvm-s2mpu.ko",
+        "drivers/soc/google/pt/slc_acpm.ko",
+        "drivers/soc/google/pt/slc_dummy.ko",
+        "drivers/soc/google/pt/slc_pmon.ko",
+        "drivers/soc/google/pt/slc_pt.ko",
+        "drivers/soc/google/sysrq-hook.ko",
+        "drivers/soc/google/vh/kernel/cgroup/vh_cgroup.ko",
+        "drivers/soc/google/vh/kernel/fs/vh_fs.ko",
+        "drivers/soc/google/vh/kernel/metrics/pixel_metrics.ko",
+        "drivers/soc/google/vh/kernel/mm/vh_mm.ko",
+        "drivers/soc/google/vh/kernel/pixel_em/pixel_em.ko",
+        "drivers/soc/google/vh/kernel/sched/sched_tp.ko",
+        "drivers/soc/google/vh/kernel/sched/vh_preemptirq_long.ko",
+        "drivers/soc/google/vh/kernel/sched/vh_sched.ko",
+        "drivers/soc/google/vh/kernel/systrace.ko",
+        "drivers/soc/google/vh/kernel/thermal/vh_thermal.ko",
+        "drivers/spi/spi-s3c64xx.ko",
+        "drivers/thermal/google/s2mpg13_spmic_thermal.ko",
+        "drivers/thermal/samsung/gpu_cooling.ko",
+        "drivers/thermal/samsung/gs_thermal.ko",
+        "drivers/tty/serial/exynos_tty.ko",
+        "drivers/ufs/ufs-exynos-gs.ko",
+        "drivers/ufs/ufs-pixel-fips140.ko",
+        "drivers/usb/dwc3/dwc3-exynos-usb.ko",
+        "drivers/usb/gadget/function/usb_f_dm.ko",
+        "drivers/usb/gadget/function/usb_f_dm1.ko",
+        "drivers/usb/gadget/function/usb_f_etr_miu.ko",
+        "drivers/usb/host/xhci-exynos.ko",
+        "drivers/usb/typec/tcpm/google/bc_max77759.ko",
+        "drivers/usb/typec/tcpm/google/google_tcpci_shim.ko",
+        "drivers/usb/typec/tcpm/google/max77759_contaminant.ko",
+        "drivers/usb/typec/tcpm/google/max77759_helper.ko",
+        "drivers/usb/typec/tcpm/google/max77779_contaminant.ko",
+        "drivers/usb/typec/tcpm/google/max777x9_contaminant.ko",
+        "drivers/usb/typec/tcpm/google/tcpci_max77759.ko",
+        "drivers/usb/typec/tcpm/google/usb_psy.ko",
+        "drivers/usb/typec/tcpm/google/usbc_cooling_dev.ko",
+        "drivers/watchdog/s3c2410_wdt.ko",
+    ],
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    makefile = ["//private/google-modules/soc/gs:Makefile"],
+    visibility = [
+        # keep sorted
+        "//private/devices/google:__subpackages__",
+        "//private/google-modules:__subpackages__",
+    ],
+    deps = [
+        "//private/google-modules/bms/misc:bms-misc",
+        "//private/google-modules/trusty",
+    ],
+)
+
+kernel_modules_install(
+    name = "gs201_pantah_modules_install",
+    kernel_build = ":gs201_pantah",
+    kernel_modules = [":pantah_ext_modules"],
 )
 
 merged_kernel_uapi_headers(
-    name = "merged_kernel_uapi_headers",
-    kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+    name = "gs201_pantah_merged_uapi_headers",
+    kernel_build = ":gs201_pantah",
+    kernel_modules = [":pantah_ext_modules"],
 )
 
-create_file(
-    name = "vendor_ramdisk_modules_list",
+kernel_unstripped_modules_archive(
+    name = "gs201_pantah_unstripped_modules_archive",
+    kernel_build = ":gs201_pantah",
+    kernel_modules = [":pantah_ext_modules"],
+)
+
+hermetic_genrule(
+    name = "vendor_kernel_boot_modules.pantah-cat",
     srcs = [
-        # do not sort
-        "//private/devices/google/gs201:vendor_ramdisk_modules_list",
-        "vendor_ramdisk.modules.pantah",
+        "vendor_kernel_boot_modules.pantah",
+        "//private/devices/google/gs201:vendor_kernel_boot_modules.gs201",
     ],
-    out = "vendor_ramdisk.modules",
+    outs = [
+        "vendor_kernel_boot_modules.concat",
+    ],
+    cmd = """
+        cat $(location vendor_kernel_boot_modules.pantah) \\
+            $(location //private/devices/google/gs201:vendor_kernel_boot_modules.gs201) \\
+            > $@
+    """,
 )
 
-create_file(
+# Don't load the zram GKI module
+_GKI_MODULES = [m for m in get_gki_modules_list("arm64") if not m.endswith("zram.ko")]
+
+write_file(
     name = "system_dlkm_modules_list",
-    srcs = ["//private/devices/google/gs201:system_dlkm_modules_list"],
-    out = "system_dlkm.modules",
-)
-
-create_file(
-    name = "system_dlkm_modules_blocklist",
-    srcs = ["//private/devices/google/gs201:system_dlkm_modules_blocklist"],
-    out = "system_dlkm.blocklist",
-)
-
-create_file(
-    name = "system_dlkm_props",
-    srcs = ["//private/devices/google/gs201:system_dlkm_props"],
-    out = "system_dlkm.props",
-)
-
-create_file(
-    name = "vendor_dlkm_modules_list",
-    srcs = ["//private/devices/google/gs201:vendor_dlkm_modules_list"],
-    out = "vendor_dlkm.modules",
-)
-
-create_file(
-    name = "vendor_dlkm_modules_blocklist",
-    srcs = [
-        # do not sort
-        "//private/devices/google/gs201:vendor_dlkm_modules_blocklist",
-        "vendor_dlkm.blocklist.pantah",
-    ],
-    out = "vendor_dlkm.blocklist",
-)
-
-create_file(
-    name = "vendor_dlkm_props",
-    srcs = ["//private/devices/google/gs201:vendor_dlkm_props"],
-    out = "vendor_dlkm.props",
-)
-
-filegroup(
-    name = "insmod_cfgs",
-    srcs = glob(["insmod_cfg/*.cfg"]),
+    out = "system_dlkm_modules_list.pantah",
+    content = _GKI_MODULES,
 )
 
 kernel_images(
-    name = "kernel_images",
-    base_kernel_images = "//common:kernel_aarch64_images",
-    # TODO: b/362627953 - Remove dtb.img
-    boot_image_outs = [
-        "dtb.img",
-        "vendor_kernel_boot.img",
-    ],
+    name = "gs201_pantah_images",
+    base_kernel_images = "//common:kernel_aarch64_images_download_or_build",
+    boot_image_outs = ["dtb.img"],
+    build_boot = False,
     build_dtbo = True,
     build_initramfs = True,
     build_system_dlkm = True,
     build_vendor_dlkm = True,
     build_vendor_kernel_boot = True,
-    dtbo_srcs = [":kernel/" + dtbo for dtbo in PANTAH_DTBOS],
-    kernel_build = ":kernel",
-    kernel_modules_install = ":kernel_modules_install",
-    modules_list = ":vendor_ramdisk_modules_list",
-    ramdisk_compression = "lz4",
-    system_dlkm_modules_blocklist = ":system_dlkm_modules_blocklist",
+    dedup_dlkm_modules = True,
+    dtbo_srcs = [":gs201_pantah/" + file for file in _GS201_PANTAH_DTBOS],
+    kernel_build = ":gs201_pantah",
+    kernel_modules_install = ":gs201_pantah_modules_install",
+    # Keep the following in sync with build.config.pantah:
+    modules_list = ":vendor_kernel_boot_modules.pantah-cat",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
-    system_dlkm_props = ":system_dlkm_props",
-    vendor_dlkm_archive = True,
-    vendor_dlkm_etc_files = [":insmod_cfgs"],
-    vendor_dlkm_modules_blocklist = ":vendor_dlkm_modules_blocklist",
-    vendor_dlkm_modules_list = ":vendor_dlkm_modules_list",
-    vendor_dlkm_props = ":vendor_dlkm_props",
-    deps = ["//private/devices/google/common:sepolicy"],
+    system_dlkm_props = "//private/devices/google/gs201:system_dlkm.props.gs201",
+    vendor_dlkm_etc_files = ["//private/devices/google/pantah:insmod_cfgs"],
+    vendor_dlkm_modules_blocklist = "//private/devices/google/gs201:vendor_dlkm.blocklist.gs201",
+    # No MODULES_BLOCKLIST
+    vendor_dlkm_modules_list = "//private/devices/google/gs201:vendor_dlkm_modules.gs201",
+    vendor_dlkm_props = "//private/devices/google/gs201:vendor_dlkm.props.gs201",
+    deps = [
+        # Keep the following in sync with (vendor|system)_dlkm.props.gs201:
+        # selinux_fc
+        "//private/devices/google/common:sepolicy",
+    ],
+)
+
+filegroup(
+    name = "insmod_cfgs",
+    srcs = glob([
+        "insmod_cfg/*.cfg",
+    ]),
+)
+
+# TODO: support running ufdt_apply_overlay in a loop on each DTBO
+#genrule(
+#    name = "gs201_pantah_ufdt_overlay",
+#    srcs = [
+#        ":gs201_pantah/google/gs201-a0.dtb",
+#        "//build/kernel:hermetic-tools/ufdt_apply_overlay",
+#    ] + [":gs201_pantah/" + file for file in _GS201_PANTAH_DTBOS],
+#    outs = [
+#        "gs201_pantahout.dtb",
+#    ],
+#    cmd = """set -e
+#	for m in {pantah_dtbos}; \\
+#	do \\
+#		$(location //build/kernel:hermetic-tools/ufdt_apply_overlay) \\
+#		    $(location :gs201_pantah/google/gs201-a0.dtb)              \\
+#		    $(location :gs201_pantah/$$m)         \\
+#		    $(location gs201_pantah$(basename $$m).dtb) \\
+#	done
+#    """.format(
+#        pantah_dtbos = " ".join(_GS201_PANTAH_DTBOS),
+#    ),
+#)
+
+_gs201_pantah_dist_targets = [
+    # Device-specific artifacts
+    ":gs201_pantah",
+    ":gs201_pantah_modules_install",
+    ":gs201_pantah_merged_uapi_headers",
+    ":gs201_pantah_images",
+    ":gki_aarch64_boot",
+    # TODO: support running ufdt_apply_overlay in a loop on each DTBO
+    #":gs201_pantah_ufdt_overlay",
+    ":gs201_pantah_unstripped_modules_archive",
+    ":insmod_cfgs",
+    ":gs201_pantah_extracted_system_dlkm",
+    "//common:android/abi_gki_aarch64_pixel",
+    "//common:kernel_aarch64_download_or_build",
+    "//common:kernel_aarch64_headers_download_or_build",
+] + select({
+    "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
+    "//private/devices/google/common:disable_download_fips140": [],
+})
+
+extracted_system_dlkm(
+    name = "gs201_pantah_extracted_system_dlkm",
+    gki_modules = [paths.basename(m) for m in _GKI_MODULES],
+    images = "//common:kernel_aarch64_images_download_or_build",
+    visibility = [
+        "//private/devices/google:__subpackages__",
+    ],
 )
 
 copy_to_dist_dir(
-    name = "dist",
-    data = [
-        # keep sorted
-        ":insmod_cfgs",
-        ":kernel",
-        ":kernel_images",
-        ":kernel_modules_install",
-        ":kernel_unstripped_modules_archive",
-        ":merged_kernel_uapi_headers",
-        "//common:android/abi_gki_aarch64_pixel",
-        "//common:kernel_aarch64",
-        "//common:kernel_aarch64_gki_boot_image",
-        "//common:kernel_aarch64_gki_modules",
-        "//common:kernel_aarch64_headers",
-    ] + select({
-        "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
-        "//private/devices/google/common:disable_download_fips140": [],
-    }),
+    name = "gs201_pantah_dist",
+    data = _gs201_pantah_dist_targets,
     dist_dir = "out/pantah/dist",
     flat = True,
     log = "info",
-)
-
-# For ABI monitoring
-kernel_abi(
-    name = "kernel_abi",
-    kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
-    kmi_symbol_list_add_only = True,
-    module_grouping = False,
-)
-
-# For compatibility
-alias(
-    name = "gs201_soc.pantah",
-    actual = "//private/devices/google/gs201:gs201_soc",
-)
-
-alias(
-    name = "gs201_pantah_dist",
-    actual = ":dist",
-)
-
-alias(
-    name = "gs201_pantah_abi_update_symbol_list",
-    actual = ":kernel_abi_update_symbol_list",
 )
