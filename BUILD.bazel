@@ -240,7 +240,7 @@ kernel_module(
         "drivers/video/backlight/rt4539_bl.ko",
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
-    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    kernel_build = "//private/devices/google/common:kernel",
     makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
