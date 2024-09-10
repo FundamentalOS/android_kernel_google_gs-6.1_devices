@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+load("//build/kernel/kleaf:kernel.bzl", "kernel_dtstree")
+
+kernel_dtstree(
+    name = "akita.dt",
+    srcs = glob([
+        "google/*.dtsi",
+        "google/*.dts",
+        "google/google-dts-base/*.dts",
+        "google/google-dts-base/*.dtsi",
+    ]) + [
+        "Makefile",
+        "google/Makefile",
+        "google/google-dts-base/Makefile",
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    visibility = [
+        "//private/devices/google/akita:__pkg__",
+        "//private/google-modules/soc/gs:__pkg__",
+    ],
+)
