@@ -7,14 +7,14 @@
 
 #include <dt-bindings/regulator/samsung,s2mpg-regulator.h>
 
-#include "gs201/gs201-common.dtsi"
-#include "gs201/gs201-cloudripper-battery.dtsi"
-#include "gs201/gs201-cloudripper-bcl.dtsi"
-#include "gs201/gs201-cloudripper-bluetooth.dtsi"
-#include "gs201/gs201-cloudripper-gsa-gsc.dtsi"
-#include "gs201/gs201-cloudripper-wlan.dtsi"
+#include "google-base/gs201-common.dtsi"
+#include "google-base/gs201-cloudripper-battery.dtsi"
+#include "google-base/gs201-cloudripper-bcl.dtsi"
+#include "google-base/gs201-cloudripper-bluetooth.dtsi"
+#include "google-base/gs201-cloudripper-gsa-gsc.dtsi"
+#include "google-base/gs201-cloudripper-wlan.dtsi"
 
-#include "gs201/gs201-pantah-pmic.dtsi"
+#include "google-base/gs201-pantah-pmic.dtsi"
 
 #include "gs201-tangorpro-uwb.dtsi"
 #include "gs201-tangorpro-camera-pmic.dtsi"
@@ -25,7 +25,7 @@
 #include "gs201-tangorpro-thermal.dtsi"
 #include "gs201-tangorpro-audio.dtsi"
 #include "gs201-tangorpro-battery.dtsi"
-#include "gs201/gs101-faceauth-dma-heap.dtsi"
+#include "google-base/gs101-faceauth-dma-heap.dtsi"
 #include "gs201-tangorpro-charging.dtsi"
 #include "gs201-tangorpro-usb.dtsi"
 #include "gs201-tangorpro-usecases.dtsi"
