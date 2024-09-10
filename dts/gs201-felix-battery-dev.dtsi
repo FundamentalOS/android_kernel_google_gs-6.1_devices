@@ -14,7 +14,7 @@
 &max77759_fg {
 
 	maxim,fg-data {
-		#include "gs201/gs101-fake-battery-data.dtsi"
+		#include "google-base/gs101-fake-battery-data.dtsi"
 	};
 };
 

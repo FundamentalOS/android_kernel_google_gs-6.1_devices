@@ -5,18 +5,18 @@
  * Copyright 2021-2022 Google,LLC
  */
 
-#include "gs201/gs201-common.dtsi"
-#include "gs201/gs201-cloudripper-battery.dtsi"
-#include "gs201/gs201-cloudripper-bluetooth.dtsi"
-#include "gs201/gs201-cloudripper-bcl.dtsi"
-#include "gs201/gs201-pantah-charging.dtsi"
-#include "gs201/gs201-cloudripper-cp-s5300-sit.dtsi"
-#include "gs201/gs201-cloudripper-ese.dtsi"
-#include "gs201/gs201-cloudripper-gsa-gsc.dtsi"
-#include "gs201/gs201-cloudripper-wlan.dtsi"
-#include "gs201/gs101-faceauth-dma-heap.dtsi"
+#include "google-base/gs201-common.dtsi"
+#include "google-base/gs201-cloudripper-battery.dtsi"
+#include "google-base/gs201-cloudripper-bluetooth.dtsi"
+#include "google-base/gs201-cloudripper-bcl.dtsi"
+#include "google-base/gs201-pantah-charging.dtsi"
+#include "google-base/gs201-cloudripper-cp-s5300-sit.dtsi"
+#include "google-base/gs201-cloudripper-ese.dtsi"
+#include "google-base/gs201-cloudripper-gsa-gsc.dtsi"
+#include "google-base/gs201-cloudripper-wlan.dtsi"
+#include "google-base/gs101-faceauth-dma-heap.dtsi"
 
-#include "gs201/gs101-faceauth-dma-heap.dtsi"
+#include "google-base/gs101-faceauth-dma-heap.dtsi"
 
 #include "gs201-felix-wcharger.dtsi"
 

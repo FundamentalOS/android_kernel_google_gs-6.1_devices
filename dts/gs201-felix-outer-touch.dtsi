@@ -7,7 +7,7 @@
  */
 
 #include <arm64/exynos/exynos-pinctrl.h>
-#include "gs201/gs101-pinctrl.h"
+#include "google-base/gs101-pinctrl.h"
 
 &tbn {
 	tbn,max_devices = <2>;

@@ -9,7 +9,7 @@
 #include <dt-bindings/clock/gs201.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <arm64/exynos/exynos-pinctrl.h>
-#include "gs201/gs101-pinctrl.h"
+#include "google-base/gs101-pinctrl.h"
 
 &slg51002_ldo1 {
 	regulator-min-microvolt = <2900000>;
@@ -231,11 +231,10 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	pinctrl-names = "default","on_i2c","off_i2c","recovery";
+	pinctrl-names = "default","on_i2c","off_i2c";
 	pinctrl-0 = <&hsi2c8_bus &flash_en>;
 	pinctrl-1 = <&hsi2c8_bus>;
 	pinctrl-2 = <&hsi2c8_bus>;
-	pinctrl-3 = <>;
 };
 
 &hsi2c_14 {

@@ -6,7 +6,7 @@
  *		https://www.google.com
 */
 
-#include "gs201/gs201-ravenclaw-uwb.dtsi"
+#include "google-base/gs201-ravenclaw-uwb.dtsi"
 
 &spi_16 {
 	dw3xxx_prod@0 {

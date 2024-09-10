@@ -31,7 +31,6 @@
 			google_battery: google,battery {
 				google,fg-psy-name = "dualbatt";
 				google,chg-battery-capacity = <4727>;
-				google,first-usage-date = <0>;
 
 				/* charge table */
 				google,chg-temp-limits = <0 100 200 420 460 480 550>;

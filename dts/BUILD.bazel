@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+load("//build/kernel/kleaf:kernel.bzl", "kernel_dtstree")
+
+kernel_dtstree(
+    name = "felix.dt",
+    srcs = glob([
+        "*.dtsi",
+        "*.dts",
+        "google-base/*.dts",
+        "google-base/*.dtsi",
+        "google-base/*.h",
+    ]) + [
+        "Makefile",
+        "google-base/Makefile",
+        "//private/google-modules/soc/gs:gs.dt-bindings",
+    ],
+    visibility = [
+        "//private/devices/google/felix:__pkg__",
+        "//private/google-modules/soc/gs:__pkg__",
+    ],
+)
