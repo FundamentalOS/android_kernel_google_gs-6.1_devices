@@ -216,7 +216,6 @@ kernel_module(
         "drivers/spmi/spmi_bit_bang.ko",
         "drivers/thermal/google/cdev_uclamp.ko",
         "drivers/thermal/google/s2mpg15_spmic_thermal.ko",
-        "drivers/thermal/google/sts4x_ambient_i2c.ko",
         "drivers/thermal/samsung/gpu_cooling.ko",
         "drivers/thermal/samsung/gs_thermal.ko",
         "drivers/tty/serial/exynos_tty.ko",
