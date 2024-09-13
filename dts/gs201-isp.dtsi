@@ -211,6 +211,8 @@
 		clock-family = <CAMERA_CLOCK_FAMILY_CAM>;
 		bts-scenario = "camera_default";
 
+		device-group = <1>;
+
 		interrupts =
 			<0 IRQ_CSIS0_CSIS IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_CSIS0_CSIS IRQ_TYPE_LEVEL_HIGH>,
@@ -420,6 +422,8 @@
 
 		clock-family = <CAMERA_CLOCK_FAMILY_CAM>;
 
+		device-group = <2>;
+
 		interrupts =
 			<0 IRQ_PDP_TOP0_PDP IRQ_TYPE_LEVEL_HIGH>, /* PDP_CORE0 */
 			<0 IRQ_PDP_TOP1_PDP IRQ_TYPE_LEVEL_HIGH>,
@@ -470,6 +474,8 @@
 		clock-names = "UMUX_CLKCMU_IPP_NOC";
 		clock-rates = <0>;
 		clock-family = <CAMERA_CLOCK_FAMILY_CAM>;
+
+		device-group = <3>;
 
 		interrupts =
 			<0 IRQ_IPP_CH0_0_IPP IRQ_TYPE_LEVEL_HIGH>,    /* IPP0 */
@@ -545,6 +551,8 @@
 		clock-rates = <0>;
 		clock-family = <CAMERA_CLOCK_FAMILY_CAM>;
 
+		device-group = <4>;
+
 		interrupts =
 			<0 IRQ_TNR_A_IPP IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_MUTE_GTNR_ALIGN_IPP IRQ_TYPE_LEVEL_HIGH>;
@@ -599,6 +607,8 @@
 
 		clock-family = <CAMERA_CLOCK_FAMILY_TNR>;
 
+		device-group = <5>;
+
 		interrupts =
 			<0 IRQ_TNR_0_TNR IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_TNR_1_TNR IRQ_TYPE_LEVEL_HIGH>,
@@ -641,6 +651,8 @@
 		clock-names = "UMUX_CLKCMU_G3AA_G3AA";
 		clock-rates = <0>;
 		clock-family = <CAMERA_CLOCK_FAMILY_CAM>;
+
+		device-group = <6>;
 
 		interrupts =
 			<0 IRQ_G3AA_G3AA IRQ_TYPE_LEVEL_HIGH>,
@@ -696,6 +708,8 @@
 		clock-rates = <0>;
 
 		clock-family = <CAMERA_CLOCK_FAMILY_INTCAM>;
+
+		device-group = <7>;
 
 		interrupts =
 			<0 INTREQ_ITP_0_ITP IRQ_TYPE_LEVEL_HIGH>,
@@ -754,6 +768,8 @@
 
 		clock-family = <CAMERA_CLOCK_FAMILY_INTCAM>;
 
+		device-group = <8>;
+
 		interrupts =
 			<0 IRQ_MCSC_0_MCSC IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_MCSC_1_MCSC IRQ_TYPE_LEVEL_HIGH>,
@@ -794,6 +810,8 @@
 
 		clock-family = <CAMERA_CLOCK_FAMILY_INTCAM>;
 
+		device-group = <9>;
+
 		interrupts =
 			<0 IRQ_SCSC_IRQ_0_GDC IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_SCSC_IRQ_1_GDC IRQ_TYPE_LEVEL_HIGH>,
@@ -832,6 +850,8 @@
 
 		clock-family = <CAMERA_CLOCK_FAMILY_INTCAM>;
 
+		device-group = <10>;
+
 		interrupts =
 			<0 IRQ_GDC0_IRQ_0_GDC IRQ_TYPE_LEVEL_HIGH>,
 			<0 IRQ_GDC0_IRQ_1_GDC IRQ_TYPE_LEVEL_HIGH>,
@@ -868,6 +888,8 @@
 		clock-names = "UMUX_CLKCMU_GDC_GDC1";
 		clock-rates = <0>;
 		clock-family = <CAMERA_CLOCK_FAMILY_INTCAM>;
+
+		device-group = <11>;
 
 		interrupts =
 			<0 IRQ_GDC1_IRQ_0_GDC IRQ_TYPE_LEVEL_HIGH>,
@@ -936,6 +958,8 @@
 			"UMUX_CLKCMU_GDC_GDC1",
 			"UMUX_CLKCMU_GDC_SCSC";
 		clock-rates = <0>;
+
+		device-group = <12>;
 
 		iommus =
 			<&sysmmu_gdc0>,
