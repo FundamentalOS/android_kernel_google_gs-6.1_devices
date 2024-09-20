@@ -66,7 +66,6 @@
 					irq,uvlo1;
 					irq,uvlo2;
 					irq,batoilo;
-					irq,batoilo2;
 					irq,smpl_warn;
 					/* Disabled IRQ
 					* irq,ocp_cpu1;
@@ -116,13 +115,6 @@
 						cpucl2 = <2294000>;
 						gpu = <723000>;
 						tpu = <845000>;
-					};
-					batoilo2 {
-						cpucl0 = <955000>;
-						cpucl1 = <1065000>;
-						cpucl2 = <1298000>;
-						gpu = <419000>;
-						tpu = <455000>;
 					};
 					vdroop1 {
 						cpucl0 = <1704000>;
