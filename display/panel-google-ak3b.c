@@ -484,6 +484,7 @@ static void ak3b_change_frequency(struct exynos_panel *ctx,
 
 	EXYNOS_DCS_BUF_ADD_SET(ctx, test_key_on_f0);
 	if (vrefresh == 120) {
+		ctx->op_hz = 120;
 		EXYNOS_DCS_BUF_ADD_SET(ctx, hs120_setting);
 		EXYNOS_DCS_BUF_ADD(ctx, 0xB9, 0x31);
 	} else {
@@ -504,8 +505,11 @@ static void buf_add_frequency_select_cmd(struct exynos_panel *ctx) {
 	u32 vrefresh = drm_mode_vrefresh(&ctx->current_mode->mode);
 	/* NS60: 0x18, HS120: 0x00, HS60: 0x08 */
 	u8 index = 0x18;
-	if (ctx->op_hz != 60) {
-	    index = (vrefresh == 120) ? 0x00 : 0x08;
+	if (vrefresh == 120) {
+		index = 0x00;
+		ctx->op_hz = 120;
+	} else if (ctx->op_hz != 60) {
+		index = 0x08;
 	} else if (ctx->panel_rev <= PANEL_REV_PROTO1) {
 		index = 0x08; /* NS60 is treated HS60 for Proto 1.0 */
 	}
