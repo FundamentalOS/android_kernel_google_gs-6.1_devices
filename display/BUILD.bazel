@@ -18,7 +18,7 @@ kernel_module(
         "panel-samsung-ana6707-f10.ko",
         "panel-samsung-ea8182-f10.ko",
     ],
-    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
+    kernel_build = "//private/devices/google/common:kernel",
     visibility = [
         "//private/devices/google:__subpackages__",
         "//private/google-modules/display:__pkg__",
