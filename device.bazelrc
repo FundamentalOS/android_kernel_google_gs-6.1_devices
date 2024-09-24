@@ -2,5 +2,5 @@
 #
 # Copyright (C) 2024 Google LLC
 
-build:zumapro --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/zumapro:kernel
+build:zumapro --//private/devices/google/common:kernel=//private/devices/google/zumapro:kernel
 build:zumapro --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/zumapro:zumapro_soc
