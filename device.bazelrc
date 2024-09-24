@@ -2,5 +2,5 @@
 #
 # Copyright (C) 2024 Google LLC
 
-build:gs201 --//private/devices/google/common:kernel=//private/devices/google/gs201:kernel
+build:gs201 --//private/google-modules/soc/gs:gs_kernel_build=//private/devices/google/gs201:kernel
 build:gs201 --//private/google-modules/soc/gs:gs_soc_module=//private/devices/google/gs201:gs201_soc
