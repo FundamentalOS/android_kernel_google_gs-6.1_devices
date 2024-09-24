@@ -2,7 +2,7 @@
 /*
  * Wireless Charger device tree entries.
  *
- * Copyright 2022 Google Inc.
+ * Copyright 2020 Google Inc.
  */
 
 #include <arm64/exynos/exynos-pinctrl.h>
@@ -45,45 +45,43 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 
-	p9412@3c {
-		compatible = "idt,p9412";
-		reg = <0x3c>;
+	p9222@61 {
+		compatible = "idt,p9222";
+		reg = <0x61>;
 		status = "ok";
 
-		/* RTX: configure boost to 7V through wlc chip */
-		idt,apbst_en;
+		/* Support p9412 GPIO */
+		idt,has_p9412_gpio;
 
-		/* Granvilla GPIO 2~4 */
-		idt,gpio_ben = <&max777x9_gpio 4 GPIO_ACTIVE_HIGH>;  /* EXT_BST_EN */
-		idt,gpio_boost = <&s2mpg12_gpio 3 GPIO_ACTIVE_HIGH>; /* WLC_TX_SW_EN */
-		/* idt,gpio_switch = <&p9xxx_gpio 3 GPIO_ACTIVE_HIGH>; */ /* EXT_BST_VTRX */
-		idt,gpio_extben = <&s2mpg12_gpio 2 GPIO_ACTIVE_HIGH>; /* AP2QI_EXTBST_EN */
-		/* CSP */
-		idt,fuel-gauge = <&google_battery>;
+		idt,has_rtx = <0>;
 
-		/* WLCDC */
-		idt,gpio_dc_switch = <&s2mpg12_gpio 0 GPIO_ACTIVE_HIGH>; /* WLC_RX_SW_EN */
-		idt,max_vout_mv = <19500>;
-		idt,has_wlc_dc = <1>;
 		google,power_mitigate_threshold = <90>;
 		google,has-sw-ramp;
+		google,epp_dcicl_default_ma = <750000>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&wc_irq &wc_en>;
 
 		idt,gpio_wlc_en = <&gpp0 0 GPIO_ACTIVE_LOW>;
-		/* idt,gpio_qi_vbus_en = <PP1800_L14S_ALIVE>; always high after boot */
+		idt,gpio_qi_vbus_en = <&s2mpg12_gpio 2 GPIO_ACTIVE_HIGH>;
 		idt,gpio_qien = <&gpp0 0 GPIO_ACTIVE_LOW>;
 		idt,irq_gpio = <&gpa9 5 GPIO_ACTIVE_LOW>;
+		idt,gpio_slct = <&s2mpg12_gpio 0 GPIO_ACTIVE_HIGH>;
+		idt,gpio_slct_value = <0>;
 
-		/* TXID: Phone type */
-		idt,tx_id_phone_type = /bits/ 8 <3>;
+		idt,max_vout_mv = <10000>;  /* max voltage in mV */
+
+		google,q_value = <43>;
+		fod = [A9 20 89 27 8D 25 92 23 9B 10 A0 0F];
+		fod_epp = [84 68 89 4D 92 2B 8A 4B 93 20 93 26 01 01 FF 19];
+
+		google,iop_en;		/* IOP enable */
+		google,light_load;	/* Calibration light load */
 
 		p9xxx_gpio: p9xxx_gpio {
 			gpio-controller;
 			#gpio-cells = <2>;
 			ngpios = <16>;
 		};
-
 	};
 };

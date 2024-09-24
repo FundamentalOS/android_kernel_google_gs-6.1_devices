@@ -9,7 +9,7 @@
 
 #include "gs201-ravenclaw-audio.dtsi"
 #include "gs201-ravenclaw-display.dtsi"
-#include "gs201/gs201-ravenclaw-fingerprint.dtsi"
+#include "gs201-ravenclaw-fingerprint.dtsi"
 #include "gs201-ravenclaw-pmic.dtsi"
 #include "gs201-ravenclaw-thermal.dtsi"
 #include "gs201-ravenclaw-touch.dtsi"
