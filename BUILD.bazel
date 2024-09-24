@@ -66,6 +66,8 @@ kernel_build(
     name = "kernel",
     srcs = [":kernel_sources"],
     outs = [
+        ".config",
+    ] + [
         "gs201/{}".format(dtb)
         for dtb in GS201_DTBS
     ] + FELIX_DTBOS,
