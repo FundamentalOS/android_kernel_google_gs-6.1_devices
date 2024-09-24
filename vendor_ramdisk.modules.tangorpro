@@ -9,15 +9,8 @@ extra/private/devices/google/tangorpro/display/panel-csot-ppa957db2d.ko
 extra/private/devices/google/tangorpro/pogo/pogo_transport.ko
 extra/private/google-modules/amplifiers/cs35l41/snd-soc-cs35l41.ko
 extra/private/google-modules/amplifiers/cs35l41/snd-soc-cs35l41-spi.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45-spi.ko
-extra/private/google-modules/amplifiers/cs35l45/snd-soc-cs35l45-wm-adsp.ko
-extra/private/google-modules/amplifiers/cs35l45/cs35l45-cs-dsp.ko
 extra/private/google-modules/amplifiers/snd_soc_wm_adsp/snd-soc-wm-adsp.ko
 extra/private/google-modules/gps/broadcom/bcm47765/bcm47765.ko
-extra/private/google-modules/nfc/st21nfc.ko
-extra/private/google-modules/nfc/ese/st54spi.ko
-extra/private/google-modules/nfc/ese/st33spi.ko
 extra/private/google-modules/touch/common/touch_bus_negotiator.ko
 extra/private/google-modules/touch/common/heatmap.ko
 extra/private/google-modules/touch/common/touch_offload.ko
