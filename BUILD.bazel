@@ -71,6 +71,8 @@ kernel_build(
     name = "kernel",
     srcs = [":kernel_sources"],
     outs = [
+        ".config",
+    ] + [
         "zuma/{}".format(dtb)
         for dtb in ZUMA_DTBS + ZUMA_DPM_DTBOS
     ] + [
