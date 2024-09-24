@@ -108,7 +108,6 @@ kernel_module(
         "drivers/i2c/busses/i2c-exynos5.ko",
         "drivers/iio/power/odpm.ko",
         "drivers/input/fingerprint/goodixfp.ko",
-        "drivers/input/fps_touch_handler/fps_touch_handler.ko",
         "drivers/input/keyboard/s2mpg14-key.ko",
         "drivers/input/keycombo.ko",
         "drivers/input/keydebug.ko",
@@ -217,6 +216,7 @@ kernel_module(
         "drivers/spmi/spmi_bit_bang.ko",
         "drivers/thermal/google/cdev_uclamp.ko",
         "drivers/thermal/google/s2mpg15_spmic_thermal.ko",
+        "drivers/thermal/google/sts4x_ambient_i2c.ko",
         "drivers/thermal/samsung/gpu_cooling.ko",
         "drivers/thermal/samsung/gs_thermal.ko",
         "drivers/tty/serial/exynos_tty.ko",
@@ -240,7 +240,7 @@ kernel_module(
         "drivers/video/backlight/rt4539_bl.ko",
         "drivers/watchdog/s3c2410_wdt.ko",
     ],
-    kernel_build = "//private/devices/google/common:kernel",
+    kernel_build = "//private/google-modules/soc/gs:gs_kernel_build",
     makefile = ["//private/google-modules/soc/gs:Makefile"],
     visibility = [
         # keep sorted
