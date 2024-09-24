@@ -7,7 +7,7 @@
  */
 #include <dt-bindings/gpio/gpio.h>
 #include <arm64/exynos/exynos-pinctrl.h>
-#include "google-base/gs101-pinctrl.h"
+#include "gs201/gs101-pinctrl.h"
 
 / {
 	fragment@pogo_transport {
