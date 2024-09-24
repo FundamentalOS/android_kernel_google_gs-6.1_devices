@@ -68,6 +68,8 @@ kernel_build(
     name = "kernel",
     srcs = [":kernel_sources"],
     outs = [
+        ".config",
+    ] + [
         "zumapro/{}".format(dtb)
         for dtb in ZUMAPRO_DTBS + ZUMAPRO_DPM_DTBOS
     ] + TEGU_DTBOS,
