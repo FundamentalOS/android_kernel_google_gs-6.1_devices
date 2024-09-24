@@ -61,8 +61,7 @@
 				/* bhi */
 				google,bhi-status-marginal = <79>;
 				google,bhi-status-need-rep = <79>;
-				google,bhi-cycle-grace = <100>;
-				google,bhi-algo-ver = <3>;
+				google,bhi-cycle-grace = <200>;
 
 				#thermal-sensor-cells = <0>;
 				#cooling-cells = <2>;
