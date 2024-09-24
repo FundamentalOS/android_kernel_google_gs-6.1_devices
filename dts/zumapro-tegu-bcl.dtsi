@@ -6,7 +6,7 @@
  *		https://www.google.com
  */
 
-#include "google-dts-zumapro/zumapro-board-bcl.dtsi"
+#include "zumapro/zumapro-board-bcl.dtsi"
 
 &pinctrl_11 {
 	bcl_rffe_modem: bcl-rffe-modem {
@@ -16,6 +16,13 @@
 	bcl_batoilo_modem: bcl-batoilo-modem {
 		samsung,pins = "gpp13-0";
 		samsung,pin-function = <EXYNOS_PIN_FUNC_OUTPUT>;
+	};
+};
+&pinctrl_0  {
+	bcl_s_ocp_tpu: bcl-s-ocp-tpu {
+		samsung,pins = "gpa9-3";
+		samsung,pin-function = <EXYNOS_PIN_FUNC_INPUT>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_DOWN>;
 	};
 };
 
@@ -63,9 +70,10 @@
 		<&gpp11 0 GPIO_ACTIVE_HIGH>,
 		<&gpp13 0 GPIO_ACTIVE_HIGH>;
 	rffe_channel = <11>;
-	pinctrl-names = "bcl-rffe-modem", "bcl-batoilo-modem";
+	pinctrl-names = "bcl-rffe-modem", "bcl-batoilo-modem", "bcl-s-ocp-tpu";
 	pinctrl-0 = <&bcl_rffe_modem>;
 	pinctrl-1 = <&bcl_batoilo_modem>;
+	pinctrl-2 = <&bcl_s_ocp_tpu>;
 	interrupt-parent = <&max77779_pmic_irq>;
 	interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
 };
