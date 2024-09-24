@@ -66,8 +66,7 @@
 
 				google,bhi-status-marginal = <79>;
 				google,bhi-status-need-rep = <79>;
-				google,bhi-cycle-grace = <100>;
-				google,bhi-algo-ver = <3>;
+				google,bhi-cycle-grace = <200>;
 
 				#thermal-sensor-cells = <0>;
 				#cooling-cells = <2>;
@@ -194,13 +193,6 @@
 		max77759,chg-term-voltage = <4400>;
 
 		#thermal-sensor-cells = <1>;
-
-		max77759_gpio: max77759_gpio {
-			gpio-controller;
-			#gpio-cells = <2>;
-			ngpios = <1>;
-		};
-
 	};
 
 };

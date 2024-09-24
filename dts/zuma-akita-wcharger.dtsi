@@ -63,7 +63,6 @@
 		google,power_mitigate_threshold = <90>;
 		google,has-sw-ramp;
 		google,epp_dcicl_default_ma = <820000>;
-		google,wcin_inlim_en = <&max77759_gpio 0 GPIO_ACTIVE_HIGH>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&wc_pdet_irq &wc_irq &wc_en>;
