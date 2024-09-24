@@ -17,6 +17,7 @@
 #include "zumapro/zumapro-board-bluetooth_wakectrl.dtsi"
 #include "zuma-tegu-ese.dtsi"
 #include "zuma-tegu-nfc.dtsi"
+#include "zuma/zuma-board-ultrasonic-udfps.dtsi"
 #include "zumapro-tegu-audio-common-tas2572.dtsi"
 #include "zuma-tegu-common-touch.dtsi"
 #include "zumapro/zumapro-board-pcie.dtsi"
