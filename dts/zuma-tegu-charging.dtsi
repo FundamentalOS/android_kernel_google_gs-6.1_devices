@@ -18,6 +18,9 @@
 				google,buck-chg-psy-name = "rt9471";
 
 				google,buck_chg_en = <&max77779_sgpio 7 GPIO_ACTIVE_LOW>;
+
+				google,split-5v = <1000 1000 500 526 552 504 564 586 535 482>;
+				google,split-9v = <1000 1000 1000 1000 546 543 563 591 584 569>;
 			};
 
 		};
