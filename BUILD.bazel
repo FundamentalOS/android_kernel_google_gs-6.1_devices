@@ -69,7 +69,9 @@ filegroup(
 kernel_build(
     name = "kernel",
     srcs = [":kernel_sources"],
-    outs = ZUMA_DTBS + ZUMA_DPM_DTBOS,
+    outs = [
+        ".config",
+    ] + ZUMA_DTBS + ZUMA_DPM_DTBOS,
     base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
