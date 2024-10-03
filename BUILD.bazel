@@ -95,26 +95,20 @@ kernel_module_group(
         "//private/devices/google/gs201:kernel_ext_modules",
     ] + [
         # keep sorted
-        # TODO: b/358264236 - Remove lynx panel.
-        "//private/devices/google/lynx/display:drm_panel.google",
         "//private/google-modules/amplifiers/cs35l41",
         "//private/google-modules/amplifiers/cs35l45",
         "//private/google-modules/amplifiers/cs40l26",
         "//private/google-modules/amplifiers/snd_soc_wm_adsp:snd-soc-wm-adsp",
         "//private/google-modules/bluetooth/broadcom:bluetooth.broadcom",
-        "//private/google-modules/bluetooth/qcom:bluetooth.qcom",
         "//private/google-modules/gps/broadcom/bcm47765",
         "//private/google-modules/nfc",
         "//private/google-modules/radio/samsung/s5300:cpif",
         "//private/google-modules/touch/common:touch.common",
         "//private/google-modules/touch/focaltech/ft3658",
-        "//private/google-modules/touch/goodix",
         "//private/google-modules/touch/sec",
         "//private/google-modules/touch/synaptics/syna_c10:syna_touch",
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/wlan/bcm4389:bcmdhd4389",
-        "//private/google-modules/wlan/wcn6740/cnss2",
-        "//private/google-modules/wlan/wcn6740/wlan/qcacld-3.0",
     ],
 )
 
