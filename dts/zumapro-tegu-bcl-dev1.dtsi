@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Google ZumaPro/Tegu bcl device tree source
+ * Google ZumaPro/Tegu bcl device tree source dev1
  *
- * Copyright (c) 2023 Google, LLC
+ * Copyright (c) 2024 Google, LLC
  *		https://www.google.com
  */
 
@@ -26,21 +26,11 @@
 	};
 };
 
-&max77759tcpc {
-	bcl-usb-voting;
-};
-
-&rt_swchg {
-    pinctrl-names = "default";
-    pinctrl-0 = <&plc_int>;
-};
-
 &google_mitigation {
 	google,ifpmic = <M77779>;
 	google,charger = <&max77779_chg>;
 	google,pmic = <&max77779_pmic>;
 	google,power-supply = <&max77779_fg>;
-	google,plc = <&rt_swchg>;
 	batoilo_lower = <1800>;
 	batoilo_upper = <8000>;
 	batoilo2_lower = <3800>;
@@ -70,7 +60,6 @@
 	uvlo2_det = <0x1>;   /* 30us */
 	uvlo1_lvl = <0xA>;   /* 3.1V */
 	uvlo2_lvl = <0x8>;   /* 3.0V */
-	usb_otg_conf;
 	uvlo1_vdrp1_en;
 	uvlo2_vdrp2_en;
 	oilo1_vdrp2_en;
