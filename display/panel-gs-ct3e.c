@@ -433,7 +433,7 @@ static const struct gs_panel_mode_array ct3e_modes = {
 	.modes = {
 		{
 			.mode = {
-				.name = "1080x2424@60:60",
+				.name = "1080x2424x60@60",
 				DRM_MODE_TIMING(60, HDISPLAY, HFP, HSA, HBP,
 							VDISPLAY, VFP, VSA, VBP),
 				.flags = 0,
@@ -451,7 +451,7 @@ static const struct gs_panel_mode_array ct3e_modes = {
 		},
 		{
 			.mode = {
-				.name = "1080x2424@120:120",
+				.name = "1080x2424x120@120",
 				DRM_MODE_TIMING(120, HDISPLAY, HFP, HSA, HBP,
 							VDISPLAY, VFP, VSA, VBP),
 				.flags = 0,
@@ -506,7 +506,7 @@ static const struct gs_panel_mode_array ct3e_lp_modes = {
 	.modes = {
 		{
 			.mode = {
-				.name = "1080x2424@30:30",
+				.name = "1080x2424x30@30",
 				DRM_MODE_TIMING(30, HDISPLAY, HFP, HSA, HBP,
 						VDISPLAY, VFP, VSA, VBP),
 				.flags = 0,
