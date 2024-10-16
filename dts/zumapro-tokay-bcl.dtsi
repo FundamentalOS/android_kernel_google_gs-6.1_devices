@@ -7,6 +7,10 @@
  */
 
 
+&max77759tcpc {
+	bcl-usb-voting;
+};
+
 &google_mitigation {
 	google,ifpmic = <M77779>;
 	google,charger = <&max77779_chg>;
