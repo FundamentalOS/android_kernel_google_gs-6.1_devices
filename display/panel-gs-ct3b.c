@@ -1742,7 +1742,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 #ifdef PANEL_FACTORY_BUILD
 		{
 			.mode = {
-				.name = "2152x2076@1:1",
+				.name = "2152x2076x1@1",
 				DRM_MODE_TIMING(1, 2152, 80, 30, 38, 2076, 6, 4, 14),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
@@ -1758,7 +1758,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 		},
 		{
 			.mode = {
-				.name = "2152x2076@10:10",
+				.name = "2152x2076x10@10",
 				DRM_MODE_TIMING(10, 2152, 80, 30, 38, 2076, 6, 4, 14),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
@@ -1774,7 +1774,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 		},
 		{
 			.mode = {
-				.name = "2152x2076@30:30",
+				.name = "2152x2076x30@30",
 				DRM_MODE_TIMING(30, 2152, 80, 30, 38, 2076, 6, 4, 14),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
@@ -1791,7 +1791,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 #endif
 		{
 			.mode = {
-				.name = "2152x2076@60:60",
+				.name = "2152x2076x60@60",
 				DRM_MODE_TIMING(60, 2152, 80, 30, 38, 2076, 6, 4, 14),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
@@ -1809,7 +1809,7 @@ static const struct gs_panel_mode_array ct3b_modes = {
 		},
 		{
 			.mode = {
-				.name = "2152x2076@120:120",
+				.name = "2152x2076x120@120",
 				DRM_MODE_TIMING(120, 2152, 80, 30, 38, 2076, 6, 4, 14),
 				.flags = DRM_MODE_FLAG_BTS_OP_RATE,
 				.width_mm = WIDTH_MM,
@@ -1829,10 +1829,9 @@ static const struct gs_panel_mode_array ct3b_modes = {
 		/* VRR modes */
 		{
 			.mode = {
-				.name = "2152x2076@120:120",
-				DRM_MODE_TIMING(120, 2152, 80, 30, 38, 2076, 6, 4, 14),
-				.flags = DRM_MODE_FLAG_TE_FREQ_X1,
-				.type = DRM_MODE_TYPE_VRR | DRM_MODE_TYPE_PREFERRED,
+				.name = "2152x2076x120@120",
+				DRM_VRR_MODE_TIMING(120, 120, 2152, 80, 30, 38, 2076, 6, 4, 14),
+				.type = DRM_MODE_TYPE_PREFERRED,
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
 			},
@@ -1855,7 +1854,7 @@ static const struct gs_panel_mode_array ct3b_lp_mode = {
 	.modes = {
 		{
 			.mode = {
-				.name = "2152x2076@30:30",
+				.name = "2152x2076x30@30",
 				DRM_MODE_TIMING(30, 2152, 80, 32, 36, 2076, 6, 4, 14),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,

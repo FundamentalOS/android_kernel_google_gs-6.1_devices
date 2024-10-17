@@ -693,7 +693,7 @@ static const struct gs_panel_mode_array ct3d_modes = {
 	.modes = {
 		{
 			.mode = {
-				.name = "1080x2424@60:60",
+				.name = "1080x2424x60@60",
 				DRM_MODE_TIMING(60, 1080, 32, 12, 16, 2424, 12, 4, 15),
 				/* aligned to bootloader setting */
 				.type = DRM_MODE_TYPE_PREFERRED,
@@ -715,7 +715,7 @@ static const struct gs_panel_mode_array ct3d_modes = {
 		},
 		{
 			.mode = {
-				.name = "1080x2424@120:120",
+				.name = "1080x2424x120@120",
 				DRM_MODE_TIMING(120, 1080, 32, 12, 16, 2424, 12, 4, 15),
 				.width_mm = WIDTH_MM,
 				.height_mm = HEIGHT_MM,
@@ -741,7 +741,7 @@ static const struct gs_panel_mode_array ct3d_lp_modes = {
 	.modes = {
 		{
 			.mode = {
-				.name = "1080x2424@30:30",
+				.name = "1080x2424x30@30",
 				DRM_MODE_TIMING(30, 1080, 32, 12, 16, 2424, 12, 4, 15),
 				.type = DRM_MODE_TYPE_DRIVER,
 				.width_mm = WIDTH_MM,
