@@ -53,7 +53,7 @@
 	batoilo2_wlc_trig_lvl = <5200>;
 	batoilo_trig_lvl = <5200>;
 	batoilo2_trig_lvl = <7000>;
-	batoilo_otg_bat_open_to = <0x8>;    /* 36ms */
+	batoilo_otg_bat_open_to = <0x0>;    /* Disabled */
 	batoilo_bat_open_to = <0x8>;    /* 36ms */
 	batoilo2_bat_open_to = <0x3>;   /* 12ms */
 	batoilo_rel = <0x3>;   /* 10ms */
