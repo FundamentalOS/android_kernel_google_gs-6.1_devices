@@ -80,5 +80,8 @@ max77779,config {
 			/* 0x00CA */	0xC8FF	/* nThermCfg */
 			/* 0x009D */	0xCEA4	/* nFilterCfg */
 		>;
+		max77779,fg_n_regval = /bits/ 16 <
+			0xB7 0x2341	/* nConvgCfg */
+		>;
 	};
 };
