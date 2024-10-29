@@ -92,7 +92,7 @@ static const u8 test_key_disable[] = { 0xF0, 0xA5, 0xA5 };
 static const u8 pixel_off[] = { 0x22 };
 
 static const struct gs_dsi_cmd ct3e_off_cmds[] = {
-	GS_DSI_DELAY_CMD(MIPI_DCS_SET_DISPLAY_OFF),
+	GS_DSI_CMD(MIPI_DCS_SET_DISPLAY_OFF),
 	GS_DSI_DELAY_CMD(120, MIPI_DCS_ENTER_SLEEP_MODE),
 };
 static DEFINE_GS_CMDSET(ct3e_off);
