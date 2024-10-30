@@ -64,6 +64,13 @@
 				cpu1_cluster = <4>;
 				cpu2_cluster = <8>;
 
+				irq_config {
+					irq,uvlo1;
+					irq,uvlo2;
+					irq,batoilo;
+					irq,smpl_warn;
+				};
+
 				main_limit {
 					pmic = "main_limit";
 					ch1 { setting = <252>; };
