@@ -109,6 +109,7 @@
 		vdd-supply = <&m_ldo25_reg>;
 		avdd-supply = <&m_ldo26_reg>;
 		reg = <0>;
+		goog,dev-id = <1>;
 		goog,offload-device-name = "fts_ext"; /* append after "touch_offload_" */
 		goog,tbn-enabled;
 		goog,offload-enabled;
