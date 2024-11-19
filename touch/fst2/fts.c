@@ -1406,7 +1406,7 @@ static int fts_init_sensing(struct fts_ts_info *info)
   *	encountered
   */
 
-static int fts_chip_init(struct fts_ts_info *info)
+static int fts_chip_init(struct fts_ts_info *info, bool skip_init_sensing)
 {
 	int res = OK;
 	int i = 0;
@@ -1430,11 +1430,13 @@ static int fts_chip_init(struct fts_ts_info *info)
 				__func__, res);
 	}
 
-	pr_info("%s: [3]: TOUCH INIT..\n", __func__);
-	res = fts_init_sensing(info);
-	if (res != OK) {
-		pr_err("%s: [3]: TOUCH INIT FAILED.. res = %d\n", __func__, res);
-		return res;
+	if (skip_init_sensing == false) {
+		pr_info("%s: [3]: TOUCH INIT..\n", __func__);
+		res = fts_init_sensing(info);
+		if (res != OK) {
+			pr_err("%s: [3]: TOUCH INIT FAILED.. res = %d\n", __func__, res);
+			return res;
+		}
 	}
 
 	return res;
@@ -1452,7 +1454,7 @@ static void flash_update_auto(struct work_struct *work)
 						     work);
 	struct fts_ts_info *info = container_of(fwu_work, struct fts_ts_info,
 						fwu_work);
-	fts_chip_init(info);
+	fts_chip_init(info, false);
 
 }
 #endif
@@ -1622,6 +1624,7 @@ exit:
 
 /**
   * Configure a GPIO according to the parameters
+  * @param info struct fts_ts_info
   * @param gpio gpio number
   * @param config if true, the gpio is set up otherwise it is free
   * @param dir direction of the gpio, 0 = in, 1 = out
@@ -1630,7 +1633,7 @@ exit:
   * return error code
   */
 
-static int fts_gpio_setup(int gpio, bool config, int dir, int state)
+static int fts_gpio_setup(struct fts_ts_info *info, int gpio, bool config, int dir, int state)
 {
 	int ret_val = 0;
 	unsigned char buf[16];
@@ -1638,7 +1641,7 @@ static int fts_gpio_setup(int gpio, bool config, int dir, int state)
 	if (config) {
 		scnprintf(buf, 16, "fts_gpio_%u\n", gpio);
 
-		ret_val = gpio_request(gpio, buf);
+		ret_val = devm_gpio_request(info->dev, gpio, buf);
 		if (ret_val) {
 			pr_err("%s: Failed to get gpio %d (code: %d)",
 				__func__, gpio, ret_val);
@@ -1654,8 +1657,7 @@ static int fts_gpio_setup(int gpio, bool config, int dir, int state)
 				__func__, gpio);
 			return ret_val;
 		}
-	} else
-		gpio_free(gpio);
+	}
 
 	return ret_val;
 }
@@ -1670,14 +1672,14 @@ static int fts_set_gpio(struct fts_ts_info *info)
 	int ret_val;
 	struct fts_hw_platform_data *bdata = info->board;
 
-	ret_val = fts_gpio_setup(bdata->irq_gpio, true, 0, 0);
+	ret_val = fts_gpio_setup(info, bdata->irq_gpio, true, 0, 0);
 	if (ret_val < 0) {
 		pr_err("%s: Failed to configure irq GPIO\n", __func__);
 		goto err_gpio_irq;
 	}
 
 	if (bdata->reset_gpio >= 0) {
-		ret_val = fts_gpio_setup(bdata->reset_gpio, true, 1, 0);
+		ret_val = fts_gpio_setup(info, bdata->reset_gpio, true, 1, 0);
 		if (ret_val < 0) {
 			pr_err("%s: Failed to configure reset GPIO\n", __func__);
 			goto err_gpio_reset;
@@ -1692,7 +1694,7 @@ static int fts_set_gpio(struct fts_ts_info *info)
 	return OK;
 
 err_gpio_reset:
-	fts_gpio_setup(bdata->irq_gpio, false, 0, 0);
+	fts_gpio_setup(info, bdata->irq_gpio, false, 0, 0);
 	bdata->reset_gpio = GPIO_NOT_DEFINED;
 err_gpio_irq:
 	return ret_val;
@@ -2040,7 +2042,7 @@ static int fts_probe(struct spi_device *client)
 		pr_err("%s: Cannot create /proc filenode..\n", __func__);
 
 #if defined(FW_UPDATE_ON_PROBE) && defined(FW_H_FILE)
-	ret_val = fts_chip_init(info);
+	ret_val = fts_chip_init(info, false);
 	if (ret_val < OK) {
 		pr_err("%s: Flashing FW/Production Test/Touch Init Failed..\n",
 			__func__);
@@ -2056,10 +2058,7 @@ static int fts_probe(struct spi_device *client)
 	}
 	INIT_DELAYED_WORK(&info->fwu_work, flash_update_auto);
 #endif
-#ifndef FW_UPDATE_ON_PROBE
-	queue_delayed_work(info->fwu_workqueue, &info->fwu_work,
-			   msecs_to_jiffies(1000));
-#endif
+
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 	if (system_info.u8_scr_tx_len > 0 && system_info.u8_scr_rx_len > 0) {
 		info->mutual_data_size =
@@ -2088,8 +2087,16 @@ static int fts_probe(struct spi_device *client)
 			goto probe_error_exit_6;
 		}
 	} else {
-		pr_err("%s: Incorrect system information ForceLen=%d SenseLen=%d.\n",
+		/*
+		 * Somehow FW was corrupt because of unexpected TX#/RX#. Try to resolve this by
+		 * forcing FW update and defer the driver probe.
+		 */
+		pr_warn("%s: Force FW update because of unexcepted TX#=%d RX#=%d.\n",
 			__func__, system_info.u8_scr_tx_len, system_info.u8_scr_rx_len);
+		error = -EPROBE_DEFER;
+		ret_val = fts_chip_init(info, true);
+		if (ret_val < OK)
+			pr_err("FW update failed to correct the system info.");
 		goto probe_error_exit_6;
 	}
 
@@ -2114,6 +2121,12 @@ static int fts_probe(struct spi_device *client)
 #endif
 
 	pr_info("%s: Probe Finished!\n", __func__);
+
+#ifndef FW_UPDATE_ON_PROBE
+	queue_delayed_work(info->fwu_workqueue, &info->fwu_work,
+			   msecs_to_jiffies(1000));
+#endif
+
 	return OK;
 #if IS_ENABLED(CONFIG_GOOG_TOUCH_INTERFACE)
 probe_error_exit_7:
