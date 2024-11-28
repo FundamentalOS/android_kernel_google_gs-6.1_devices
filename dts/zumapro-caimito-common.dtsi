@@ -31,5 +31,5 @@
 #include "zumapro-caimito-usecases.dtsi"
 #include "zumapro/zumapro-cp-s5400-thermal-zone.dtsi"
 #include "zumapro-caimito-sbbm.dtsi"
-#include "zumapro-caimito-dma-heap.dtsi"
 #include "zuma/gs101-faceauth-dma-heap.dtsi"
+#include "zumapro/zumapro-16kb-dma-heap.dtsi"
