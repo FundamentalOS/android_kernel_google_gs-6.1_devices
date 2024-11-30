@@ -77,6 +77,8 @@
 		cirrus,redc-default = <0x68000>;	/* 13 Ohm */
 		cirrus,pm-active-timeout-ms = <5>;
 
+		google,reset-recovery-enable;
+
 		status = "okay";
 		cs40l26_codec: cs40l26_codec@snd {
 			#sound-dai-cells = <1>;
