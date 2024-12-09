@@ -102,6 +102,9 @@ CONFIG_PINCTRL_SLG51002=m
 # private/google-modules/soc/gs/drivers/power/Kconfig
 CONFIG_DEBUG_REBOOT=m
 
+# private/google-modules/soc/gs/drivers/pwm/Kconfig
+CONFIG_PWM_EXYNOS=m
+
 # private/google-modules/soc/gs/drivers/regulator/Kconfig
 CONFIG_REGULATOR_S2MPG12=m
 CONFIG_REGULATOR_S2MPG13=m
