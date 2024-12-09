@@ -42,6 +42,8 @@ source "$(KCONFIG_SOC_GS_PREFIX)drivers/pinctrl/Kconfig"
 
 source "$(KCONFIG_SOC_GS_PREFIX)drivers/power/Kconfig"
 
+source "$(KCONFIG_SOC_GS_PREFIX)drivers/pwm/Kconfig"
+
 source "$(KCONFIG_SOC_GS_PREFIX)drivers/regulator/Kconfig"
 
 source "$(KCONFIG_SOC_GS_PREFIX)drivers/rtc/Kconfig"
