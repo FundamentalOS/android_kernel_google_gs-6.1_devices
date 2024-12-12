@@ -37,6 +37,11 @@
 		fp-gpio-irq = <&gpa7 3 GPIO_ACTIVE_HIGH>;
 		fp-gpio-reset = <&gpp1 0 GPIO_ACTIVE_LOW>;
 	};
+
+	fps_touch_handler: fps_touch_handler {
+		status = "okay";
+		compatible = "google,fps-touch-handler";
+	};
 };
 
 &s_ldo15_reg {
