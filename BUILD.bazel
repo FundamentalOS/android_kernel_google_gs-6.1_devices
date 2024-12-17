@@ -17,6 +17,8 @@ load("//private/devices/google/common/kleaf:create_file.bzl", "create_file")
 load("//private/devices/google/gs201:constants.bzl", "GS201_DTBS", "GS201_MODULE_OUTS")
 load(":constants.bzl", "TANGORPRO_DTBOS", "TANGORPRO_MODULE_OUTS")
 
+exports_files(["tangorpro_defconfig"])
+
 kernel_build_config(
     name = "build_config",
     srcs = [
@@ -69,7 +71,7 @@ kernel_build(
     ] + [
         "gs201/{}".format(dtb)
         for dtb in GS201_DTBS
-    ] + TANGORPRO_DTBOS,
+    ],
     base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
@@ -83,6 +85,22 @@ kernel_build(
     ],
     module_outs = GS201_MODULE_OUTS + TANGORPRO_MODULE_OUTS,
     strip_modules = True,
+)
+
+kernel_build(
+    name = "_dtbos",
+    srcs = [":kernel_sources"],
+    outs = TANGORPRO_DTBOS,
+    base_kernel = "//common:kernel_aarch64",
+    build_config = ":build_config",
+    dtstree = ":dtstree",
+    make_goals = ["dtbs"],
+)
+
+filegroup(
+    name = "dtbos",
+    srcs = [":_dtbos/" + dtbo for dtbo in TANGORPRO_DTBOS],
+    visibility = ["//private/devices/google/gs201:__subpackages__"],
 )
 
 kernel_module_group(
@@ -106,6 +124,7 @@ kernel_module_group(
         "//private/google-modules/uwb/qorvo/dw3000/kernel:uwb.dw3000",
         "//private/google-modules/wlan/dhd43752p:synadhd",
     ],
+    visibility = ["//private/devices/google/gs201:__subpackages__"],
 )
 
 kernel_modules_install(
@@ -188,7 +207,7 @@ kernel_images(
     build_system_dlkm = True,
     build_vendor_dlkm = True,
     build_vendor_kernel_boot = True,
-    dtbo_srcs = [":kernel/" + dtbo for dtbo in TANGORPRO_DTBOS],
+    dtbo_srcs = [":dtbos"],
     kernel_build = ":kernel",
     kernel_modules_install = ":kernel_modules_install",
     modules_list = ":vendor_ramdisk_modules_list",
@@ -207,6 +226,7 @@ copy_to_dist_dir(
     name = "dist",
     data = [
         # keep sorted
+        ":dtbos",
         ":insmod_cfgs",
         ":kernel",
         ":kernel_images",
