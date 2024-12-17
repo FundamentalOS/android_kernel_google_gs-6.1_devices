@@ -68,4 +68,4 @@ endef
 # overlays. For the base dtbs, kbuild will expose the symbols as needed for the
 # overlays. Additionally, kbuild will statically apply the overlay to the base
 # dtb which could be used to verify the overlay applies cleanly.
-$(call multi_dtbs_overlay, $(gs201_dtbs), $(gs201_overlays), $(CONFIG_SOC_GS201))
+$(call multi_dtbs_overlay, $(gs201_dtbs), $(gs201_overlays), y)
