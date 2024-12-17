@@ -3,6 +3,7 @@
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load(
     "//build/kernel/kleaf:kernel.bzl",
+    "kernel_abi",
     "kernel_build",
     "kernel_build_config",
     "kernel_dtstree",
@@ -15,7 +16,7 @@ load(
 )
 load("//private/devices/google/common:constants.bzl", "PIXEL_GKI_MODULES_LIST")
 load("//private/devices/google/common/kleaf:create_file.bzl", "create_file")
-load(":constants.bzl", "GS201_DTBS", "GS201_MODULE_OUTS")
+load(":constants.bzl", "GS201_DEVICE_MODULE_OUTS", "GS201_DTBS", "GS201_MODULE_OUTS")
 
 package(
     default_visibility = [
@@ -52,6 +53,18 @@ filegroup(
 )
 
 filegroup(
+    name = "devices_defconfig_fragments",
+    srcs = [
+        # do not sort
+        ":defconfig_fragments",
+        "//private/devices/google/felix:felix_defconfig",
+        "//private/devices/google/lynx:lynx_defconfig",
+        "//private/devices/google/pantah:pantah_defconfig",
+        "//private/devices/google/tangorpro:tangorpro_defconfig",
+    ],
+)
+
+filegroup(
     name = "kernel_sources",
     srcs = [
         # keep sorted
@@ -61,7 +74,10 @@ filegroup(
         "//private/google-modules/display/samsung:display.samsung.kconfig",
         "//private/google-modules/power/mitigation:bcl.kconfig",
         "//private/google-modules/power/reset:reset.kconfig",
+        "//private/google-modules/radio/samsung/s5300:cpif.kconfig",
         "//private/google-modules/soc/gs:gs_soc.kconfig",
+        "//private/google-modules/touch/common:touch.common.kconfig",
+        "//private/google-modules/touch/sec:sec.kconfig",
         "//private/google-modules/trusty:trusty.kconfig",
     ],
 )
@@ -75,15 +91,24 @@ kernel_build(
     base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
-    defconfig_fragments = [":defconfig_fragments"],
+    defconfig_fragments = [":devices_defconfig_fragments"],
     dtstree = ":dtstree",
     kconfig_ext = ":kconfig_ext",
+    kmi_symbol_list = "//common:android/abi_gki_aarch64_pixel",
     make_goals = [
         "modules",
         "dtbs",
     ],
-    module_outs = GS201_MODULE_OUTS,
+    module_outs = GS201_MODULE_OUTS + GS201_DEVICE_MODULE_OUTS,
     strip_modules = True,
+)
+
+kernel_abi(
+    name = "gs201_abi",
+    kernel_build = ":kernel",
+    kernel_modules = [":kernel_ext_device_modules"],
+    kmi_symbol_list_add_only = True,
+    module_grouping = False,
 )
 
 kernel_module(
@@ -275,27 +300,51 @@ kernel_module_group(
     ],
 )
 
+# Extra modules needed for some (but not all) devices, to be loaded after
+# common ones. Separate so <device> builds can exclude them.
+kernel_module_group(
+    name = "kernel_ext_device_modules",
+    srcs = [
+        # FIXME: SoC modules need to be loaded first or the device will crash.
+        #        Module dependencies should not rely on the order. This needs be fixed.
+        ":kernel_ext_modules",
+        "//private/devices/google/felix:kernel_ext_modules",
+        "//private/devices/google/lynx:kernel_ext_modules",
+        "//private/devices/google/pantah:kernel_ext_modules",
+        "//private/devices/google/tangorpro:kernel_ext_modules",
+    ],
+)
+
 kernel_modules_install(
     name = "kernel_modules_install",
     kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+    kernel_modules = [":kernel_ext_device_modules"],
 )
 
 kernel_unstripped_modules_archive(
     name = "kernel_unstripped_modules_archive",
     kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+    kernel_modules = [":kernel_ext_device_modules"],
 )
 
 merged_kernel_uapi_headers(
     name = "merged_kernel_uapi_headers",
     kernel_build = ":kernel",
-    kernel_modules = [":kernel_ext_modules"],
+    kernel_modules = [":kernel_ext_device_modules"],
+)
+
+filegroup(
+    name = "vendor_ramdisk_modules_list",
+    srcs = ["vendor_ramdisk.modules.gs201"],
 )
 
 create_file(
-    name = "vendor_ramdisk_modules_list",
-    srcs = ["vendor_ramdisk.modules.gs201"],
+    name = "vendor_ramdisk_device_modules_list",
+    srcs = [
+        # do not sort
+        ":vendor_ramdisk_modules_list",
+        "vendor_ramdisk.modules.devices",
+    ],
     out = "vendor_ramdisk.modules",
 )
 
@@ -314,14 +363,31 @@ create_file(
 
 create_file(
     name = "vendor_dlkm_modules_list",
-    out = "vendor_dlkm.modules",
+    out = "vendor_dlkm.modules.gs201",
     # The list is used to filter modules with `grep -w`.
     content = ["^kernel/" + m for m in GS201_MODULE_OUTS] + ["^extra/.*"],
 )
 
 create_file(
+    name = "vendor_dlkm_device_modules_list",
+    srcs = [":vendor_dlkm_modules_list"],
+    out = "vendor_dlkm.modules",
+    # The list is used to filter modules with `grep -w`.
+    content = ["^kernel/" + m for m in GS201_DEVICE_MODULE_OUTS] + ["^extra/.*"],
+)
+
+filegroup(
     name = "vendor_dlkm_modules_blocklist",
     srcs = ["vendor_dlkm.blocklist.gs201"],
+)
+
+create_file(
+    name = "vendor_dlkm_device_modules_blocklist",
+    srcs = [
+        # do not sort
+        ":vendor_dlkm_modules_blocklist",
+        "vendor_dlkm.blocklist.devices",
+    ],
     out = "vendor_dlkm.blocklist",
 )
 
@@ -331,40 +397,75 @@ create_file(
     out = "vendor_dlkm.props",
 )
 
+filegroup(
+    name = "dtbos",
+    srcs = [
+        "//private/devices/google/felix:dtbos",
+        "//private/devices/google/lynx:dtbos",
+        "//private/devices/google/pantah:dtbos",
+        "//private/devices/google/tangorpro:dtbos",
+    ],
+)
+
 kernel_images(
     name = "kernel_images",
     base_kernel_images = "//common:kernel_aarch64_images",
+    boot_image_outs = ["dtb.img"],
+    build_boot = False,
+    build_dtbo = True,
     build_initramfs = True,
     build_system_dlkm = True,
     build_vendor_dlkm = True,
+    build_vendor_kernel_boot = True,
+    dedup_dlkm_modules = True,
+    dtbo_srcs = [":dtbos"],
     kernel_build = ":kernel",
     kernel_modules_install = ":kernel_modules_install",
-    modules_list = ":vendor_ramdisk_modules_list",
+    modules_list = ":vendor_ramdisk_device_modules_list",
     ramdisk_compression = "lz4",
     system_dlkm_modules_list = ":system_dlkm_modules_list",
     system_dlkm_props = ":system_dlkm_props",
     vendor_dlkm_archive = True,
-    vendor_dlkm_modules_blocklist = ":vendor_dlkm_modules_blocklist",
-    vendor_dlkm_modules_list = ":vendor_dlkm_modules_list",
+    vendor_dlkm_etc_files = [":insmod_cfgs"],
+    vendor_dlkm_modules_blocklist = ":vendor_dlkm_device_modules_blocklist",
+    vendor_dlkm_modules_list = ":vendor_dlkm_device_modules_list",
     vendor_dlkm_props = ":vendor_dlkm_props",
     deps = ["//private/devices/google/common:sepolicy"],
+)
+
+filegroup(
+    name = "insmod_cfgs",
+    srcs = glob([
+        "insmod_cfg/*.cfg",
+    ]),
 )
 
 copy_to_dist_dir(
     name = "dist",
     data = [
         # keep sorted
+        ":dtbos",
+        ":insmod_cfgs",
         ":kernel",
         ":kernel_images",
         ":kernel_modules_install",
         ":kernel_unstripped_modules_archive",
         ":merged_kernel_uapi_headers",
+        "//common:android/abi_gki_aarch64_pixel",
         "//common:kernel_aarch64",
         "//common:kernel_aarch64_gki_boot_image",
         "//common:kernel_aarch64_headers",
         "//private/devices/google/common:kernel_gki_modules",
-    ],
+    ] + select({
+        "//private/devices/google/common:enable_download_fips140": ["@gki_prebuilt_fips140//fips140.ko"],
+        "//private/devices/google/common:disable_download_fips140": [],
+    }),
     dist_dir = "out/gs201/dist",
     flat = True,
     log = "info",
+)
+
+alias(
+    name = "gs201_dist",
+    actual = ":dist",
 )
