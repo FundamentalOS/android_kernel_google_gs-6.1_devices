@@ -33,6 +33,20 @@
 					50   0
 				>;
 
+				google,aact-cv-limits = <4100000 4400000>;
+				google,aact-temp-limits = <80 170 200 430 530>;
+				google,chg-aact-ecc = <0 1000>;
+				google,aact-cc-limits = <
+					25  25
+					50  50
+					50  50
+					50   0
+					25  25
+					45  45
+					45  45
+					45   0
+				>;
+
 				/* bpst */
 				google,bpst-enable;
 				google,bpst-chg-rate = <50>;
