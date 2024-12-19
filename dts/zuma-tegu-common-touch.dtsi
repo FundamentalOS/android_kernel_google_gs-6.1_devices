@@ -99,7 +99,7 @@
 		synaptics,spi-byte-delay-us = <0>;
 		synaptics,spi-block-delay-us = <0>;
 
-		//goog,coord-filter-enabled;
+		goog,coord-filter-enabled;
 		goog,tbn-enabled;
 		goog,manual-heatmap-from-irq;
 		goog,v4l2-enabled;
