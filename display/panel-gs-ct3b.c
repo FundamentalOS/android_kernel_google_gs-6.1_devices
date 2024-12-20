@@ -1159,6 +1159,7 @@ static int ct3b_enable(struct drm_panel *panel)
 	struct gs_panel *ctx = container_of(panel, struct gs_panel, base);
 	struct ct3b_panel *spanel = to_spanel(ctx);
 	const struct gs_panel_mode *pmode = ctx->current_mode;
+	const bool needs_reset = !gs_is_panel_enabled(ctx);
 
 	if (!pmode) {
 		dev_err(ctx->dev, "no current mode set\n");
@@ -1169,7 +1170,9 @@ static int ct3b_enable(struct drm_panel *panel)
 
 	PANEL_ATRACE_BEGIN(__func__);
 
-	gs_panel_reset_helper(ctx);
+	if (needs_reset)
+		gs_panel_reset_helper(ctx);
+
 	gs_panel_send_cmdset(ctx, &ct3b_init_cmdset);
 	ct3b_update_panel_feat(ctx, true);
 
