@@ -35,6 +35,8 @@
 				batoilo_lower = <3800>;
 				batoilo_upper = <6800>;
 				batoilo_trig_lvl = <5000>;
+				batoilo_usb_trig_lvl = <4800>;
+				batoilo_otg_trig_lvl = <4800>;
 				batoilo_det = <0x1>;   /* 30us */
 				uvlo1_det = <0x0>;   /* 0us */
 				uvlo2_det = <0x0>;   /* 0us */
@@ -44,6 +46,7 @@
 				cpu0_cluster = <0>;
 				cpu1_cluster = <4>;
 				cpu2_cluster = <6>;
+				usb_otg_conf;
 
 				irq_config {
 					irq,uvlo1;
