@@ -4,7 +4,12 @@
 # Copyright (C) Google LLC, 2022
 # Author: Will McVicker (willmcvicker@google.com)
 
-GKI_REMOTE="aosp"
+BUILD_ON_BUILD_BOT=`echo ${DIST_DIR} | grep \/buildbot\/`
+if [ -z "$BUILD_ON_BUILD_BOT" ]; then
+  GKI_REMOTE="aosp"
+else
+  GKI_REMOTE="android"
+fi
 GKI_SHA=`repo --color=never info aosp | grep "Manifest revision" | sed 's/Manifest revision: //g'`
 GKI_BRANCH="android14-6.1" # Need to push symbol list changes to the main ACK branch (not release branches)
 GKI_STAGING_REMOTE="partner-common"
