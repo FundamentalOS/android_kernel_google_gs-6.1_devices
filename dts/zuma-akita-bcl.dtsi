@@ -50,6 +50,8 @@
 				batoilo_lower = <3800>;
 				batoilo_upper = <6800>;
 				batoilo_trig_lvl = <5000>;
+				batoilo_usb_trig_lvl = <4800>;
+				batoilo_otg_trig_lvl = <4800>;
 				irq_enable_delay = <50>;
 				odpm_ratio = <3>;
 				gpios = <&gpa9 5 0>,		/* VDROOP1 */
@@ -63,6 +65,7 @@
 				cpu0_cluster = <0>;
 				cpu1_cluster = <4>;
 				cpu2_cluster = <8>;
+				usb_otg_conf;
 
 				irq_config {
 					irq,uvlo1;
