@@ -70,10 +70,7 @@ kernel_build(
     srcs = [":kernel_sources"],
     outs = [
         ".config",
-    ] + [
-        "gs201/{}".format(dtb)
-        for dtb in GS201_DTBS
-    ],
+    ] + PANTAH_DTBOS + GS201_DTBS,
     base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
@@ -89,19 +86,9 @@ kernel_build(
     strip_modules = True,
 )
 
-kernel_build(
-    name = "_dtbos",
-    srcs = [":kernel_sources"],
-    outs = PANTAH_DTBOS,
-    base_kernel = "//common:kernel_aarch64",
-    build_config = ":build_config",
-    dtstree = ":dtstree",
-    make_goals = ["dtbs"],
-)
-
 filegroup(
     name = "dtbos",
-    srcs = ["_dtbos/" + dtbo for dtbo in PANTAH_DTBOS],
+    srcs = [":kernel/" + dtbo for dtbo in PANTAH_DTBOS],
     visibility = ["//private/devices/google/gs201:__subpackages__"],
 )
 
@@ -201,7 +188,6 @@ filegroup(
 kernel_images(
     name = "kernel_images",
     base_kernel_images = "//common:kernel_aarch64_images",
-    # TODO: b/362627953 - Remove dtb.img
     boot_image_outs = [
         "dtb.img",
         "vendor_kernel_boot.img",
@@ -230,7 +216,6 @@ copy_to_dist_dir(
     name = "dist",
     data = [
         # keep sorted
-        ":dtbos",
         ":insmod_cfgs",
         ":kernel",
         ":kernel_images",
