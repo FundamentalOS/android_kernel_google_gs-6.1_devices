@@ -3,6 +3,7 @@
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load(
     "//build/kernel/kleaf:kernel.bzl",
+    "dtb_image",
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
@@ -87,6 +88,12 @@ kernel_build(
     ],
     module_outs = GS101_MODULE_OUTS,
     strip_modules = True,
+)
+
+dtb_image(
+    name = "dtb_image",
+    srcs = [":kernel/" + dtb for dtb in GS101_DTBS],
+    out = "dtb.img",
 )
 
 kernel_build(
@@ -210,6 +217,7 @@ copy_to_dist_dir(
     name = "dist",
     data = [
         # keep sorted
+        ":dtb_image",
         ":dtbos",
         ":insmod_cfgs",
         ":kernel",
