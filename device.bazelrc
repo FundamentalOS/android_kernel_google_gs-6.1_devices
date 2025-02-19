@@ -11,8 +11,8 @@ build --flag_alias=download_prebuilt_gki_fips140=//private/devices/google/common
 build --action_env=KLEAF_DOWNLOAD_BUILD_NUMBER_MAP="gki_prebuilts=13005711,gki_prebuilts_aarch64_16k=13005711"
 
 # Use prebuilt GKI
-# build --use_prebuilt_gki=true
-# build --use_signed_prebuilts
+build --use_prebuilt_gki=true
+build --use_signed_prebuilts=true
 
 # Use prebuilt fips140.ko
 build --download_prebuilt_gki_fips140=true
@@ -36,6 +36,7 @@ build:kunit --//private/devices/google/common:kunit
 # Build 16k page size kernel
 build:16k --page_size=16k
 build:16k --download_prebuilt_gki_fips140=false
+build:16k --use_signed_prebuilts=false
 
 # For compatibility only. Do no introduce new usage of these configs.
 # Use --kernel_package directly.
