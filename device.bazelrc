@@ -28,6 +28,8 @@ build:factory --//private/devices/google/common:factory
 build:testing --notrim
 build:testing --gcov
 build:testing --//private/devices/google/common:kunit
+build:testing --use_prebuilt_gki=false
+build:testing --use_signed_prebuilts=false
 
 # Build kunit modules
 build:kunit --notrim
@@ -41,8 +43,14 @@ build:16k --use_signed_prebuilts=false
 # For compatibility only. Do no introduce new usage of these configs.
 # Use --kernel_package directly.
 build:aosp_staging --kernel_package=@//aosp-staging
+build:aosp_staging --use_prebuilt_gki=false
+build:aosp_staging --use_signed_prebuilts=false
 build:use_source_tree_aosp --kernel_package=@//aosp
+build:use_source_tree_aosp --use_prebuilt_gki=false
+build:use_source_tree_aosp --use_signed_prebuilts=false
 build:use_source_tree_aosp_staging --kernel_package=@//aosp-staging
+build:use_source_tree_aosp_staging --use_prebuilt_gki=false
+build:use_source_tree_aosp_staging --use_signed_prebuilts=false
 # Use --config=testing or --config=kunit.
 build:pixel_kunit --config=kunit
 # Use --download_prebuilt_gki_fips140 directly.
