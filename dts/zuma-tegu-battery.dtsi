@@ -56,6 +56,18 @@
 		google,cv-tier-switch-cnt = <3>;
 		google,cv-otv-margin = <12000>;
 	};
+
+	google,batt-id-1-atl {
+		google,batt-id = <1>;
+		google,aacr-ref-cycles = <700 800 900 1000>;
+		google,aacr-ref-fade10 = <  8  15  24   33>;
+	};
+
+	google,batt-id-4-lwn {
+		google,batt-id = <4>;
+		google,aacr-ref-cycles = <500 600 700 800 900 1000>;
+		google,aacr-ref-fade10 = <  3   7  18  25  30   39>;
+	};
 };
 
 &max77779_fg {
