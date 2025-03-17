@@ -41,6 +41,9 @@
 		 30    0    0    0    0
 	>;
 
+	google,aacr-config = <1>; /* enabled, no opt out */
+	google,aafv-config = <1>; /* enabled, no opt out */
+
 	/* 90% after 600 cycles, 80% after 1000 cycles */
 	google,aacr-algo = <3>;
 	google,aacr-cliff-capacity-rate = <80>;
