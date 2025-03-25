@@ -174,6 +174,7 @@ CONFIG_BOOKERCI=m
 CONFIG_ETM2DRAM=m
 CONFIG_EXYNOS_GNSS_IF_SPI=m
 CONFIG_GCMA=m
+CONFIG_SMRA=m
 CONFIG_VH_SYSTRACE=m
 CONFIG_PIXEL_EM=m
 CONFIG_PIXEL_METRICS=m
@@ -210,6 +211,7 @@ CONFIG_SERIAL_EXYNOS=m
 
 # private/google-modules/soc/gs/drivers/ufs/Kconfig
 CONFIG_SCSI_UFS_EXYNOS_GS=m
+CONFIG_SCSI_UFS_CRYPTO_SW_KEYS_MODE=y
 CONFIG_SCSI_UFS_PIXEL_FIPS140=m
 
 # private/google-modules/soc/gs/drivers/usb/Kconfig
@@ -254,6 +256,9 @@ CONFIG_DRM_PANEL_SAMSUNG_S6E3HC3=m
 CONFIG_DRM_PANEL_SAMSUNG_S6E3HC3_C10=m
 CONFIG_DRM_PANEL_SAMSUNG_S6E3HC4=m
 CONFIG_DRM_PANEL_BOE_NT37290=m
+
+# private/google-modules/fingerprint/goodix/fps_touch_handler/Kconfig
+CONFIG_FPS_TOUCH_HANDLER=m
 
 # private/google-modules/power/mitigation/Kconfig
 CONFIG_GOOGLE_BCL=m
