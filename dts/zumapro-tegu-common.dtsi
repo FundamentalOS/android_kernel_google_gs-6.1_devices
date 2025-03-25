@@ -26,6 +26,7 @@
 #include "zuma-tegu-usb.dtsi"
 #include "zuma-tegu-typec.dtsi"
 #include "zumapro-tegu-usecases.dtsi"
+#include "zumapro-tegu-sbbm.dtsi"
 
 #include "zuma-tegu-battery.dtsi"
 #include "zuma-tegu-charging.dtsi"
