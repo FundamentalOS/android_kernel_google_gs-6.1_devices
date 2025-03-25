@@ -20,6 +20,7 @@
 #include <linux/of_irq.h>
 #include <linux/platform_device.h>
 #include <linux/power_supply.h>
+#include <linux/reboot.h>
 #include <linux/regulator/consumer.h>
 #include <linux/spinlock.h>
 #include <linux/usb.h>
@@ -323,6 +324,11 @@ struct pogo_transport {
 	bool main_hcd_suspend;
 	bool shared_hcd_suspend;
 
+	/* Register the notifier for reboot events */
+	struct notifier_block reboot_nb;
+	struct mutex reboot_lock;
+	bool rebooting;
+
 	/* To read voltage at the pogo pins */
 	struct power_supply *pogo_psy;
 	/* To read the status exported from pogo accessory charger */
@@ -417,18 +423,26 @@ static void update_extcon_dev(struct pogo_transport *pogo_transport, bool docked
 
 static void ssphy_restart_control(struct pogo_transport *pogo_transport, bool enable)
 {
+	mutex_lock(&pogo_transport->reboot_lock);
+	if (pogo_transport->rebooting) {
+		dev_info(pogo_transport->dev, "ignore ssphy_restart during reboot\n");
+		mutex_unlock(&pogo_transport->reboot_lock);
+		return;
+	}
+
 	if (!pogo_transport->ssphy_restart_votable)
 		pogo_transport->ssphy_restart_votable =
 				gvotable_election_get_handle(SSPHY_RESTART_EL);
 
-	if (IS_ERR_OR_NULL(pogo_transport->ssphy_restart_votable)) {
-		logbuffer_log(pogo_transport->log, "SSPHY_RESTART get failed %ld\n",
-			      PTR_ERR(pogo_transport->ssphy_restart_votable));
+	if (!pogo_transport->ssphy_restart_votable) {
+		logbuffer_log(pogo_transport->log, "SSPHY_RESTART get failed\n");
+		mutex_unlock(&pogo_transport->reboot_lock);
 		return;
 	}
 
 	logbuffer_log(pogo_transport->log, "ssphy_restart_control %u", enable);
 	gvotable_cast_long_vote(pogo_transport->ssphy_restart_votable, POGO_VOTER, enable, enable);
+	mutex_unlock(&pogo_transport->reboot_lock);
 }
 
 /*
@@ -2633,6 +2647,18 @@ static int pogo_transport_udev_notify(struct notifier_block *nb, unsigned long a
 	return NOTIFY_OK;
 }
 
+static int pogo_transport_reboot_notify(struct notifier_block *nb, unsigned long action,
+					void *data)
+{
+	struct pogo_transport *pogo_transport = container_of(nb, struct pogo_transport, reboot_nb);
+
+	mutex_lock(&pogo_transport->reboot_lock);
+	pogo_transport->rebooting = true;
+	mutex_unlock(&pogo_transport->reboot_lock);
+
+	return NOTIFY_OK;
+}
+
 #if IS_ENABLED(CONFIG_DEBUG_FS)
 static int mock_hid_connected_set(void *data, u64 val)
 {
@@ -3041,6 +3067,7 @@ static int pogo_transport_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, pogo_transport);
 
 	spin_lock_init(&pogo_transport->pogo_event_lock);
+	mutex_init(&pogo_transport->reboot_lock);
 
 	pogo_transport->wq = kthread_create_worker(0, "wq-pogo-transport");
 	if (IS_ERR_OR_NULL(pogo_transport->wq)) {
@@ -3200,6 +3227,8 @@ static int pogo_transport_probe(struct platform_device *pdev)
 	register_bus_suspend_callback(usb_bus_suspend_resume, pogo_transport);
 	pogo_transport->udev_nb.notifier_call = pogo_transport_udev_notify;
 	usb_register_notify(&pogo_transport->udev_nb);
+	pogo_transport->reboot_nb.notifier_call = pogo_transport_reboot_notify;
+	register_reboot_notifier(&pogo_transport->reboot_nb);
 	/* run once in case orientation has changed before registering the callback */
 	orientation_changed((void *)pogo_transport);
 	dev_info(&pdev->dev, "force usb:%d\n", modparam_force_usb ? 1 : 0);
@@ -3229,6 +3258,7 @@ static int pogo_transport_remove(struct platform_device *pdev)
 	struct dentry *dentry;
 	int ret;
 
+	unregister_reboot_notifier(&pogo_transport->reboot_nb);
 	usb_unregister_notify(&pogo_transport->udev_nb);
 
 #if IS_ENABLED(CONFIG_DEBUG_FS)
