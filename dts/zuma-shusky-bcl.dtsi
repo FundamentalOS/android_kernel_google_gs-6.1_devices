@@ -20,6 +20,10 @@
 	};
 };
 
+&max77759tcpc {
+	bcl-usb-voting;
+};
+
 / {
 	fragment@battery {
 		target-path = "/";
@@ -49,8 +53,11 @@
 				aur_clkdivstep = <0x1>;
 				batoilo_lower = <3800>;
 				batoilo_upper = <6800>;
+				batoilo_usb_trig_lvl = <4800>;
+				batoilo_otg_trig_lvl = <4800>;
 				batoilo_trig_lvl = <5000>;
 				batoilo_det = <0x1>;   /* 30us */
+				usb_otg_conf;
 				smpl_ctrl = <0xA8>; /* 3.1V, 200mV HYS, 0us Debounce */
 				irq_enable_delay = <50>;
 				odpm_ratio = <3>;
