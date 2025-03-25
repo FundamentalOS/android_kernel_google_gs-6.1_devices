@@ -3,6 +3,7 @@
 load("//build/bazel_common_rules/dist:dist.bzl", "copy_to_dist_dir")
 load(
     "//build/kernel/kleaf:kernel.bzl",
+    "dtb_image",
     "kernel_abi",
     "kernel_build",
     "kernel_build_config",
@@ -16,6 +17,8 @@ load(
 load("//private/devices/google/common/kleaf:create_file.bzl", "create_file")
 load("//private/devices/google/gs101:constants.bzl", "GS101_DTBS", "GS101_MODULE_OUTS")
 load(":constants.bzl", "BLUEJAY_DTBOS")
+
+exports_files(["bluejay_defconfig"])
 
 kernel_build_config(
     name = "build_config",
@@ -71,7 +74,7 @@ kernel_build(
     ] + [
         "gs101/{}".format(dtb)
         for dtb in GS101_DTBS
-    ] + BLUEJAY_DTBOS,
+    ],
     base_kernel = "//common:kernel_aarch64",
     build_config = ":build_config",
     collect_unstripped_modules = True,
@@ -85,6 +88,28 @@ kernel_build(
     ],
     module_outs = GS101_MODULE_OUTS,
     strip_modules = True,
+)
+
+dtb_image(
+    name = "dtb_image",
+    srcs = [":kernel/" + dtb for dtb in GS101_DTBS],
+    out = "dtb.img",
+)
+
+kernel_build(
+    name = "_dtbos",
+    srcs = [":kernel_sources"],
+    outs = BLUEJAY_DTBOS,
+    base_kernel = "//common:kernel_aarch64",
+    build_config = ":build_config",
+    dtstree = ":dtstree",
+    make_goals = ["dtbs"],
+)
+
+filegroup(
+    name = "dtbos",
+    srcs = [":_dtbos/" + dtbo for dtbo in BLUEJAY_DTBOS],
+    visibility = ["//private/devices/google/gs101:__subpackages__"],
 )
 
 kernel_module_group(
@@ -107,6 +132,7 @@ kernel_module_group(
         "//private/google-modules/touch/fts/ftm5_legacy:ftm5",
         "//private/google-modules/wlan/bcm4389:bcmdhd4389",
     ],
+    visibility = ["//private/devices/google/gs101:__subpackages__"],
 )
 
 kernel_modules_install(
@@ -162,7 +188,7 @@ kernel_images(
     build_dtbo = True,
     build_initramfs = True,
     build_vendor_dlkm = True,
-    dtbo_srcs = [":kernel/" + dtbo for dtbo in BLUEJAY_DTBOS],
+    dtbo_srcs = [":dtbos"],
     kernel_build = ":kernel",
     kernel_modules_install = ":kernel_modules_install",
     modules_list = ":vendor_ramdisk_modules_list",
@@ -191,6 +217,8 @@ copy_to_dist_dir(
     name = "dist",
     data = [
         # keep sorted
+        ":dtb_image",
+        ":dtbos",
         ":insmod_cfgs",
         ":kernel",
         ":kernel_images",
