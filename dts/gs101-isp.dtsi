@@ -377,6 +377,7 @@
 			<&sysmmu_csis1>;
 		power-domains = <&pd_pdp>;
 		samsung,iommu-group = <&iommu_group_isp>;
+		lwis,iommu-best-fit-algo;
 		samsung,tzmp = "true";
 	};
 
@@ -736,6 +737,9 @@
 			<&sysmmu_mcsc0>;
 		samsung,iommu-group = <&iommu_group_isp>;
 		samsung,tzmp = "true";
+
+		/* Adjust Thread priority */
+		transaction-thread-priority = <99>;
 	};
 
 	lwis_mcsc: lwis_mcsc@1B760000 {
