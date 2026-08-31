@@ -18,4 +18,6 @@ exec tools/bazel run \
     ${parameters} \
     --config=stamp \
     --config=caimito \
+    --config=use_source_tree_aosp \
+    --notrim \
     //private/devices/google/caimito:zumapro_caimito_dist "$@"
